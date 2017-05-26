@@ -1,0 +1,21 @@
+---
+files:
+  - .gitattributes
+  - CONTRIBUTING.md
+  - Makefile
+  - README.md
+  - md2html.jar
+mh-info: true
+mh-nav: false
+mh-native: true
+mh-css:
+  - main.css
+mh-js:
+  - lazyload.min.js
+  - jquery-3.0.0.min.js
+  - clipboard.min.js
+  - main.js
+generator: pandoc+md2html.jar
+title-prefix:
+#absolute-rootdir-url: http://tangzhixiong.com/md2html
+---

@@ -1,0 +1,2108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- mh-head-head (alias: raw-head) -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="district10" />
+    <meta name="generator" content="md2html" />
+    <title></title>
+    <!-- mh-css-before-cdn -->
+    <!-- mh-css-before -->
+    <!-- mh-css -->
+    <link rel="stylesheet" href="_md2html/main.css" type="text/css" />
+    <!-- mh-css-after-cdn (alias: remote-css )-->
+    <!-- mh-css-after (alias: local-css) -->
+    <!-- mh-css-raw (alias: raw-css) -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+    <!-- mh-head-tail -->
+</head>
+<body id ="md2html-body" class="markdown-body">
+<!-- mh-nav (true/false, default: false) -->
+<!-- body-before -->
+<!-- body (Modify with CAUSION) -->
+<h1 id="prelude">Prelude</h1>
+<blockquote>
+<p>Role models are important. <br> &#8211; Officer Alex J. Murphy / RoboCop</p>
+</blockquote>
+<p>One thing has always bothered me as a Ruby developer&#8212;Python developers have a great programming style reference (<a href="https://www.python.org/dev/peps/pep-0008/">PEP-8</a>) and we never got an official guide, documenting Ruby coding style and best practices. And I do believe that style matters. I also believe that a great hacker community, such as Ruby has, should be quite capable of producing this coveted document.</p>
+<p>This guide started its life as our internal company Ruby coding guidelines (written by yours truly). At some point I decided that the work I was doing might be interesting to members of the Ruby community in general and that the world had little need for another internal company guideline. But the world could certainly benefit from a community-driven and community-sanctioned set of practices, idioms and style prescriptions for Ruby programming.</p>
+<p>Since the inception of the guide I&#8217;ve received a lot of feedback from members of the exceptional Ruby community around the world. Thanks for all the suggestions and the support! Together we can make a resource beneficial to each and every Ruby developer out there.</p>
+<p>By the way, if you&#8217;re into Rails you might want to check out the complementary <a href="https://github.com/bbatsov/rails-style-guide">Ruby on Rails Style Guide</a>.</p>
+<h1 id="the-ruby-style-guide">The Ruby Style Guide</h1>
+<p>This Ruby style guide recommends best practices so that <strong>real-world Ruby programmers</strong> can write code that can be maintained by other real-world Ruby programmers. A style guide that reflects real-world usage gets used, while a style guide that holds to an ideal that has been rejected by the people it is supposed to help risks not getting used at all&#8212;no matter how good it is.</p>
+<p>The guide is separated into several sections of related rules. I&#8217;ve tried to add the rationale behind the rules (if it&#8217;s omitted I&#8217;ve assumed it&#8217;s pretty obvious).</p>
+<p>I didn&#8217;t come up with all the rules out of nowhere&#8212;they are mostly based on my extensive career as a professional software engineer, feedback and suggestions from members of the Ruby community and various highly regarded Ruby programming resources, such as <a href="https://pragprog.com/book/ruby4/programming-ruby-1-9-2-0">&#8220;Programming Ruby&#8221;</a> and <a href="http://www.amazon.com/Ruby-Programming-Language-David-Flanagan/dp/0596516177">&#8220;The Ruby Programming Language&#8221;</a>.</p>
+<p>There are some areas in which there is no clear consensus in the Ruby community regarding a particular style (like string literal quoting, spacing inside hash literals, dot position in multi-line method chaining, etc.). In such scenarios all popular styles are acknowledged and it&#8217;s up to you to pick one and apply it consistently.</p>
+<p>This style guide evolves over time as additional conventions are identified and past conventions are rendered obsolete by changes in Ruby itself.</p>
+<p>Many projects have their own coding style guidelines (often derived from this guide). In the event of any conflicts, such project-specific guides take precedence for that project.</p>
+<p>You can generate a PDF or an HTML copy of this guide using <a href="http://pandoc.org/">Pandoc</a>.</p>
+<p><a href="https://github.com/bbatsov/rubocop">RuboCop</a> is a code analyzer, based on this style guide.</p>
+<p>Translations of the guide are available in the following languages:</p>
+<h2 id="source-code-layout">Source Code Layout</h2>
+<blockquote>
+<p>Nearly everybody is convinced that every style but their own is ugly and unreadable. Leave out the &#8220;but their own&#8221; and they&#8217;re probably right&#8230; <br> &#8211; Jerry Coffin (on indentation)</p>
+</blockquote>
+<ul>
+<li><p>Use <code>UTF-8</code> as the source file encoding.</p></li>
+<li><p>Use two <strong>spaces</strong> per indentation level (aka soft tabs). No hard tabs.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad - four spaces</span>
+<span class="kw">def</span> some_method
+    do_something
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">def</span> some_method
+  do_something
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Use Unix-style line endings. (*BSD/Solaris/Linux/macOS users are covered by default, Windows users have to be extra careful.)</p>
+<ul>
+<li><p>If you&#8217;re using Git you might want to add the following configuration setting to protect your project from Windows line endings creeping in:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="fu">git</span> config --global core.autocrlf true</code></pre></div></li>
+</ul></li>
+<li><p>Don&#8217;t use <code>;</code> to separate statements and expressions. As a corollary&#8212;use one expression per line.</p>
+<p>corollary &#25512;&#35770;&#65292;&#24517;&#28982;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+puts <span class="st">&#39;foobar&#39;</span>; <span class="co"># superfluous semicolon</span>
+
+puts <span class="st">&#39;foo&#39;</span>; puts <span class="st">&#39;bar&#39;</span> <span class="co"># two expressions on the same line</span>
+
+<span class="co"># good</span>
+puts <span class="st">&#39;foobar&#39;</span>
+
+puts <span class="st">&#39;foo&#39;</span>
+puts <span class="st">&#39;bar&#39;</span>
+
+puts <span class="st">&#39;foo&#39;</span>, <span class="st">&#39;bar&#39;</span> <span class="co"># this applies to puts in particular</span></code></pre></div></li>
+<li><p>Prefer a single-line format for class definitions with no body.</p>
+<p>&#27809;&#26377;&#20869;&#23481;&#30340; class &#23450;&#20041;&#65292;&#29992; ClassName = Class.new(parent)</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">class</span> <span class="dt">FooError</span> &lt; <span class="dt">StandardError</span>
+<span class="kw">end</span>
+
+<span class="co"># okish</span>
+<span class="kw">class</span> <span class="dt">FooError</span> &lt; <span class="dt">StandardError</span>; <span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="dt">FooError</span> = <span class="dt">Class</span>.new(<span class="dt">StandardError</span>)</code></pre></div></li>
+<li><p>Avoid single-line methods. Although they are somewhat popular in the wild, there are a few peculiarities about their definition syntax that make their use undesirable. At any rate&#8212;there should be no more than one expression in a single-line method.</p>
+<p>&#26377;&#20869;&#23481;&#30340; function &#23450;&#20041;&#65292;&#19981;&#35201;&#20889;&#25104; one-liner</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">def</span> too_much; something; something_else; <span class="kw">end</span>
+
+<span class="co"># okish - notice that the first ; is required</span>
+<span class="kw">def</span> no_braces_method; body <span class="kw">end</span>
+
+<span class="co"># okish - notice that the second ; is optional</span>
+<span class="kw">def</span> no_braces_method; body; <span class="kw">end</span>
+
+<span class="co"># okish - valid syntax, but no ; makes it kind of hard to read</span>
+<span class="kw">def</span> some_method() body <span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">def</span> some_method
+  body
+<span class="kw">end</span></code></pre></div>
+<p>One exception to the rule are empty-body methods.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># good</span>
+<span class="kw">def</span> no_op; <span class="kw">end</span></code></pre></div></li>
+<li><p>Use spaces around operators, after commas, colons and semicolons. Whitespace might be (mostly) irrelevant to the Ruby interpreter, but its proper use is the key to writing easily readable code. &#29305;&#20040;&#22810;&#21152;&#28857;&#31354;&#26684;&#8230;&#8230;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">sum = <span class="dv">1</span> + <span class="dv">2</span>
+a, b = <span class="dv">1</span>, <span class="dv">2</span>
+<span class="kw">class</span> <span class="dt">FooError</span> &lt; <span class="dt">StandardError</span>; <span class="kw">end</span></code></pre></div>
+<p>The only exception, regarding operators, is the exponent operator: &#38500;&#20102;&#25351;&#25968;&#31526;&#21495;&#65288;&#20854;&#23454; unary &#31526;&#21495;&#37117;&#19981;&#24212;&#35813;&#21152;&#31354;&#26684;&#65292;&#27604;&#22914; <code>!</code>&#65289;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+e = M * c ** <span class="dv">2</span>
+
+<span class="co"># good</span>
+e = M * c**<span class="dv">2</span></code></pre></div></li>
+<li><p>No spaces after <code>(</code>, <code>[</code> or before <code>]</code>, <code>)</code>. Use spaces around <code>{</code> and before <code>}</code>. &#19981;&#35201;&#32473; method param &#37027;&#24038;&#21491;&#21152;&#19978;&#31354;&#26684;&#8230;&#8230;&#22826;&#36807;&#8230;&#8230; &#20989;&#25968; block &#21017;&#21152;&#19978;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+some( arg ).other
+[ <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span> ].each{|e| puts e}
+
+<span class="co"># good</span>
+some(arg).other
+[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>].each { |e| puts e }</code></pre></div>
+<p><code>{</code> and <code>}</code> deserve a bit of clarification, since they are used for block and hash literals, as well as string interpolation.</p>
+<p>For hash literals two styles are considered acceptable. The first variant is slightly more readable (and arguably more popular in the Ruby community in general). The second variant has the advantage of adding visual difference between block and hash literals. Whichever one you pick&#8212;apply it consistently.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># good - space after { and before }</span>
+{ <span class="st">one: </span><span class="dv">1</span>, <span class="st">two: </span><span class="dv">2</span> }
+
+<span class="co"># good - no space after { and before }</span>
+{<span class="st">one: </span><span class="dv">1</span>, <span class="st">two: </span><span class="dv">2</span>}</code></pre></div>
+<p>With interpolated expressions, there should be no padded-spacing inside the braces. &#23383;&#31526;&#20018;&#27169;&#26495;&#37324;&#38754;&#23601;&#21035;&#24324;&#37027;&#20040;&#22810;&#31354;&#26684;&#20102;&#8230;&#8230;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="st">&quot;From: </span><span class="ot">#{</span> user.first_name <span class="ot">}</span><span class="st">, </span><span class="ot">#{</span> user.last_name <span class="ot">}</span><span class="st">&quot;</span>
+
+<span class="co"># good</span>
+<span class="st">&quot;From: </span><span class="ot">#{</span>user.first_name<span class="ot">}</span><span class="st">, </span><span class="ot">#{</span>user.last_name<span class="ot">}</span><span class="st">&quot;</span></code></pre></div></li>
+<li><p>No space after <code>!</code>. &#36825;&#20010;&#20854;&#23454;&#21644; <code>**</code> &#24212;&#35813;&#24324;&#21040;&#19968;&#36215;&#35828;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+! something
+
+<span class="co"># good</span>
+!something</code></pre></div></li>
+<li><p>No space inside range literals.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="dv">1</span> .. <span class="dv">3</span>
+<span class="st">&#39;a&#39;</span> ... <span class="st">&#39;z&#39;</span>
+
+<span class="co"># good</span>
+<span class="dv">1</span>..<span class="dv">3</span>
+<span class="st">&#39;a&#39;</span>...<span class="st">&#39;z&#39;</span></code></pre></div></li>
+<li><p>Indent <code>when</code> as deep as <code>case</code>. This is the style established in both &#8220;The Ruby Programming Language&#8221; and &#8220;Programming Ruby&#8221;. &#36825;&#20010;&#29616;&#22312; C++ &#20063;&#26159;&#36825;&#26679;&#30340;&#39118;&#26684;&#12290;&#20854;&#23454;&#26159;&#22312;&#22312;&#20687; if elseif &#30475;&#40784;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">case</span>
+  <span class="kw">when</span> song.name == <span class="st">&#39;Misty&#39;</span>
+    puts <span class="st">&#39;Not again!&#39;</span>
+  <span class="kw">when</span> song.duration &gt; <span class="dv">120</span>
+    puts <span class="st">&#39;Too long!&#39;</span>
+  <span class="kw">when</span> <span class="dt">Time</span>.now.hour &gt; <span class="dv">21</span>
+    puts <span class="st">&quot;It&#39;s too late&quot;</span>
+  <span class="kw">else</span>
+    song.play
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">case</span>
+<span class="kw">when</span> song.name == <span class="st">&#39;Misty&#39;</span>
+  puts <span class="st">&#39;Not again!&#39;</span>
+<span class="kw">when</span> song.duration &gt; <span class="dv">120</span>
+  puts <span class="st">&#39;Too long!&#39;</span>
+<span class="kw">when</span> <span class="dt">Time</span>.now.hour &gt; <span class="dv">21</span>
+  puts <span class="st">&quot;It&#39;s too late&quot;</span>
+<span class="kw">else</span>
+  song.play
+<span class="kw">end</span></code></pre></div></li>
+<li><p>When assigning the result of a conditional expression to a variable, preserve the usual alignment of its branches.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad - pretty convoluted</span>
+kind = <span class="kw">case</span> year
+<span class="kw">when</span> <span class="dv">1850</span>..<span class="dv">1889</span> <span class="kw">then</span> <span class="st">&#39;Blues&#39;</span>
+<span class="kw">when</span> <span class="dv">1890</span>..<span class="dv">1909</span> <span class="kw">then</span> <span class="st">&#39;Ragtime&#39;</span>
+<span class="kw">when</span> <span class="dv">1910</span>..<span class="dv">1929</span> <span class="kw">then</span> <span class="st">&#39;New Orleans Jazz&#39;</span>
+<span class="kw">when</span> <span class="dv">1930</span>..<span class="dv">1939</span> <span class="kw">then</span> <span class="st">&#39;Swing&#39;</span>
+<span class="kw">when</span> <span class="dv">1940</span>..<span class="dv">1950</span> <span class="kw">then</span> <span class="st">&#39;Bebop&#39;</span>
+<span class="kw">else</span> <span class="st">&#39;Jazz&#39;</span>
+<span class="kw">end</span>
+
+result <span class="kw">= if</span> some_cond
+  calc_something
+<span class="kw">else</span>
+  calc_something_else
+<span class="kw">end</span>
+
+<span class="co"># good - it&#39;s apparent what&#39;s going on</span>
+kind = <span class="kw">case</span> year
+       <span class="kw">when</span> <span class="dv">1850</span>..<span class="dv">1889</span> <span class="kw">then</span> <span class="st">&#39;Blues&#39;</span>
+       <span class="kw">when</span> <span class="dv">1890</span>..<span class="dv">1909</span> <span class="kw">then</span> <span class="st">&#39;Ragtime&#39;</span>
+       <span class="kw">when</span> <span class="dv">1910</span>..<span class="dv">1929</span> <span class="kw">then</span> <span class="st">&#39;New Orleans Jazz&#39;</span>
+       <span class="kw">when</span> <span class="dv">1930</span>..<span class="dv">1939</span> <span class="kw">then</span> <span class="st">&#39;Swing&#39;</span>
+       <span class="kw">when</span> <span class="dv">1940</span>..<span class="dv">1950</span> <span class="kw">then</span> <span class="st">&#39;Bebop&#39;</span>
+       <span class="kw">else</span> <span class="st">&#39;Jazz&#39;</span>
+       <span class="kw">end</span>
+
+result <span class="kw">= if</span> some_cond
+           calc_something
+         <span class="kw">else</span>
+           calc_something_else
+         <span class="kw">end</span>
+
+<span class="co"># good (and a bit more width efficient)</span>
+kind =
+  <span class="kw">case</span> year
+  <span class="kw">when</span> <span class="dv">1850</span>..<span class="dv">1889</span> <span class="kw">then</span> <span class="st">&#39;Blues&#39;</span>
+  <span class="kw">when</span> <span class="dv">1890</span>..<span class="dv">1909</span> <span class="kw">then</span> <span class="st">&#39;Ragtime&#39;</span>
+  <span class="kw">when</span> <span class="dv">1910</span>..<span class="dv">1929</span> <span class="kw">then</span> <span class="st">&#39;New Orleans Jazz&#39;</span>
+  <span class="kw">when</span> <span class="dv">1930</span>..<span class="dv">1939</span> <span class="kw">then</span> <span class="st">&#39;Swing&#39;</span>
+  <span class="kw">when</span> <span class="dv">1940</span>..<span class="dv">1950</span> <span class="kw">then</span> <span class="st">&#39;Bebop&#39;</span>
+  <span class="kw">else</span> <span class="st">&#39;Jazz&#39;</span>
+  <span class="kw">end</span>
+
+result =
+  <span class="kw">if</span> some_cond
+    calc_something
+  <span class="kw">else</span>
+    calc_something_else
+  <span class="kw">end</span></code></pre></div></li>
+<li><p>Use empty lines between method definitions and also to break up methods into logical paragraphs internally. &#20854;&#23454;&#23601;&#26159;&#36923;&#36753;&#20998;&#22359;&#8230;&#8230;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="kw">def</span> some_method
+  data = initialize(options)
+
+  data.manipulate!
+
+  data.result
+<span class="kw">end</span>
+
+<span class="kw">def</span> some_method
+  result
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Don&#8217;t use several empty lines in a row. &#32534;&#36753;&#22120;&#20063;&#19981;&#21516;&#24847;&#21834;&#65281;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad - It has two empty lines.</span>
+some_method
+
+
+some_method
+
+<span class="co"># good</span>
+some_method
+
+some_method</code></pre></div></li>
+<li><p>Use empty lines around access modifiers. &#19981;&#25026;&#8230;&#8230;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">class</span> <span class="dt">Foo</span>
+  <span class="ot">attr_reader</span> <span class="st">:foo</span>
+  <span class="kw">def</span> foo
+    <span class="co"># do something...</span>
+  <span class="kw">end</span>
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">class</span> <span class="dt">Foo</span>
+  <span class="ot">attr_reader</span> <span class="st">:foo</span>
+
+  <span class="kw">def</span> foo
+    <span class="co"># do something...</span>
+  <span class="kw">end</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Don&#8217;t use empty lines around method, class, module, block bodies. &#36825;&#20123;&#31354;&#34892;&#19981;&#24517;&#35201;&#8230;&#8230;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">class</span> <span class="dt">Foo</span>
+
+  <span class="kw">def</span> foo
+
+    <span class="kw">begin</span>
+
+      do_something <span class="kw">do</span>
+
+        something
+
+      <span class="kw">end</span>
+
+    <span class="kw">rescue</span>
+
+      something
+
+    <span class="kw">end</span>
+
+  <span class="kw">end</span>
+
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">class</span> <span class="dt">Foo</span>
+  <span class="kw">def</span> foo
+    <span class="kw">begin</span>
+      do_something <span class="kw">do</span>
+        something
+      <span class="kw">end</span>
+    <span class="kw">rescue</span>
+      something
+    <span class="kw">end</span>
+  <span class="kw">end</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Avoid comma after the last parameter in a method call, especially when the parameters are not on separate lines. &#25105;&#23601;&#21916;&#27426;&#36825;&#26679;&#8230;&#8230;&#35805;&#35828;&#29305;&#21035;&#35752;&#21388; JSON &#25991;&#26412;&#24471;&#21015;&#34920;&#19981;&#20801;&#35768;&#26368;&#21518;&#20803;&#32032;&#21518;&#38754;&#21152;&#20010;&#8220;,&#8221;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad - easier to move/add/remove parameters, but still not preferred</span>
+some_method(
+  size,
+  count,
+  color,
+)
+
+<span class="co"># bad</span>
+some_method(size, count, color, )
+
+<span class="co"># good</span>
+some_method(size, count, color)</code></pre></div></li>
+<li><p>Use spaces around the <code>=</code> operator when assigning default values to method parameters:</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">def</span> some_method(arg1=<span class="st">:default</span>, arg2=<span class="dv">nil</span>, arg3=[])
+  <span class="co"># do something...</span>
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">def</span> some_method(arg1 = <span class="st">:default</span>, arg2 = <span class="dv">nil</span>, arg3 = [])
+  <span class="co"># do something...</span>
+<span class="kw">end</span></code></pre></div>
+<p>While several Ruby books suggest the first style, the second is much more prominent in practice (and arguably a bit more readable).</p></li>
+<li><p>Avoid line continuation <code>\</code> where not required. In practice, avoid using line continuations for anything but string concatenation. &#20854;&#23454;&#36825;&#21644;&#33521;&#35821;&#37324;&#21015;&#34920;&#35828;&#8220;1) blah blah and 2) blah blah&#8221;&#31867;&#20284;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+result = <span class="dv">1</span> - \
+         <span class="dv">2</span>
+
+<span class="co"># good (but still ugly as hell)</span>
+result = <span class="dv">1</span> \
+         - <span class="dv">2</span>
+
+long_string = <span class="st">&#39;First part of the long string&#39;</span> \
+              <span class="st">&#39; and second part of the long string&#39;</span></code></pre></div></li>
+<li><p><strong>Adopt a consistent multi-line method chaining style.</strong> There are two popular styles in the Ruby community, both of which are considered good&#8212;leading <code>.</code> (Option A) and trailing <code>.</code> (Option B).</p>
+<ul>
+<li><p><strong>(Option A)</strong> When continuing a chained method invocation on another line keep the <code>.</code> on the second line.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad - need to consult first line to understand second line</span>
+one.two.three.
+  four
+
+<span class="co"># good - it&#39;s immediately clear what&#39;s going on the second line</span>
+one.two.three
+  .four</code></pre></div></li>
+<li><p><strong>(Option B)</strong> When continuing a chained method invocation on another line, include the <code>.</code> on the first line to indicate that the expression continues.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad - need to read ahead to the second line to know that the chain continues</span>
+one.two.three
+  .four
+
+<span class="co"># good - it&#39;s immediately clear that the expression continues beyond the first line</span>
+one.two.three.
+  four</code></pre></div></li>
+</ul>
+<p>A discussion on the merits of both alternative styles can be found <a href="https://github.com/bbatsov/ruby-style-guide/pull/176">here</a>.</p></li>
+<li><p>Align the parameters of a method call if they span more than one line. When aligning parameters is not appropriate due to line-length constraints, single indent for the lines after the first is also acceptable.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># starting point (line is too long)</span>
+<span class="kw">def</span> send_mail(source)
+  <span class="dt">Mailer</span>.deliver(<span class="st">to: &#39;bob@example.com&#39;</span>, <span class="st">from: &#39;us@example.com&#39;</span>, <span class="st">subject: &#39;Important message&#39;</span>, <span class="st">body: </span>source.text)
+<span class="kw">end</span>
+
+<span class="co"># bad (double indent)</span>
+<span class="co"># &#35828;&#23454;&#35805;&#22312; C++ &#37324;&#38754;&#25105;&#23601;&#21916;&#27426;&#36825;&#26679; align</span>
+<span class="kw">def</span> send_mail(source)
+  <span class="dt">Mailer</span>.deliver(
+      <span class="st">to: &#39;bob@example.com&#39;</span>,
+      <span class="st">from: &#39;us@example.com&#39;</span>,
+      <span class="st">subject: &#39;Important message&#39;</span>,
+      <span class="st">body: </span>source.text)
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="co"># &#24403;&#28982;&#36825;&#26679;&#20063;&#19981;&#38169;</span>
+<span class="kw">def</span> send_mail(source)
+  <span class="dt">Mailer</span>.deliver(<span class="st">to: &#39;bob@example.com&#39;</span>,
+                 <span class="st">from: &#39;us@example.com&#39;</span>,
+                 <span class="st">subject: &#39;Important message&#39;</span>,
+                 <span class="st">body: </span>source.text)
+<span class="kw">end</span>
+
+<span class="co"># good (normal indent)</span>
+<span class="kw">def</span> send_mail(source)
+  <span class="dt">Mailer</span>.deliver(
+    <span class="st">to: &#39;bob@example.com&#39;</span>,
+    <span class="st">from: &#39;us@example.com&#39;</span>,
+    <span class="st">subject: &#39;Important message&#39;</span>,
+    <span class="st">body: </span>source.text
+  )
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Align the elements of array literals spanning multiple lines.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad - single indent</span>
+menu_item = [<span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>,
+  <span class="st">&#39;Baked beans&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>]
+
+<span class="co"># good</span>
+<span class="co"># &#25105;&#26368;&#21916;&#27426;&#36825;&#26679;&#24471;</span>
+menu_item = [
+  <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>,
+  <span class="st">&#39;Baked beans&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>
+]
+
+<span class="co"># good</span>
+menu_item =
+  [<span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>,
+   <span class="st">&#39;Baked beans&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>, <span class="st">&#39;Spam&#39;</span>]</code></pre></div></li>
+<li><p>Add underscores to large numeric literals to improve their readability. &#36825;&#26159; Ruby &#29420;&#26377;&#24471;&#20248;&#21183;&#65288;&#22909;&#20687; Perl &#20063;&#26377;&#65289;&#65292;&#21033;&#29992;&#20043;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad - how many 0s are there?</span>
+num = <span class="dv">1000000</span>
+
+<span class="co"># good - much easier to parse for the human brain</span>
+num = <span class="dv">1_000_000</span></code></pre></div></li>
+<li><p>Prefer smallcase letters for numeric literal prefixes. <code>0o</code> for octal, <code>0x</code> for hexadecimal and <code>0b</code> for binary. Do not use <code>0d</code> prefix for decimal literals. &#22312;&#25105;&#30475;&#26469;&#65292;<code>0o</code> &#36825;&#26679;&#29992;&#30830;&#23454;&#27604;&#36739;&#23569;&#35265;&#8230;&#8230;&#19981;&#36807;&#30830;&#23454;&#19981;&#38169;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+num = <span class="bn">01234</span>
+num = <span class="dv">0O1234</span>
+num = <span class="bn">0X12AB</span>
+num = <span class="bn">0B10101</span>
+num = 0D1234
+num = 0d1234
+
+<span class="co"># good - easier to separate digits from the prefix</span>
+num = <span class="dv">0o1234</span>
+num = <span class="bn">0x12AB</span>
+num = <span class="bn">0b10101</span>
+num = <span class="dv">1234</span></code></pre></div></li>
+<li><p>Use <a href="http://rdoc.sourceforge.net/doc/">Rdoc</a> and its conventions for API documentation. Don&#8217;t put an empty line between the comment block and the <code>def</code>.</p></li>
+<li><p>Limit lines to 80 characters.</p></li>
+<li><p>Avoid trailing whitespace.</p></li>
+<li><p>End each file with a newline.</p></li>
+<li><p>Don&#8217;t use block comments. They cannot be preceded by whitespace and are not as easy to spot as regular comments. &#29992;&#21333;&#34892;&#24471;&#27880;&#37322;&#65292;chenshuo &#36824;&#35828;&#36807;&#36825;&#26679;&#30340;&#27880;&#37322;&#22312; diff &#37324;&#36824;&#26356;&#30452;&#35266;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="co">=begin</span>
+<span class="co">comment line</span>
+<span class="co">another comment line</span>
+<span class="co">=end</span>
+
+<span class="co"># good</span>
+<span class="co"># comment line</span>
+<span class="co"># another comment line</span></code></pre></div></li>
+</ul>
+<h2 id="syntax">Syntax</h2>
+<ul>
+<li><p>Use <code>::</code> only to reference constants(this includes classes and modules) and constructors (like <code>Array()</code> or <code>Nokogiri::HTML()</code>). Do not use <code>::</code> for regular method invocation. <code>::</code> &#21482;&#29992;&#26469;&#26500;&#36896; instance&#65292;&#25110;&#32773;&#33719;&#21462;&#24120;&#37327;&#65288;&#21453;&#27491;&#26159;&#29992;&#26469;&#24471;&#21040;&#19968;&#20010;&#20540;/&#23545;&#35937;&#65289;&#12290;&#19981;&#35201;&#21521; C++ &#37324;&#38754;&#37027;&#26679;&#65292;invoke method&#65288;&#38745;&#24577;&#65289;&#23601;&#29992;&#36825;&#20010;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="dt">SomeClass</span>::some_method
+some_object::some_method
+
+<span class="co"># good</span>
+<span class="dt">SomeClass</span>.some_method
+some_object.some_method
+<span class="dt">SomeModule</span>::<span class="dt">SomeClass</span>::<span class="dt">SOME_CONST</span>
+<span class="dt">SomeModule</span>::<span class="dt">SomeClass</span>()</code></pre></div></li>
+<li><p>Use <code>def</code> with parentheses when there are parameters. Omit the parentheses when the method doesn&#8217;t accept any parameters. &#27809;&#26377;&#21442;&#25968;&#23601;&#30465;&#30053;&#25324;&#24359;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">def</span> some_method()
+  <span class="co"># body omitted</span>
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">def</span> some_method
+  <span class="co"># body omitted</span>
+<span class="kw">end</span>
+
+<span class="co"># bad</span>
+<span class="kw">def</span> some_method_with_parameters param1, param2
+  <span class="co"># body omitted</span>
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">def</span> some_method_with_parameters(param1, param2)
+  <span class="co"># body omitted</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Use parentheses around the arguments of method invocations, especially if the first argument begins with an open parenthesis <code>(</code>, as in <code>f((3 + 2) + 1)</code>. &#20989;&#25968;&#35843;&#29992;&#26377;&#21442;&#25968;&#30340;&#26102;&#20505;&#65292;&#36824;&#26159;&#21152;&#19978;&#25324;&#24359;&#25226;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+x = <span class="dt">Math</span>.sin y
+<span class="co"># good</span>
+x = <span class="dt">Math</span>.sin(y)
+
+<span class="co"># bad</span>
+array.delete e
+<span class="co"># good</span>
+array.delete(e)
+
+<span class="co"># bad</span>
+temperance = <span class="dt">Person</span>.new <span class="st">&#39;Temperance&#39;</span>, <span class="dv">30</span>
+<span class="co"># good</span>
+temperance = <span class="dt">Person</span>.new(<span class="st">&#39;Temperance&#39;</span>, <span class="dv">30</span>)</code></pre></div>
+<p>Always omit parentheses for &#19968;&#23450;&#19981;&#33021;&#35201;&#25324;&#24359;</p>
+<ul>
+<li><p>Method calls with no arguments: &#27809;&#21442;&#25968;&#23601;&#19981;&#35201;&#25324;&#24359;&#20102;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="dt">Kernel</span>.exit!()
+<span class="dv">2</span>.even?()
+fork()
+<span class="st">&#39;test&#39;</span>.upcase()
+
+<span class="co"># good</span>
+<span class="dt">Kernel</span>.exit!
+<span class="dv">2</span>.even?
+fork
+<span class="st">&#39;test&#39;</span>.upcase</code></pre></div></li>
+<li><p>Methods that are part of an internal DSL (e.g., Rake, Rails, RSpec): DSL &#23601;&#19981;&#35201;&#25353;&#29031;&#36825;&#20010;&#35268;&#21017;&#26469;&#20102;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+validates(<span class="st">:name</span>, <span class="st">presence: </span><span class="dv">true</span>)
+<span class="co"># good</span>
+validates <span class="st">:name</span>, <span class="st">presence: </span><span class="dv">true</span></code></pre></div></li>
+<li><p>Methods that have &#8220;keyword&#8221; status in Ruby: &#65311;&#65311;&#36825;&#26159;&#21861;&#65311;&#65311;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="kw">class</span> <span class="dt">Person</span>
+  <span class="co"># bad</span>
+  <span class="ot">attr_reader</span>(<span class="st">:name</span>, <span class="st">:age</span>)
+  <span class="co"># good</span>
+  <span class="ot">attr_reader</span> <span class="st">:name</span>, <span class="st">:age</span>
+
+  <span class="co"># body omitted</span>
+<span class="kw">end</span></code></pre></div></li>
+</ul>
+<p>Can omit parentheses for &#21487;&#20197;&#19981;&#35201;</p>
+<ul>
+<li><p>Methods that have &#8220;keyword&#8221; status in Ruby, but are not declarative:</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># good</span>
+puts(temperance.age)
+system(<span class="st">&#39;ls&#39;</span>)
+<span class="co"># also good</span>
+puts temperance.age
+system <span class="st">&#39;ls&#39;</span></code></pre></div></li>
+</ul></li>
+<li><p>Define optional arguments at the end of the list of arguments. Ruby has some unexpected results when calling methods that have optional arguments at the front of the list. &#36825;&#20010;&#22312; C++ &#37324;&#38754;&#30452;&#25509;&#26159;&#19981;&#20801;&#35768;&#24471;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">def</span> some_method(a = <span class="dv">1</span>, b = <span class="dv">2</span>, c, d)
+  puts <span class="st">&quot;</span><span class="ot">#{</span>a<span class="ot">}</span><span class="st">, </span><span class="ot">#{</span>b<span class="ot">}</span><span class="st">, </span><span class="ot">#{</span>c<span class="ot">}</span><span class="st">, </span><span class="ot">#{</span>d<span class="ot">}</span><span class="st">&quot;</span>
+<span class="kw">end</span>
+
+some_method(<span class="st">&#39;w&#39;</span>, <span class="st">&#39;x&#39;</span>) <span class="co"># =&gt; &#39;1, 2, w, x&#39;</span>
+some_method(<span class="st">&#39;w&#39;</span>, <span class="st">&#39;x&#39;</span>, <span class="st">&#39;y&#39;</span>) <span class="co"># =&gt; &#39;w, 2, x, y&#39;</span>
+some_method(<span class="st">&#39;w&#39;</span>, <span class="st">&#39;x&#39;</span>, <span class="st">&#39;y&#39;</span>, <span class="st">&#39;z&#39;</span>) <span class="co"># =&gt; &#39;w, x, y, z&#39;</span>
+
+<span class="co"># good</span>
+<span class="kw">def</span> some_method(c, d, a = <span class="dv">1</span>, b = <span class="dv">2</span>)
+  puts <span class="st">&quot;</span><span class="ot">#{</span>a<span class="ot">}</span><span class="st">, </span><span class="ot">#{</span>b<span class="ot">}</span><span class="st">, </span><span class="ot">#{</span>c<span class="ot">}</span><span class="st">, </span><span class="ot">#{</span>d<span class="ot">}</span><span class="st">&quot;</span>
+<span class="kw">end</span>
+
+some_method(<span class="st">&#39;w&#39;</span>, <span class="st">&#39;x&#39;</span>) <span class="co"># =&gt; &#39;1, 2, w, x&#39;</span>
+some_method(<span class="st">&#39;w&#39;</span>, <span class="st">&#39;x&#39;</span>, <span class="st">&#39;y&#39;</span>) <span class="co"># =&gt; &#39;y, 2, w, x&#39;</span>
+some_method(<span class="st">&#39;w&#39;</span>, <span class="st">&#39;x&#39;</span>, <span class="st">&#39;y&#39;</span>, <span class="st">&#39;z&#39;</span>) <span class="co"># =&gt; &#39;y, z, w, x&#39;</span></code></pre></div></li>
+<li><p>Avoid the use of parallel assignment for defining variables. Parallel assignment is allowed when it is the return of a method call, used with the splat operator, or when used to swap variable assignment. Parallel assignment is less readable than separate assignment. &#23450;&#20041;&#30340;&#26102;&#20505;&#19981;&#35201;&#36825;&#20040;&#29609;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+a, b, c, d = <span class="st">&#39;foo&#39;</span>, <span class="st">&#39;bar&#39;</span>, <span class="st">&#39;baz&#39;</span>, <span class="st">&#39;foobar&#39;</span>
+
+<span class="co"># good</span>
+a = <span class="st">&#39;foo&#39;</span>
+b = <span class="st">&#39;bar&#39;</span>
+c = <span class="st">&#39;baz&#39;</span>
+d = <span class="st">&#39;foobar&#39;</span>
+
+<span class="co"># good - swapping variable assignment</span>
+<span class="co"># Swapping variable assignment is a special case because it will allow you to</span>
+<span class="co"># swap the values that are assigned to each variable.</span>
+a = <span class="st">&#39;foo&#39;</span>
+b = <span class="st">&#39;bar&#39;</span>
+
+a, b = b, a
+puts a <span class="co"># =&gt; &#39;bar&#39;</span>
+puts b <span class="co"># =&gt; &#39;foo&#39;</span>
+
+<span class="co"># good - method return</span>
+<span class="kw">def</span> multi_return
+  [<span class="dv">1</span>, <span class="dv">2</span>]
+<span class="kw">end</span>
+
+first, second = multi_return
+
+<span class="co"># good - use with splat</span>
+first, *list = [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>] <span class="co"># first =&gt; 1, list =&gt; [2, 3, 4]</span>
+
+hello_array = *<span class="st">&#39;Hello&#39;</span> <span class="co"># =&gt; [&quot;Hello&quot;]</span>
+
+a = *(<span class="dv">1</span>..<span class="dv">3</span>) <span class="co"># =&gt; [1, 2, 3]</span></code></pre></div></li>
+<li><p>Avoid the use of unnecessary trailing underscore variables during parallel assignment. Named underscore variables are to be preferred over underscore variables because of the context that they provide. Trailing underscore variables are necessary when there is a splat variable defined on the left side of the assignment, and the splat variable is not an underscore.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+foo = <span class="st">&#39;one,two,three,four,five&#39;</span>
+<span class="co"># Unnecessary assignment that does not provide useful information</span>
+first, second, _ = foo.split(<span class="st">&#39;,&#39;</span>)
+first, _, _ = foo.split(<span class="st">&#39;,&#39;</span>)
+first, *_ = foo.split(<span class="st">&#39;,&#39;</span>)
+
+
+<span class="co"># good</span>
+<span class="co"># &#27809;&#24517;&#35201;&#29992; `_`</span>
+foo = <span class="st">&#39;one,two,three,four,five&#39;</span>
+<span class="co"># The underscores are needed to show that you want all elements</span>
+<span class="co"># except for the last number of underscore elements</span>
+*beginning, _ = foo.split(<span class="st">&#39;,&#39;</span>)
+*beginning, something, _ = foo.split(<span class="st">&#39;,&#39;</span>)
+
+a, = foo.split(<span class="st">&#39;,&#39;</span>)
+a, b, = foo.split(<span class="st">&#39;,&#39;</span>)
+<span class="co"># Unnecessary assignment to an unused variable, but the assignment</span>
+<span class="co"># provides us with useful information.</span>
+<span class="co"># &#21152;&#20010;&#21517;&#23383;&#35828;&#26126;&#26159;&#21861;</span>
+first, _second = foo.split(<span class="st">&#39;,&#39;</span>)
+first, _second, = foo.split(<span class="st">&#39;,&#39;</span>)
+first, *_ending = foo.split(<span class="st">&#39;,&#39;</span>)</code></pre></div></li>
+<li><p>Do not use <code>for</code>, unless you know exactly why. Most of the time iterators should be used instead. <code>for</code> is implemented in terms of <code>each</code> (so you&#8217;re adding a level of indirection), but with a twist&#8212;<code>for</code> doesn&#8217;t introduce a new scope (unlike <code>each</code>) and variables defined in its block will be visible outside it. each &#30340;&#20316;&#29992;&#22495;&#20284;&#20046;&#26356;&#22909;&#29992;&#65311;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">arr = [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]
+
+<span class="co"># bad</span>
+<span class="kw">for</span> elem <span class="kw">in</span> arr <span class="kw">do</span>
+  puts elem
+<span class="kw">end</span>
+
+<span class="co"># note that elem is accessible outside of the for loop</span>
+elem <span class="co"># =&gt; 3</span>
+
+<span class="co"># good</span>
+arr.each { |elem| puts elem }
+
+<span class="co"># elem is not accessible outside each&#39;s block</span>
+elem <span class="co"># =&gt; NameError: undefined local variable or method `elem&#39;</span></code></pre></div></li>
+<li><p>Do not use <code>then</code> for multi-line <code>if</code>/<code>unless</code>. <code>then</code> &#21482;&#22312;&#19968;&#34892;&#30340;&#26102;&#20505;&#29992;&#65288;&#19981;&#35201;&#29992; <code>;</code>&#65289;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">if</span> some_condition <span class="kw">then</span>
+  <span class="co"># body omitted</span>
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">if</span> some_condition
+  <span class="co"># body omitted</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Always put the condition on the same line as the <code>if</code>/<code>unless</code> in a multi-line conditional. &#31532;&#19968;&#34892;&#20063;&#26377;&#26377; cond</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">if</span>
+  some_condition
+  do_something
+  do_something_else
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">if</span> some_condition
+  do_something
+  do_something_else
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Favor the ternary operator(<code>?:</code>) over <code>if/then/else/end</code> constructs. It&#8217;s more common and obviously more concise. &#19977;&#20803;&#36816;&#31639;&#31526;&#30475;&#19978;&#21435;&#31616;&#27905;&#28857;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+result <span class="kw">= if</span> some_condition <span class="kw">then</span> something <span class="kw">else</span> something_else <span class="kw">end</span>
+
+<span class="co"># good</span>
+result = some_condition ? something : something_else</code></pre></div></li>
+<li><p>Use one expression per branch in a ternary operator. This also means that ternary operators must not be nested. Prefer <code>if/else</code> constructs in these cases. &#22797;&#26434;&#20102;&#65292;&#23601;&#19981;&#35201;&#29992; ternary &#36816;&#31639;&#31526;&#65292;&#30452;&#25509; if else &#26356;&#26126;&#30333;&#28857;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+some_condition ? (nested_condition ? nested_something : nested_something_else) : something_else
+
+<span class="co"># good</span>
+<span class="kw">if</span> some_condition
+  nested_condition ? nested_something : nested_something_else
+<span class="kw">else</span>
+  something_else
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Do not use <code>if x; ...</code>. Use the ternary operator instead.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+result <span class="kw">= if</span> some_condition; something <span class="kw">else</span> something_else <span class="kw">end</span>
+
+<span class="co"># good</span>
+result = some_condition ? something : something_else</code></pre></div></li>
+<li><p>Leverage the fact that <code>if</code> and <code>case</code> are expressions which return a result. &#36825;&#20010;&#21644;&#22823;&#22810;&#25968;&#32534;&#31243;&#35821;&#35328;&#19981;&#19968;&#26679;&#65292;&#22240;&#20026; ruby &#30340; if else &#20063;&#26159; expression&#65292;while &#21035;&#30340;&#35821;&#35328;&#37117;&#21482;&#31639; statement&#12290;&#19968;&#20010;&#34920;&#36798;&#24335;&#65288;expression&#65289;&#26159;&#35201;&#36820;&#22238;&#20540;&#30340;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">if</span> condition
+  result = x
+<span class="kw">else</span>
+  result = y
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+result =
+  <span class="kw">if</span> condition
+    x
+  <span class="kw">else</span>
+    y
+  <span class="kw">end</span></code></pre></div></li>
+<li><p>Use <code>when x then ...</code> for one-line cases. The alternative syntax <code>when x: ...</code> has been removed as of Ruby 1.9.</p></li>
+<li><p>Do not use <code>when x; ...</code>. See the previous rule.</p></li>
+<li><p>Use <code>!</code> instead of <code>not</code>.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad - parentheses are required because of op precedence</span>
+x = (<span class="kw">not</span> something)
+
+<span class="co"># good</span>
+x = !something</code></pre></div></li>
+<li><p>Avoid the use of <code>!!</code>. &#36825;&#20010;&#22312; JS &#37324;&#38754;&#20063;&#26377;&#29992;&#12290;</p>
+<p><code>!!</code> converts a value to boolean, but you don&#8217;t need this explicit conversion in the condition of a control expression; using it only obscures your intention. If you want to do a <code>nil</code> check, use <code>nil?</code> instead.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+x = <span class="st">&#39;test&#39;</span>
+<span class="co"># obscure nil check</span>
+<span class="kw">if</span> !!x
+  <span class="co"># body omitted</span>
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+x = <span class="st">&#39;test&#39;</span>
+<span class="kw">if</span> x
+  <span class="co"># body omitted</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>The <code>and</code> and <code>or</code> keywords are banned. The minimal added readability is just not worth the high probability of introducing subtle bugs. For boolean expressions, always use <code>&amp;&amp;</code> and <code>||</code> instead. For flow control, use <code>if</code> and <code>unless</code>; <code>&amp;&amp;</code> and <code>||</code> are also acceptable but less clear. &#19981;&#35201;&#29992; <code>and</code> &#21644; <code>or</code> &#20043;&#31867;&#30340;&#22826;&#33521;&#35821;&#30340;&#20851;&#38190;&#35789;&#8230;&#8230;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="co"># boolean expression</span>
+ok = got_needed_arguments <span class="kw">and</span> arguments_are_valid
+
+<span class="co"># control flow</span>
+document.save <span class="kw">or</span> fail(<span class="dt">RuntimeError</span>, <span class="st">&quot;Failed to save document!&quot;</span>)
+
+<span class="co"># good</span>
+<span class="co"># boolean expression</span>
+ok = got_needed_arguments &amp;&amp; arguments_are_valid
+
+<span class="co"># control flow</span>
+fail(<span class="dt">RuntimeError</span>, <span class="st">&quot;Failed to save document!&quot;</span>) <span class="kw">unless</span> document.save
+
+<span class="co"># ok</span>
+<span class="co"># control flow</span>
+document.save || fail(<span class="dt">RuntimeError</span>, <span class="st">&quot;Failed to save document!&quot;</span>)</code></pre></div></li>
+<li><p>Avoid multi-line <code>?:</code> (the ternary operator); use <code>if</code>/<code>unless</code> instead. &#36825;&#20010;&#19981;&#26159;&#35828;&#20102;&#20040;&#8230;&#8230;</p></li>
+<li><p>Favor modifier <code>if</code>/<code>unless</code> usage when you have a single-line body. Another good alternative is the usage of control flow <code>&amp;&amp;</code>/<code>||</code>. &#22914;&#26524;&#21482;&#26377;&#19968;&#20010;&#35821;&#21477;&#65292;&#23601;&#29992; modifier&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">if</span> some_condition
+  do_something
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+do_something <span class="kw">if</span> some_condition
+
+<span class="co"># another good option</span>
+some_condition &amp;&amp; do_something</code></pre></div></li>
+<li><p>Avoid modifier <code>if</code>/<code>unless</code> usage at the end of a non-trivial multi-line block. &#21518;&#32622;&#30340; if &#36824;&#26159;&#21482;&#36866;&#21512; one-liner&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="dv">10</span>.times <span class="kw">do</span>
+  <span class="co"># multi-line body omitted</span>
+<span class="kw">end</span> <span class="kw">if</span> some_condition
+
+<span class="co"># good</span>
+<span class="kw">if</span> some_condition
+  <span class="dv">10</span>.times <span class="kw">do</span>
+    <span class="co"># multi-line body omitted</span>
+  <span class="kw">end</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Avoid nested modifier <code>if</code>/<code>unless</code>/<code>while</code>/<code>until</code> usage. Favor <code>&amp;&amp;</code>/<code>||</code> if appropriate. &#31532;&#19968;&#31181;&#20889;&#27861;&#20063;&#22826;&#20982;&#27531;&#20102;&#8230;&#8230;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+do_something <span class="kw">if</span> other_condition <span class="kw">if</span> some_condition
+
+<span class="co"># good</span>
+do_something <span class="kw">if</span> some_condition &amp;&amp; other_condition</code></pre></div></li>
+<li><p>Favor <code>unless</code> over <code>if</code> for negative conditions (or control flow <code>||</code>). &#35805;&#35828;&#29992; unless &#30340;&#26102;&#20505;&#65292;&#25105;&#24635;&#26159;&#22312;&#24515;&#37324;&#33258;&#24049; if not &#20102;&#19968;&#19979;&#8230;&#8230;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+do_something <span class="kw">if</span> !some_condition
+
+<span class="co"># bad</span>
+do_something <span class="kw">if</span> <span class="kw">not</span> some_condition
+
+<span class="co"># good</span>
+do_something <span class="kw">unless</span> some_condition
+
+<span class="co"># another good option</span>
+some_condition || do_something</code></pre></div></li>
+<li><p>Do not use <code>unless</code> with <code>else</code>. Rewrite these with the positive case first. unless &#21482;&#35201;&#21644;&#19968;&#20010;&#36319;&#8230;&#8230;&#65288;&#36825;&#20010;&#22909;&#20687;&#19981;&#26159;&#39118;&#26684;&#65292;&#32780;&#26159;&#24605;&#32771;&#30340;&#21746;&#23398;&#12290;&#65289;&#65288;&#19981;&#36807;&#26377;&#26102;&#20505;&#23601;&#26159; unless &#8230; else &#8230; &#25165;&#22909;&#29992;&#21602;&#8230;&#8230;&#65289;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">unless</span> success?
+  puts <span class="st">&#39;failure&#39;</span>
+<span class="kw">else</span>
+  puts <span class="st">&#39;success&#39;</span>
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">if</span> success?
+  puts <span class="st">&#39;success&#39;</span>
+<span class="kw">else</span>
+  puts <span class="st">&#39;failure&#39;</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Don&#8217;t use parentheses around the condition of a control expression. if &#21518;&#38754;&#19981;&#38656;&#35201;&#25324;&#24359;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">if</span> (x &gt; <span class="dv">10</span>)
+  <span class="co"># body omitted</span>
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">if</span> x &gt; <span class="dv">10</span>
+  <span class="co"># body omitted</span>
+<span class="kw">end</span></code></pre></div>
+<p>Note that there is an exception to this rule, namely &#8220;safe assignment in condition&#8221;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad (+ a warning)</span>
+<span class="kw">if</span> v = array.grep(<span class="ot">/foo/</span>)
+    do_something(v)
+    <span class="co"># some code</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Do not use <code>while/until condition do</code> for multi-line <code>while/until</code>. &#36825;&#20010;&#21644; if &#8230; then &#19968;&#26679;&#65292;&#21482;&#26377; one-liner &#21152;&#19978; then&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+while x &gt; <span class="dv">5</span> <span class="kw">do</span>
+  <span class="co"># body omitted</span>
+<span class="kw">end</span>
+
+<span class="kw">until</span> x &gt; <span class="dv">5</span> <span class="kw">do</span>
+  <span class="co"># body omitted</span>
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">while</span> x &gt; <span class="dv">5</span>
+  <span class="co"># body omitted</span>
+<span class="kw">end</span>
+
+<span class="kw">until</span> x &gt; <span class="dv">5</span>
+  <span class="co"># body omitted</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Favor modifier <code>while/until</code> usage when you have a single-line body. &#35805;&#35828;&#36825;&#26679;&#30830;&#23454;&#27809;&#38169;&#65292;&#19981;&#36807;&#24456;&#22810;&#26102;&#20505;&#20320;&#19981;&#22826;&#28165;&#26970;&#36825;&#20010; body &#26159;&#19981;&#26159; single-line &#23601;&#33021;&#25630;&#23450;&#12290;&#25152;&#20197;&#21834;&#8230;&#8230;&#20054;&#20054;&#20889;&#25104; while &#8230; end &#26368;&#22909;&#12290;&#36824;&#21487;&#20197;&#25193;&#23637;&#12290;&#21482;&#26377;&#22312;&#26497;&#20854; sure &#21482;&#26377;&#19968;&#20010; single-line bode &#30340;&#26102;&#20505;&#65292;&#25165;&#29992;&#21518;&#32622;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">while</span> some_condition
+  do_something
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+do_something <span class="kw">while</span> some_condition</code></pre></div></li>
+<li><p>Favor <code>until</code> over <code>while</code> for negative conditions.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+do_something <span class="kw">while</span> !some_condition
+
+<span class="co"># good</span>
+do_something <span class="kw">until</span> some_condition</code></pre></div></li>
+<li><p>Use <code>Kernel#loop</code> instead of <code>while/until</code> when you need an infinite loop. &#36825;&#20010;&#20989;&#25968;&#19981;&#38169;&#8230;&#8230;loop &#23601;&#26159;&#27515;&#24490;&#29615;&#12290;&#25512;&#33616;&#21152;&#19978; do&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">while</span> <span class="dv">true</span>
+  do_something
+<span class="kw">end</span>
+
+<span class="kw">until</span> <span class="dv">false</span>
+  do_something
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+loop <span class="kw">do</span>
+  do_something
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Use <code>Kernel#loop</code> with <code>break</code> rather than <code>begin/end/until</code> or <code>begin/end/while</code> for post-loop tests.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">begin</span>
+  puts val
+  val += <span class="dv">1</span>
+<span class="kw">end</span> <span class="kw">while</span> val &lt; <span class="dv">0</span>
+
+<span class="co"># good</span>
+loop <span class="kw">do</span>
+  puts val
+  val += <span class="dv">1</span>
+  <span class="kw">break</span> <span class="kw">unless</span> val &lt; <span class="dv">0</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Omit the outer braces around an implicit options hash. hash &#21487;&#20197;&#33258;&#21160; boxing &#22909;&#65292;&#25152;&#20197;&#19981;&#29992;&#33258;&#24049;&#21152;&#19978; &#8220;{}&#8221;&#65288;&#19981;&#36807;&#25105;&#24863;&#35273;&#21152;&#20102;&#20063;&#25402;&#22909;&#8230;&#8230;&#65289;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+user.set({ <span class="st">name: &#39;John&#39;</span>, <span class="st">age: </span><span class="dv">45</span>, <span class="st">permissions: </span>{ <span class="st">read: </span><span class="dv">true</span> } })
+
+<span class="co"># good</span>
+user.set(<span class="st">name: &#39;John&#39;</span>, <span class="st">age: </span><span class="dv">45</span>, <span class="st">permissions: </span>{ <span class="st">read: </span><span class="dv">true</span> })</code></pre></div></li>
+<li><p>Omit both the outer braces and parentheses for methods that are part of an internal DSL. &#36825;&#26679;&#30475;&#36215;&#26469;&#28165;&#29245;&#28857;&#65292;&#19981;&#35201;&#19968;&#33324;&#20989;&#25968;&#35843;&#29992;&#65292;&#20854;&#20182;&#30340;&#35805;&#8230;&#8230;&#20063;&#27809;&#21861;&#8230;&#8230;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="kw">class</span> <span class="dt">Person</span> &lt; <span class="dt">ActiveRecord</span>::<span class="dt">Base</span>
+  <span class="co"># bad</span>
+  validates(<span class="st">:name</span>, { <span class="st">presence: </span><span class="dv">true</span>, <span class="st">length: </span>{ <span class="st">within: </span><span class="dv">1</span>..<span class="dv">10</span> } })
+
+  <span class="co"># good</span>
+  validates <span class="st">:name</span>, <span class="st">presence: </span><span class="dv">true</span>, <span class="st">length: </span>{ <span class="st">within: </span><span class="dv">1</span>..<span class="dv">10</span> }
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Use the proc invocation shorthand when the invoked method is the only operation of a block. &#29992; symbol &#21069;&#32622; &amp; &#30340;&#26041;&#24335;&#26469; invocate &#19968;&#20010; proc&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+names.map { |name| name.upcase }
+
+<span class="co"># good</span>
+names.map(&amp;<span class="st">:upcase</span>)</code></pre></div></li>
+<li><p>Prefer <code>{...}</code> over <code>do...end</code> for single-line blocks. Avoid using <code>{...}</code> for multi-line blocks (multi-line chaining is always ugly). Always use <code>do...end</code> for &#8220;control flow&#8221; and &#8220;method definitions&#8221; (e.g.&#160;in Rakefiles and certain DSLs). Avoid <code>do...end</code> when chaining. &#36825;&#20010;&#25105;&#22312; Learning Ruby &#30340;&#31508;&#35760;&#37324;&#20063;&#24635;&#32467;&#20102;&#12290;&#65288;&#25105;&#22909;&#26426;&#26234;&#8230;&#8230;&#65289;&#22806;&#65292;&#21487;&#20197; chain &#23601;&#26159;&#22909;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">names =<span class="ot"> %w[</span><span class="st">Bozhidar Steve Sarah</span><span class="ot">]</span>
+
+<span class="co"># bad</span>
+names.each <span class="kw">do</span> |name|
+  puts name
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+names.each { |name| puts name }
+
+<span class="co"># bad</span>
+names.select <span class="kw">do</span> |name|
+  name.start_with?(<span class="st">&#39;S&#39;</span>)
+<span class="kw">end</span>.map { |name| name.upcase }
+
+<span class="co"># good</span>
+names.select { |name| name.start_with?(<span class="st">&#39;S&#39;</span>) }.map(&amp;<span class="st">:upcase</span>)</code></pre></div>
+<p>Some will argue that multi-line chaining would look OK with the use of {&#8230;}, but they should ask themselves&#8212;is this code really readable and can the blocks&#8217; contents be extracted into nifty methods?</p></li>
+<li><p>Consider using explicit block argument to avoid writing block literal that just passes its arguments to another block. Beware of the performance impact, though, as the block gets converted to a Proc. &#21482;&#26159;&#19968;&#20010;&#23553;&#35013;&#65292;&#23548;&#20986;&#19968;&#20010;&#21861;&#65292;&#23454;&#22312;&#22826; low&#12290;&#20026;&#21704;&#19981;&#30452;&#25509; take &#19968;&#20010; block&#65292;&#28982;&#21518;&#22788;&#29702;&#23427;&#21602;&#65311;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">require <span class="st">&#39;tempfile&#39;</span>
+
+<span class="co"># bad</span>
+<span class="kw">def</span> with_tmp_dir
+  <span class="dt">Dir</span>.mktmpdir <span class="kw">do</span> |tmp_dir|
+    <span class="dt">Dir</span>.chdir(tmp_dir) { |dir| <span class="kw">yield</span> dir }  <span class="co"># block just passes arguments</span>
+  <span class="kw">end</span>
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">def</span> with_tmp_dir(&amp;block)
+  <span class="dt">Dir</span>.mktmpdir <span class="kw">do</span> |tmp_dir|
+    <span class="dt">Dir</span>.chdir(tmp_dir, &amp;block)
+  <span class="kw">end</span>
+<span class="kw">end</span>
+
+with_tmp_dir <span class="kw">do</span> |dir|
+  puts <span class="st">&quot;dir is accessible as a parameter and pwd is set: </span><span class="ot">#{</span>dir<span class="ot">}</span><span class="st">&quot;</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Avoid <code>return</code> where not required for flow of control. return &#35201;&#25106;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">def</span> some_method(some_arr)
+  <span class="kw">return</span> some_arr.size
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">def</span> some_method(some_arr)
+  some_arr.size
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Avoid <code>self</code> where not required. (It is only required when calling a self write accessor, methods named after reserved words, or overloadable operators.)</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">def</span> ready?
+  <span class="kw">if</span> <span class="dv">self</span>.last_reviewed_at &gt; <span class="dv">self</span>.last_updated_at
+    <span class="dv">self</span>.worker.update(<span class="dv">self</span>.content, <span class="dv">self</span>.options)
+    <span class="dv">self</span>.status = <span class="st">:in_progress</span>
+  <span class="kw">end</span>
+  <span class="dv">self</span>.status == <span class="st">:verified</span>
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">def</span> ready?
+  <span class="kw">if</span> last_reviewed_at &gt; last_updated_at
+    worker.update(content, options)
+    <span class="dv">self</span>.status = <span class="st">:in_progress</span>
+  <span class="kw">end</span>
+  status == <span class="st">:verified</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>As a corollary, avoid shadowing methods with local variables unless they are both equivalent. &#36991;&#20813;&#22806;&#38754;&#26469;&#19968;&#20010;&#21464;&#37327;&#25226;&#20869;&#37096;&#30340;&#21464;&#37327;&#32473; shadow &#20102;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="kw">class</span> <span class="dt">Foo</span>
+  <span class="ot">attr_accessor</span> <span class="st">:options</span>
+
+  <span class="co"># ok</span>
+  <span class="kw">def</span> initialize(options)
+    <span class="dv">self</span>.options = options
+    <span class="co"># both options and self.options are equivalent here</span>
+  <span class="kw">end</span>
+
+  <span class="co"># bad</span>
+  <span class="kw">def</span> do_something(options = {})
+    <span class="kw">unless</span> options[<span class="st">:when</span>] == <span class="st">:later</span>
+      output(<span class="dv">self</span>.options[<span class="st">:message</span>])
+    <span class="kw">end</span>
+  <span class="kw">end</span>
+
+  <span class="co"># good</span>
+  <span class="kw">def</span> do_something(params = {})
+    <span class="kw">unless</span> params[<span class="st">:when</span>] == <span class="st">:later</span>
+      output(options[<span class="st">:message</span>])
+    <span class="kw">end</span>
+  <span class="kw">end</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Don&#8217;t use the return value of <code>=</code> (an assignment) in conditional expressions unless the assignment is wrapped in parentheses. This is a fairly popular idiom among Rubyists that&#8217;s sometimes referred to as <em>safe assignment in condition</em>. &#36825;&#20010;&#19978;&#38754;&#35828;&#20102;&#8230;&#8230;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad (+ a warning)</span>
+<span class="kw">if</span> v = array.grep(<span class="ot">/foo/</span>)
+  do_something(v)
+  <span class="co"># some code</span>
+<span class="kw">end</span>
+
+<span class="co"># good (MRI would still complain, but RuboCop won&#39;t)</span>
+<span class="kw">if</span> (v = array.grep(<span class="ot">/foo/</span>))
+  do_something(v)
+  <span class="co"># some code</span>
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+v = array.grep(<span class="ot">/foo/</span>)
+<span class="kw">if</span> v
+  do_something(v)
+  <span class="co"># some code</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Use shorthand self assignment operators whenever applicable. &#36825;&#20010;&#26159;&#21508;&#31181;&#35821;&#35328;&#37117;&#20351;&#29992;&#30340;&#35268;&#33539;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+x = x + y
+x = x * y
+x = x**y
+x = x / y
+x = x || y
+x = x &amp;&amp; y
+
+<span class="co"># good</span>
+x += y
+x *= y
+x **= y
+x /= y
+x ||= y
+x &amp;&amp;= y</code></pre></div></li>
+<li><p>Use <code>||=</code> to initialize variables only if they&#8217;re not already initialized.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+name = name ? name : <span class="st">&#39;Bozhidar&#39;</span>
+
+<span class="co"># bad</span>
+name = <span class="st">&#39;Bozhidar&#39;</span> <span class="kw">unless</span> name
+
+<span class="co"># good - set name to &#39;Bozhidar&#39;, only if it&#39;s nil or false</span>
+name ||= <span class="st">&#39;Bozhidar&#39;</span></code></pre></div></li>
+<li><p>Don&#8217;t use <code>||=</code> to initialize boolean variables. (Consider what would happen if the current value happened to be <code>false</code>.) <code>:nil?</code> &#26377;&#28857;&#24847;&#24605;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad - would set enabled to true even if it was false</span>
+enabled ||= <span class="dv">true</span>
+
+<span class="co"># good</span>
+enabled = <span class="dv">true</span> <span class="kw">if</span> enabled.nil?</code></pre></div></li>
+<li><p>Use <code>&amp;&amp;=</code> to preprocess variables that may or may not exist. Using <code>&amp;&amp;=</code> will change the value only if it exists, removing the need to check its existence with <code>if</code>.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">if</span> something
+  something = something.downcase
+<span class="kw">end</span>
+
+<span class="co"># bad</span>
+something = something ? something.downcase : <span class="dv">nil</span>
+
+<span class="co"># ok</span>
+something = something.downcase <span class="kw">if</span> something
+
+<span class="co"># good</span>
+something = something &amp;&amp; something.downcase
+
+<span class="co"># better</span>
+something &amp;&amp;= something.downcase</code></pre></div></li>
+<li><p><a name="no-case-equality"></a> Avoid explicit use of the case equality operator <code>===</code>. As its name implies it is meant to be used implicitly by <code>case</code> expressions and outside of them it yields some pretty confusing code. <sup>[<a href="#no-case-equality">link</a>]</sup></p></li>
+</ul>
+<p>```ruby # bad Array === something (1..100) === 7 /something/ === some_string</p>
+<p># good something.is_a?(Array) (1..100).include?(7) some_string =~ /something/ ```</p>
+<ul>
+<li><a name="eql"></a> Do not use <code>eql?</code> when using <code>==</code> will do. The stricter comparison semantics provided by <code>eql?</code> are rarely needed in practice. <sup>[<a href="#eql">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad - eql? is the same as == for strings &#8216;ruby&#8217;.eql? some_str</p>
+<p># good &#8216;ruby&#8217; == some_str 1.0.eql? x # eql? makes sense here if want to differentiate between Integer and Float 1 ```</p>
+<ul>
+<li><a name="no-cryptic-perlisms"></a> Avoid using Perl-style special variables (like <code>$:</code>, <code>$;</code>, etc. ). They are quite cryptic and their use in anything but one-liner scripts is discouraged. Use the human-friendly aliases provided by the <code>English</code> library. <sup>[<a href="#no-cryptic-perlisms">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad $:.unshift File.dirname(<strong>FILE</strong>)</p>
+<p># good require &#8216;English&#8217; $LOAD_PATH.unshift File.dirname(<strong>FILE</strong>) ```</p>
+<ul>
+<li><a name="parens-no-spaces"></a> Do not put a space between a method name and the opening parenthesis. <sup>[<a href="#parens-no-spaces">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad f (3 + 2) + 1</p>
+<p># good f(3 + 2) + 1 ```</p>
+<ul>
+<li><p><a name="always-warn-at-runtime"></a> Always run the Ruby interpreter with the <code>-w</code> option so it will warn you if you forget either of the rules above! <sup>[<a href="#always-warn-at-runtime">link</a>]</sup></p></li>
+<li><p><a name="no-nested-methods"></a> Do not use nested method definitions, use lambda instead. Nested method definitions actually produce methods in the same scope (e.g.&#160;class) as the outer method. Furthermore, the &#8220;nested method&#8221; will be redefined every time the method containing its definition is invoked. <sup>[<a href="#no-nested-methods">link</a>]</sup></p></li>
+</ul>
+<p>```ruby # bad def foo(x) def bar(y) # body omitted end</p>
+<pre><code>bar(x)</code></pre>
+<p>end</p>
+<p># good - the same as the previous, but no bar redefinition on every foo call def bar(y) # body omitted end</p>
+<p>def foo(x) bar(x) end</p>
+<p># also good def foo(x) bar = -&gt;(y) { &#8230; } bar.call(x) end ```</p>
+<ul>
+<li><a name="lambda-multi-line"></a> Use the new lambda literal syntax for single line body blocks. Use the <code>lambda</code> method for multi-line blocks. <sup>[<a href="#lambda-multi-line">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad l = lambda { |a, b| a + b } l.call(1, 2)</p>
+<p># correct, but looks extremely awkward l = -&gt;(a, b) do tmp = a * 7 tmp * b / 50 end</p>
+<p># good l = -&gt;(a, b) { a + b } l.call(1, 2)</p>
+<p>l = lambda do |a, b| tmp = a * 7 tmp * b / 50 end ```</p>
+<ul>
+<li><a name="stabby-lambda-with-args"></a> Don&#8217;t omit the parameter parentheses when defining a stabby lambda with parameters. <sup>[<a href="#stabby-lambda-with-args">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad l = -&gt;x, y { something(x, y) }</p>
+<p># good l = -&gt;(x, y) { something(x, y) } ```</p>
+<ul>
+<li><a name="stabby-lambda-no-args"></a> Omit the parameter parentheses when defining a stabby lambda with no parameters. <sup>[<a href="#stabby-lambda-no-args">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad l = -&gt;() { something }</p>
+<p># good l = -&gt; { something } ```</p>
+<ul>
+<li><a name="proc"></a> Prefer <code>proc</code> over <code>Proc.new</code>. <sup>[<a href="#proc">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad p = Proc.new { |n| puts n }</p>
+<p># good p = proc { |n| puts n } ```</p>
+<ul>
+<li><a name="proc-call"></a> Prefer <code>proc.call()</code> over <code>proc[]</code> or <code>proc.()</code> for both lambdas and procs. <sup>[<a href="#proc-call">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad - looks similar to Enumeration access l = -&gt;(v) { puts v } l[1]</p>
+<p># also bad - uncommon syntax l = -&gt;(v) { puts v } l.(1)</p>
+<p># good l = -&gt;(v) { puts v } l.call(1) ```</p>
+<ul>
+<li><a name="underscore-unused-vars"></a> Prefix with <code>_</code> unused block parameters and local variables. It&#8217;s also acceptable to use just <code>_</code> (although it&#8217;s a bit less descriptive). This convention is recognized by the Ruby interpreter and tools like RuboCop and will suppress their unused variable warnings. <sup>[<a href="#underscore-unused-vars">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad result = hash.map { |k, v| v + 1 }</p>
+<p>def something(x) unused_var, used_var = something_else(x) # some code end</p>
+<p># good result = hash.map { |_k, v| v + 1 }</p>
+<p>def something(x) _unused_var, used_var = something_else(x) # some code end</p>
+<p># good result = hash.map { |_, v| v + 1 }</p>
+<p>def something(x) _, used_var = something_else(x) # some code end ```</p>
+<ul>
+<li><p><a name="global-stdout"></a> Use <code>$stdout/$stderr/$stdin</code> instead of <code>STDOUT/STDERR/STDIN</code>. <code>STDOUT/STDERR/STDIN</code> are constants, and while you can actually reassign (possibly to redirect some stream) constants in Ruby, you&#8217;ll get an interpreter warning if you do so. <sup>[<a href="#global-stdout">link</a>]</sup></p></li>
+<li><p><a name="warn"></a> Use <code>warn</code> instead of <code>$stderr.puts</code>. Apart from being more concise and clear, <code>warn</code> allows you to suppress warnings if you need to (by setting the warn level to 0 via <code>-W0</code>). <sup>[<a href="#warn">link</a>]</sup></p></li>
+<li><p><a name="sprintf"></a> Favor the use of <code>sprintf</code> and its alias <code>format</code> over the fairly cryptic <code>String#%</code> method. <sup>[<a href="#sprintf">link</a>]</sup></p></li>
+</ul>
+<p>```ruby # bad &#8216;%d %d&#8217; % [20, 10] # =&gt; &#8216;20 10&#8217;</p>
+<p># good sprintf(&#8216;%d %d&#8217;, 20, 10) # =&gt; &#8216;20 10&#8217;</p>
+<p># good sprintf(&#8216;%<first>d %<second>d&#8217;, first: 20, second: 10) # =&gt; &#8216;20 10&#8217;</p>
+<p>format(&#8216;%d %d&#8217;, 20, 10) # =&gt; &#8216;20 10&#8217;</p>
+<p># good format(&#8216;%<first>d %<second>d&#8217;, first: 20, second: 10) # =&gt; &#8216;20 10&#8217; ```</p>
+<ul>
+<li><a name="named-format-tokens"></a> When using named format string tokens, favor <code>%&lt;name&gt;s</code> over <code>%{name}</code> because it encodes information about the type of the value. <sup><a href="#named-format-tokens">[link]</a></sup></li>
+</ul>
+<p>```ruby # bad format(&#8216;Hello, %{name}&#8217;, name: &#8216;John&#8217;)</p>
+<p># good format(&#8216;Hello, %<name>s&#8217;, name: &#8216;John&#8217;) ```</p>
+<ul>
+<li><a name="array-join"></a> Favor the use of <code>Array#join</code> over the fairly cryptic <code>Array#*</code> with a string argument. <sup>[<a href="#array-join">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad %w[one two three] * &#8216;,&#8217; # =&gt; &#8216;one, two, three&#8217;</p>
+<p># good %w[one two three].join(&#8216;,&#8217;) # =&gt; &#8216;one, two, three&#8217; ```</p>
+<ul>
+<li><a name="array-coercion"></a> Use <code>Array()</code> instead of explicit <code>Array</code> check or <code>[*var]</code>, when dealing with a variable you want to treat as an Array, but you&#8217;re not certain it&#8217;s an array. <sup>[<a href="#array-coercion">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad paths = [paths] unless paths.is_a? Array paths.each { |path| do_something(path) }</p>
+<p># bad (always creates a new Array instance) [*paths].each { |path| do_something(path) }</p>
+<p># good (and a bit more readable) Array(paths).each { |path| do_something(path) } ```</p>
+<ul>
+<li><a name="ranges-or-between"></a> Use ranges or <code>Comparable#between?</code> instead of complex comparison logic when possible. <sup>[<a href="#ranges-or-between">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad do_something if x &gt;= 1000 &amp;&amp; x &lt;= 2000</p>
+<p># good do_something if (1000..2000).include?(x)</p>
+<p># good do_something if x.between?(1000, 2000) ```</p>
+<ul>
+<li><a name="predicate-methods"></a> Favor the use of predicate methods to explicit comparisons with <code>==</code>. Numeric comparisons are OK. <sup>[<a href="#predicate-methods">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad if x % 2 == 0 end</p>
+<p>if x % 2 == 1 end</p>
+<p>if x == nil end</p>
+<p># good if x.even? end</p>
+<p>if x.odd? end</p>
+<p>if x.nil? end</p>
+<p>if x.zero? end</p>
+<p>if x == 0 end ```</p>
+<ul>
+<li><p><a name="no-non-nil-checks"></a> Don&#8217;t do explicit non-<code>nil</code> checks unless you&#8217;re dealing with boolean values. <sup>[<a href="#no-non-nil-checks">link</a>]</sup></p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+do_something <span class="kw">if</span> !something.nil?
+do_something <span class="kw">if</span> something != <span class="dv">nil</span>
+
+<span class="co"># good</span>
+do_something <span class="kw">if</span> something
+
+<span class="co"># good - dealing with a boolean</span>
+<span class="kw">def</span> value_set?
+  !<span class="ot">@some_boolean</span>.nil?
+<span class="kw">end</span></code></pre></div></li>
+<li><p><a name="no-BEGIN-blocks"></a> Avoid the use of <code>BEGIN</code> blocks. <sup>[<a href="#no-BEGIN-blocks">link</a>]</sup></p></li>
+<li><p><a name="no-END-blocks"></a> Do not use <code>END</code> blocks. Use <code>Kernel#at_exit</code> instead. <sup>[<a href="#no-END-blocks">link</a>]</sup></p></li>
+</ul>
+<p>```ruby # bad END { puts &#8216;Goodbye!&#8217; }</p>
+<p># good at_exit { puts &#8216;Goodbye!&#8217; } ```</p>
+<ul>
+<li><p><a name="no-flip-flops"></a> Avoid the use of flip-flops. <sup>[<a href="#no-flip-flops">link</a>]</sup></p></li>
+<li><p><a name="no-nested-conditionals"></a> Avoid use of nested conditionals for flow of control. <sup>[<a href="#no-nested-conditionals">link</a>]</sup></p></li>
+</ul>
+<p>Prefer a guard clause when you can assert invalid data. A guard clause is a conditional statement at the top of a function that bails out as soon as it can.</p>
+<p>```ruby # bad def compute_thing(thing) if thing[:foo] update_with_bar(thing[:foo]) if thing[:foo][:bar] partial_compute(thing) else re_compute(thing) end end end</p>
+<p># good def compute_thing(thing) return unless thing[:foo] update_with_bar(thing[:foo]) return re_compute(thing) unless thing[:foo][:bar] partial_compute(thing) end ```</p>
+<p>Prefer <code>next</code> in loops instead of conditional blocks.</p>
+<p>```ruby # bad [0, 1, 2, 3].each do |item| if item &gt; 1 puts item end end</p>
+<p># good [0, 1, 2, 3].each do |item| next unless item &gt; 1 puts item end ```</p>
+<ul>
+<li><p><a name="map-find-select-reduce-size"></a> Prefer <code>map</code> over <code>collect</code>, <code>find</code> over <code>detect</code>, <code>select</code> over <code>find_all</code>, <code>reduce</code> over <code>inject</code> and <code>size</code> over <code>length</code>. This is not a hard requirement; if the use of the alias enhances readability, it&#8217;s ok to use it. The rhyming methods are inherited from Smalltalk and are not common in other programming languages. The reason the use of <code>select</code> is encouraged over <code>find_all</code> is that it goes together nicely with <code>reject</code> and its name is pretty self-explanatory. <sup>[<a href="#map-find-select-reduce-size">link</a>]</sup></p></li>
+<li><p><a name="count-vs-size"></a> Don&#8217;t use <code>count</code> as a substitute for <code>size</code>. For <code>Enumerable</code> objects other than <code>Array</code> it will iterate the entire collection in order to determine its size. <sup>[<a href="#count-vs-size">link</a>]</sup></p></li>
+</ul>
+<p>```ruby # bad some_hash.count</p>
+<p># good some_hash.size ```</p>
+<ul>
+<li><a name="flat-map"></a> Use <code>flat_map</code> instead of <code>map</code> + <code>flatten</code>. This does not apply for arrays with a depth greater than 2, i.e. if <code>users.first.songs == ['a', ['b','c']]</code>, then use <code>map + flatten</code> rather than <code>flat_map</code>. <code>flat_map</code> flattens the array by 1, whereas <code>flatten</code> flattens it all the way. <sup>[<a href="#flat-map">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad all_songs = users.map(&amp;:songs).flatten.uniq</p>
+<p># good all_songs = users.flat_map(&amp;:songs).uniq ```</p>
+<ul>
+<li><a name="reverse-each"></a> Prefer <code>reverse_each</code> to <code>reverse.each</code> because some classes that <code>include   Enumerable</code> will provide an efficient implementation. Even in the worst case where a class does not provide a specialized implementation, the general implementation inherited from <code>Enumerable</code> will be at least as efficient as using <code>reverse.each</code>. <sup>[<a href="#reverse-each">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad array.reverse.each { &#8230; }</p>
+<p># good array.reverse_each { &#8230; } ```</p>
+<h2 id="naming">Naming</h2>
+<blockquote>
+<p>The only real difficulties in programming are cache invalidation and naming things. <br> &#8211; Phil Karlton</p>
+</blockquote>
+<ul>
+<li><a name="english-identifiers"></a> Name identifiers in English. <sup>[<a href="#english-identifiers">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad - identifier using non-ascii characters &#1079;&#1072;&#1087;&#1083;&#1072;&#1090;&#1072; = 1_000</p>
+<p># bad - identifier is a Bulgarian word, written with Latin letters (instead of Cyrillic) zaplata = 1_000</p>
+<p># good salary = 1_000 ```</p>
+<ul>
+<li><a name="snake-case-symbols-methods-vars"></a> Use <code>snake_case</code> for symbols, methods and variables. <sup>[<a href="#snake-case-symbols-methods-vars">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad :&#8216;some symbol&#8217; :SomeSymbol :someSymbol</p>
+<p>someVar = 5 var_10 = 10</p>
+<p>def someMethod # some code end</p>
+<p>def SomeMethod # some code end</p>
+<p># good :some_symbol</p>
+<p>some_var = 5 var10 = 10</p>
+<p>def some_method # some code end ```</p>
+<ul>
+<li><a name="snake-case-symbols-methods-vars-with-numbers"></a> Do not separate numbers from letters on symbols, methods and variables. <sup>[<a href="#snake-case-symbols-methods-vars-with-numbers">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad :some_sym_1</p>
+<p>some_var_1 = 1</p>
+<p>def some_method_1 # some code end</p>
+<p># good :some_sym1</p>
+<p>some_var1 = 1</p>
+<p>def some_method1 # some code end ```</p>
+<ul>
+<li><a name="camelcase-classes"></a> Use <code>CamelCase</code> for classes and modules. (Keep acronyms like HTTP, RFC, XML uppercase.) <sup>[<a href="#camelcase-classes">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad class Someclass # some code end</p>
+<p>class Some_Class # some code end</p>
+<p>class SomeXml # some code end</p>
+<p>class XmlSomething # some code end</p>
+<p># good class SomeClass # some code end</p>
+<p>class SomeXML # some code end</p>
+<p>class XMLSomething # some code end ```</p>
+<ul>
+<li><p><a name="snake-case-files"></a> Use <code>snake_case</code> for naming files, e.g. <code>hello_world.rb</code>. <sup>[<a href="#snake-case-files">link</a>]</sup></p></li>
+<li><p><a name="snake-case-dirs"></a> Use <code>snake_case</code> for naming directories, e.g. <code>lib/hello_world/hello_world.rb</code>. <sup>[<a href="#snake-case-dirs">link</a>]</sup></p></li>
+<li><p><a name="one-class-per-file"></a> Aim to have just a single class/module per source file. Name the file name as the class/module, but replacing CamelCase with snake_case. <sup>[<a href="#one-class-per-file">link</a>]</sup></p></li>
+<li><p><a name="screaming-snake-case"></a> Use <code>SCREAMING_SNAKE_CASE</code> for other constants. <sup>[<a href="#screaming-snake-case">link</a>]</sup></p></li>
+</ul>
+<p>```ruby # bad SomeConst = 5</p>
+<p># good SOME_CONST = 5 ```</p>
+<ul>
+<li><p><a name="bool-methods-qmark"></a> The names of predicate methods (methods that return a boolean value) should end in a question mark. (i.e. <code>Array#empty?</code>). Methods that don&#8217;t return a boolean, shouldn&#8217;t end in a question mark. <sup>[<a href="#bool-methods-qmark">link</a>]</sup></p></li>
+<li><p><a name="bool-methods-prefix"></a> Avoid prefixing predicate methods with the auxiliary verbs such as <code>is</code>, <code>does</code>, or <code>can</code>. These words are redundant and inconsistent with the style of boolean methods in the Ruby core library, such as <code>empty?</code> and <code>include?</code>. <sup>[<a href="#bool-methods-prefix">link</a>]</sup></p></li>
+</ul>
+<p>```ruby # bad class Person def is_tall? true end</p>
+<pre><code>def can_play_basketball?
+  false
+end
+
+def does_like_candy?
+  true
+end</code></pre>
+<p>end</p>
+<p># good class Person def tall? true end</p>
+<pre><code>def basketball_player?
+  false
+end
+
+def likes_candy?
+  true
+end</code></pre>
+<p>end ```</p>
+<ul>
+<li><a name="dangerous-method-bang"></a> The names of potentially <em>dangerous</em> methods (i.e.&#160;methods that modify <code>self</code> or the arguments, <code>exit!</code> (doesn&#8217;t run the finalizers like <code>exit</code> does), etc.) should end with an exclamation mark if there exists a safe version of that <em>dangerous</em> method. <sup>[<a href="#dangerous-method-bang">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad - there is no matching &#8216;safe&#8217; method class Person def update! end end</p>
+<p># good class Person def update end end</p>
+<p># good class Person def update! end</p>
+<pre><code>def update
+end</code></pre>
+<p>end ```</p>
+<ul>
+<li><a name="safe-because-unsafe"></a> Define the non-bang (safe) method in terms of the bang (dangerous) one if possible. <sup>[<a href="#safe-because-unsafe">link</a>]</sup></li>
+</ul>
+<p>```ruby class Array def flatten_once! res = []</p>
+<pre><code>  each do |e|
+    [*e].each { |f| res &lt;&lt; f }
+  end
+
+  replace(res)
+end
+
+def flatten_once
+  dup.flatten_once!
+end</code></pre>
+<p>end ```</p>
+<ul>
+<li><a name="other-arg"></a> When defining binary operators, name the parameter <code>other</code>(<code>&lt;&lt;</code> and <code>[]</code> are exceptions to the rule, since their semantics are different). <sup>[<a href="#other-arg">link</a>]</sup></li>
+</ul>
+<p><code>ruby   def +(other)     # body omitted   end</code></p>
+<h2 id="comments">Comments</h2>
+<blockquote>
+<p>Good code is its own best documentation. As you&#8217;re about to add a comment, ask yourself, &#8220;How can I improve the code so that this comment isn&#8217;t needed?&#8221; Improve the code and then document it to make it even clearer. <br> &#8211; Steve McConnell</p>
+</blockquote>
+<ul>
+<li><p><a name="no-comments"></a> Write self-documenting code and ignore the rest of this section. Seriously! <sup>[<a href="#no-comments">link</a>]</sup></p></li>
+<li><p><a name="english-comments"></a> Write comments in English. <sup>[<a href="#english-comments">link</a>]</sup></p></li>
+<li><p><a name="hash-space"></a> Use one space between the leading <code>#</code> character of the comment and the text of the comment. <sup>[<a href="#hash-space">link</a>]</sup></p></li>
+<li><p><a name="english-syntax"></a> Comments longer than a word are capitalized and use punctuation. Use <a href="https://en.wikipedia.org/wiki/Sentence_spacing">one space</a> after periods. <sup>[<a href="#english-syntax">link</a>]</sup></p></li>
+<li><p><a name="no-superfluous-comments"></a> Avoid superfluous comments. <sup>[<a href="#no-superfluous-comments">link</a>]</sup></p></li>
+</ul>
+<p><code>ruby   # bad   counter += 1 # Increments counter by one.</code></p>
+<ul>
+<li><a name="comment-upkeep"></a> Keep existing comments up-to-date. An outdated comment is worse than no comment at all. <sup>[<a href="#comment-upkeep">link</a>]</sup></li>
+</ul>
+<blockquote>
+<p>Good code is like a good joke: it needs no explanation. <br> &#8212; old programmers maxim, through <a href="http://eloquentruby.com/blog/2011/03/07/good-code-and-good-jokes/">Russ Olsen</a></p>
+</blockquote>
+<ul>
+<li><a name="refactor-dont-comment"></a> Avoid writing comments to explain bad code. Refactor the code to make it self-explanatory. (&#8220;Do or do not&#8212;there is no try.&#8221; Yoda) <sup>[<a href="#refactor-dont-comment">link</a>]</sup></li>
+</ul>
+<h3 id="comment-annotations">Comment Annotations</h3>
+<ul>
+<li><p><a name="annotate-above"></a> Annotations should usually be written on the line immediately above the relevant code. <sup>[<a href="#annotate-above">link</a>]</sup></p></li>
+<li><p><a name="annotate-keywords"></a> The annotation keyword is followed by a colon and a space, then a note describing the problem. <sup>[<a href="#annotate-keywords">link</a>]</sup></p></li>
+<li><p><a name="indent-annotations"></a> If multiple lines are required to describe the problem, subsequent lines should be indented three spaces after the <code>#</code> (one general plus two for indentation purpose). <sup>[<a href="#indent-annotations">link</a>]</sup></p></li>
+</ul>
+<p><code>ruby   def bar     # FIXME: This has crashed occasionally since v3.2.1. It may     #   be related to the BarBazUtil upgrade.     baz(:quux)   end</code></p>
+<ul>
+<li><a name="rare-eol-annotations"></a> In cases where the problem is so obvious that any documentation would be redundant, annotations may be left at the end of the offending line with no note. This usage should be the exception and not the rule. <sup>[<a href="#rare-eol-annotations">link</a>]</sup></li>
+</ul>
+<p><code>ruby   def bar     sleep 100 # OPTIMIZE   end</code></p>
+<ul>
+<li><p><a name="todo"></a> Use <code>TODO</code> to note missing features or functionality that should be added at a later date. <sup>[<a href="#todo">link</a>]</sup></p></li>
+<li><p><a name="fixme"></a> Use <code>FIXME</code> to note broken code that needs to be fixed. <sup>[<a href="#fixme">link</a>]</sup></p></li>
+<li><p><a name="optimize"></a> Use <code>OPTIMIZE</code> to note slow or inefficient code that may cause performance problems. <sup>[<a href="#optimize">link</a>]</sup></p></li>
+<li><p><a name="hack"></a> Use <code>HACK</code> to note code smells where questionable coding practices were used and should be refactored away. <sup>[<a href="#hack">link</a>]</sup></p></li>
+<li><p><a name="review"></a> Use <code>REVIEW</code> to note anything that should be looked at to confirm it is working as intended. For example: <code>REVIEW: Are we sure this is how the client   does X currently?</code> <sup>[<a href="#review">link</a>]</sup></p></li>
+<li><p><a name="document-annotations"></a> Use other custom annotation keywords if it feels appropriate, but be sure to document them in your project&#8217;s <code>README</code> or similar. <sup>[<a href="#document-annotations">link</a>]</sup></p></li>
+</ul>
+<h3 id="magic-comments">Magic Comments</h3>
+<ul>
+<li><a name="magic-comments-first"></a> Place magic comments above all code and documentation. Magic comments should only go below shebangs if they are needed in your source file. <sup>[<a href="#magic-comments-first">link</a>]</sup></li>
+</ul>
+<p>```ruby # good # frozen_string_literal: true # Some documentation about Person class Person end</p>
+<p># bad # Some documentation about Person # frozen_string_literal: true class Person end ```</p>
+<p>```ruby # good #!/usr/bin/env ruby # frozen_string_literal: true App.parse(ARGV)</p>
+<p># bad # frozen_string_literal: true #!/usr/bin/env ruby App.parse(ARGV) ```</p>
+<ul>
+<li><a name="one-magic-comment-per-line"></a> Use one magic comment per line if you need multiple. <sup>[<a href="#one-magic-comment-per-line">link</a>]</sup></li>
+</ul>
+<p>```ruby # good # frozen_string_literal: true # encoding: ascii-8bit</p>
+<p># bad # -<em>- frozen_string_literal: true; encoding: ascii-8bit -</em>- ```</p>
+<ul>
+<li><a name="separate-magic-comments-from-code"></a> Separate magic comments from code and documentation with a blank line. <sup>[<a href="#separate-magic-comments-from-code">link</a>]</sup></li>
+</ul>
+<p>```ruby # good # frozen_string_literal: true</p>
+<p># Some documentation for Person class Person # Some code end</p>
+<p># bad # frozen_string_literal: true # Some documentation for Person class Person # Some code end ```</p>
+<h2 id="classes-modules">Classes &amp; Modules</h2>
+<ul>
+<li><a name="consistent-classes"></a> Use a consistent structure in your class definitions. <sup>[<a href="#consistent-classes">link</a>]</sup></li>
+</ul>
+<p>```ruby class Person # extend and include go first extend SomeModule include AnotherModule</p>
+<pre><code># inner classes
+CustomError = Class.new(StandardError)
+
+# constants are next
+SOME_CONSTANT = 20
+
+# afterwards we have attribute macros
+attr_reader :name
+
+# followed by other macros (if any)
+validates :name
+
+# public class methods are next in line
+def self.some_method
+end
+
+# initialization goes between class methods and other instance methods
+def initialize
+end
+
+# followed by other public instance methods
+def some_method
+end
+
+# protected and private methods are grouped near the end
+protected
+
+def some_protected_method
+end
+
+private
+
+def some_private_method
+end</code></pre>
+<p>end ```</p>
+<ul>
+<li><a name="mixin-grouping"></a> Split multiple mixins into separate statements. <sup>[<a href="#mixin-grouping">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad class Person include Foo, Bar end</p>
+<p># good class Person # multiple mixins go in separate statements include Foo include Bar end ```</p>
+<ul>
+<li><a name="file-classes"></a> Don&#8217;t nest multi-line classes within classes. Try to have such nested classes each in their own file in a folder named like the containing class. <sup>[<a href="#file-classes">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad</p>
+<p># foo.rb class Foo class Bar # 30 methods inside end</p>
+<pre><code>class Car
+  # 20 methods inside
+end
+
+# 30 methods inside</code></pre>
+<p>end</p>
+<p># good</p>
+<p># foo.rb class Foo # 30 methods inside end</p>
+<p># foo/bar.rb class Foo class Bar # 30 methods inside end end</p>
+<p># foo/car.rb class Foo class Car # 20 methods inside end end ```</p>
+<ul>
+<li><a name="modules-vs-classes"></a> Prefer modules to classes with only class methods. Classes should be used only when it makes sense to create instances out of them. <sup>[<a href="#modules-vs-classes">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad class SomeClass def self.some_method # body omitted end</p>
+<pre><code>def self.some_other_method
+  # body omitted
+end</code></pre>
+<p>end</p>
+<p># good module SomeModule module_function</p>
+<pre><code>def some_method
+  # body omitted
+end
+
+def some_other_method
+  # body omitted
+end</code></pre>
+<p>end ```</p>
+<ul>
+<li><a name="module-function"></a> Favor the use of <code>module_function</code> over <code>extend self</code> when you want to turn a module&#8217;s instance methods into class methods. <sup>[<a href="#module-function">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad module Utilities extend self</p>
+<pre><code>def parse_something(string)
+  # do stuff here
+end
+
+def other_utility_method(number, string)
+  # do some more stuff
+end</code></pre>
+<p>end</p>
+<p># good module Utilities module_function</p>
+<pre><code>def parse_something(string)
+  # do stuff here
+end
+
+def other_utility_method(number, string)
+  # do some more stuff
+end</code></pre>
+<p>end ```</p>
+<ul>
+<li><p><a name="liskov"></a> When designing class hierarchies make sure that they conform to the <a href="https://en.wikipedia.org/wiki/Liskov_substitution_principle">Liskov Substitution Principle</a>. <sup>[<a href="#liskov">link</a>]</sup></p></li>
+<li><p><a name="solid-design"></a> Try to make your classes as <a href="https://en.wikipedia.org/wiki/SOLID_(object-oriented_design)">SOLID</a> as possible. <sup>[<a href="#solid-design">link</a>]</sup></p></li>
+<li><p><a name="define-to-s"></a> Always supply a proper <code>to_s</code> method for classes that represent domain objects. <sup>[<a href="#define-to-s">link</a>]</sup></p></li>
+</ul>
+<p>```ruby class Person attr_reader :first_name, :last_name</p>
+<pre><code>def initialize(first_name, last_name)
+  @first_name = first_name
+  @last_name = last_name
+end
+
+def to_s
+  &quot;#{@first_name} #{@last_name}&quot;
+end</code></pre>
+<p>end ```</p>
+<ul>
+<li><a name="attr_family"></a> Use the <code>attr</code> family of functions to define trivial accessors or mutators. <sup>[<a href="#attr_family">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad class Person def initialize(first_name, last_name) <span class="citation">@first_name</span> = first_name <span class="citation">@last_name</span> = last_name end</p>
+<pre><code>def first_name
+  @first_name
+end
+
+def last_name
+  @last_name
+end</code></pre>
+<p>end</p>
+<p># good class Person attr_reader :first_name, :last_name</p>
+<pre><code>def initialize(first_name, last_name)
+  @first_name = first_name
+  @last_name = last_name
+end</code></pre>
+<p>end ```</p>
+<ul>
+<li><a name="accessor_mutator_method_names"></a> For accessors and mutators, avoid prefixing method names with <code>get_</code> and <code>set_</code>. It is a Ruby convention to use attribute names for accessors (readers) and <code>attr_name=</code> for mutators (writers). <sup>[<a href="#accessor_mutator_method_names">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad class Person def get_name &#8220;#{<span class="citation">@first_name</span>} #{<span class="citation">@last_name</span>}&#8221; end</p>
+<pre><code>def set_name(name)
+  @first_name, @last_name = name.split(&#39; &#39;)
+end</code></pre>
+<p>end</p>
+<p># good class Person def name &#8220;#{<span class="citation">@first_name</span>} #{<span class="citation">@last_name</span>}&#8221; end</p>
+<pre><code>def name=(name)
+  @first_name, @last_name = name.split(&#39; &#39;)
+end</code></pre>
+<p>end ```</p>
+<ul>
+<li><a name="attr"></a> Avoid the use of <code>attr</code>. Use <code>attr_reader</code> and <code>attr_accessor</code> instead. <sup>[<a href="#attr">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad - creates a single attribute accessor (deprecated in Ruby 1.9) attr :something, true attr :one, :two, :three # behaves as attr_reader</p>
+<p># good attr_accessor :something attr_reader :one, :two, :three ```</p>
+<ul>
+<li><a name="struct-new"></a> Consider using <code>Struct.new</code>, which defines the trivial accessors, constructor and comparison operators for you. <sup>[<a href="#struct-new">link</a>]</sup></li>
+</ul>
+<p>```ruby # good class Person attr_accessor :first_name, :last_name</p>
+<pre><code>def initialize(first_name, last_name)
+  @first_name = first_name
+  @last_name = last_name
+end</code></pre>
+<p>end</p>
+<p># better Person = Struct.new(:first_name, :last_name) do end ```</p>
+<ul>
+<li><a name="no-extend-struct-new"></a> Don&#8217;t extend an instance initialized by <code>Struct.new</code>. Extending it introduces a superfluous class level and may also introduce weird errors if the file is required multiple times. <sup>[<a href="#no-extend-struct-new">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad class Person &lt; Struct.new(:first_name, :last_name) end</p>
+<p># good Person = Struct.new(:first_name, :last_name) ```</p>
+<ul>
+<li><a name="factory-methods"></a> Consider adding factory methods to provide additional sensible ways to create instances of a particular class. <sup>[<a href="#factory-methods">link</a>]</sup></li>
+</ul>
+<p><code>ruby   class Person     def self.create(options_hash)       # body omitted     end   end</code></p>
+<ul>
+<li><a name="duck-typing"></a> Prefer <a href="https://en.wikipedia.org/wiki/Duck_typing">duck-typing</a> over inheritance. <sup>[<a href="#duck-typing">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad class Animal # abstract method def speak end end</p>
+<p># extend superclass class Duck &lt; Animal def speak puts &#8216;Quack! Quack&#8217; end end</p>
+<p># extend superclass class Dog &lt; Animal def speak puts &#8216;Bau! Bau!&#8217; end end</p>
+<p># good class Duck def speak puts &#8216;Quack! Quack&#8217; end end</p>
+<p>class Dog def speak puts &#8216;Bau! Bau!&#8217; end end ```</p>
+<ul>
+<li><a name="no-class-vars"></a> Avoid the usage of class (<code>@@</code>) variables due to their &#8220;nasty&#8221; behavior in inheritance. <sup>[<a href="#no-class-vars">link</a>]</sup></li>
+</ul>
+<p>```ruby class Parent @<span class="citation">@class_var</span> = &#8216;parent&#8217;</p>
+<pre><code>def self.print_class_var
+  puts @@class_var
+end</code></pre>
+<p>end</p>
+<p>class Child &lt; Parent @<span class="citation">@class_var</span> = &#8216;child&#8217; end</p>
+<p>Parent.print_class_var # =&gt; will print &#8216;child&#8217; ```</p>
+<p>As you can see all the classes in a class hierarchy actually share one class variable. Class instance variables should usually be preferred over class variables.</p>
+<ul>
+<li><p><a name="visibility"></a> Assign proper visibility levels to methods (<code>private</code>, <code>protected</code>) in accordance with their intended usage. Don&#8217;t go off leaving everything <code>public</code> (which is the default). After all we&#8217;re coding in <em>Ruby</em> now, not in <em>Python</em>. <sup>[<a href="#visibility">link</a>]</sup></p></li>
+<li><p><a name="indent-public-private-protected"></a> Indent the <code>public</code>, <code>protected</code>, and <code>private</code> methods as much as the method definitions they apply to. Leave one blank line above the visibility modifier and one blank line below in order to emphasize that it applies to all methods below it. <sup>[<a href="#indent-public-private-protected">link</a>]</sup></p></li>
+</ul>
+<p>```ruby class SomeClass def public_method # some code end</p>
+<pre><code>private
+
+def private_method
+  # some code
+end
+
+def another_private_method
+  # some code
+end</code></pre>
+<p>end ```</p>
+<ul>
+<li><a name="def-self-class-methods"></a> Use <code>def self.method</code> to define class methods. This makes the code easier to refactor since the class name is not repeated. <sup>[<a href="#def-self-class-methods">link</a>]</sup></li>
+</ul>
+<p>```ruby class TestClass # bad def TestClass.some_method # body omitted end</p>
+<pre><code># good
+def self.some_other_method
+  # body omitted
+end
+
+# Also possible and convenient when you
+# have to define many class methods.
+class &lt;&lt; self
+  def first_method
+    # body omitted
+  end
+
+  def second_method_etc
+    # body omitted
+  end
+end</code></pre>
+<p>end ```</p>
+<ul>
+<li><a name="alias-method-lexically"></a> Prefer <code>alias</code> when aliasing methods in lexical class scope as the resolution of <code>self</code> in this context is also lexical, and it communicates clearly to the user that the indirection of your alias will not be altered at runtime or by any subclass unless made explicit. <sup>[<a href="#alias-method-lexically">link</a>]</sup></li>
+</ul>
+<p>```ruby class Westerner def first_name <span class="citation">@names.first</span> end</p>
+<pre><code>alias given_name first_name</code></pre>
+<p>end ```</p>
+<p>Since <code>alias</code>, like <code>def</code>, is a keyword, prefer bareword arguments over symbols or strings. In other words, do <code>alias foo bar</code>, not <code>alias :foo :bar</code>.</p>
+<p>Also be aware of how Ruby handles aliases and inheritance: an alias references the method that was resolved at the time the alias was defined; it is not dispatched dynamically.</p>
+<p><code>ruby   class Fugitive &lt; Westerner     def first_name       'Nobody'     end   end</code></p>
+<p>In this example, <code>Fugitive#given_name</code> would still call the original <code>Westerner#first_name</code> method, not <code>Fugitive#first_name</code>. To override the behavior of <code>Fugitive#given_name</code> as well, you&#8217;d have to redefine it in the derived class.</p>
+<p>```ruby class Fugitive &lt; Westerner def first_name &#8216;Nobody&#8217; end</p>
+<pre><code>alias given_name first_name</code></pre>
+<p>end ```</p>
+<ul>
+<li><a name="alias-method"></a> Always use <code>alias_method</code> when aliasing methods of modules, classes, or singleton classes at runtime, as the lexical scope of <code>alias</code> leads to unpredictability in these cases. <sup>[<a href="#alias-method">link</a>]</sup></li>
+</ul>
+<p>```ruby module Mononymous def self.included(other) other.class_eval { alias_method :full_name, :given_name } end end</p>
+<p>class Sting &lt; Westerner include Mononymous end ```</p>
+<ul>
+<li><a name="class-and-self"></a> When class (or module) methods call other such methods, omit the use of a leading <code>self</code> or own name followed by a <code>.</code> when calling other such methods. This is often seen in &#8220;service classes&#8221; or other similar concepts where a class is treated as though it were a function. This convention tends to reduce repetitive boilerplate in such classes. <sup>[<a href="#class-and-self">link</a>]</sup></li>
+</ul>
+<p>```ruby class TestClass # bad &#8211; more work when class renamed/method moved def self.call(param1, param2) TestClass.new(param1).call(param2) end</p>
+<pre><code># bad -- more verbose than necessary
+def self.call(param1, param2)
+  self.new(param1).call(param2)
+end
+
+# good
+def self.call(param1, param2)
+  new(param1).call(param2)
+end
+
+# ...other methods...</code></pre>
+<p>end ```</p>
+<h2 id="exceptions">Exceptions</h2>
+<ul>
+<li><a name="prefer-raise-over-fail"></a> Prefer <code>raise</code> over <code>fail</code> for exceptions. <sup>[<a href="#prefer-raise-over-fail">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad fail SomeException, &#8216;message&#8217;</p>
+<p># good raise SomeException, &#8216;message&#8217; ```</p>
+<ul>
+<li><a name="no-explicit-runtimeerror"></a> Don&#8217;t specify <code>RuntimeError</code> explicitly in the two argument version of <code>raise</code>. <sup>[<a href="#no-explicit-runtimeerror">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad raise RuntimeError, &#8216;message&#8217;</p>
+<p># good - signals a RuntimeError by default raise &#8216;message&#8217; ```</p>
+<ul>
+<li><a name="exception-class-messages"></a> Prefer supplying an exception class and a message as two separate arguments to <code>raise</code>, instead of an exception instance. <sup>[<a href="#exception-class-messages">link</a>]</sup></li>
+</ul>
+<p>``<code>ruby   # bad   raise SomeException.new('message')   # Note that there is no way to do</code>raise SomeException.new(&#8216;message&#8217;), backtrace`.</p>
+<p># good raise SomeException, &#8216;message&#8217; # Consistent with <code>raise SomeException, 'message', backtrace</code>. ```</p>
+<ul>
+<li><a name="no-return-ensure"></a> Do not return from an <code>ensure</code> block. If you explicitly return from a method inside an <code>ensure</code> block, the return will take precedence over any exception being raised, and the method will return as if no exception had been raised at all. In effect, the exception will be silently thrown away. <sup>[<a href="#no-return-ensure">link</a>]</sup></li>
+</ul>
+<p><code>ruby   # bad   def foo     raise   ensure     return 'very bad idea'   end</code></p>
+<ul>
+<li><a name="begin-implicit"></a> Use <em>implicit begin blocks</em> where possible. <sup>[<a href="#begin-implicit">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad def foo begin # main logic goes here rescue # failure handling goes here end end</p>
+<p># good def foo # main logic goes here rescue # failure handling goes here end ```</p>
+<ul>
+<li><a name="contingency-methods"></a> Mitigate the proliferation of <code>begin</code> blocks by using <em>contingency methods</em> (a term coined by Avdi Grimm). <sup>[<a href="#contingency-methods">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad begin something_that_might_fail rescue IOError # handle IOError end</p>
+<p>begin something_else_that_might_fail rescue IOError # handle IOError end</p>
+<p># good def with_io_error_handling yield rescue IOError # handle IOError end</p>
+<p>with_io_error_handling { something_that_might_fail }</p>
+<p>with_io_error_handling { something_else_that_might_fail } ```</p>
+<ul>
+<li><a name="dont-hide-exceptions"></a> Don&#8217;t suppress exceptions. <sup>[<a href="#dont-hide-exceptions">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad begin # an exception occurs here rescue SomeError # the rescue clause does absolutely nothing end</p>
+<p># bad do_something rescue nil ```</p>
+<ul>
+<li><a name="no-rescue-modifiers"></a> Avoid using <code>rescue</code> in its modifier form. <sup>[<a href="#no-rescue-modifiers">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad - this catches exceptions of StandardError class and its descendant classes read_file rescue handle_error($!)</p>
+<p># good - this catches only the exceptions of Errno::ENOENT class and its descendant classes def foo read_file rescue Errno::ENOENT =&gt; ex handle_error(ex) end ```</p>
+<ul>
+<li><a name="no-exceptional-flows"></a> Don&#8217;t use exceptions for flow of control. <sup>[<a href="#no-exceptional-flows">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad begin n / d rescue ZeroDivisionError puts &#8216;Cannot divide by 0!&#8217; end</p>
+<p># good if d.zero? puts &#8216;Cannot divide by 0!&#8217; else n / d end ```</p>
+<ul>
+<li><a name="no-blind-rescues"></a> Avoid rescuing the <code>Exception</code> class. This will trap signals and calls to <code>exit</code>, requiring you to <code>kill -9</code> the process. <sup>[<a href="#no-blind-rescues">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad begin # calls to exit and kill signals will be caught (except kill -9) exit rescue Exception puts &#8220;you didn&#8217;t really want to exit, right?&#8221; # exception handling end</p>
+<p># good begin # a blind rescue rescues from StandardError, not Exception as many # programmers assume. rescue =&gt; e # exception handling end</p>
+<p># also good begin # an exception occurs here rescue StandardError =&gt; e # exception handling end ```</p>
+<ul>
+<li><a name="exception-ordering"></a> Put more specific exceptions higher up the rescue chain, otherwise they&#8217;ll never be rescued from. <sup>[<a href="#exception-ordering">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad begin # some code rescue StandardError =&gt; e # some handling rescue IOError =&gt; e # some handling that will never be executed end</p>
+<p># good begin # some code rescue IOError =&gt; e # some handling rescue StandardError =&gt; e # some handling end ```</p>
+<ul>
+<li><a name="release-resources"></a> Release external resources obtained by your program in an <code>ensure</code> block. <sup>[<a href="#release-resources">link</a>]</sup></li>
+</ul>
+<p><code>ruby   f = File.open('testfile')   begin     # .. process   rescue     # .. handle error   ensure     f.close if f   end</code></p>
+<ul>
+<li><a name="auto-release-resources"></a> Use versions of resource obtaining methods that do automatic resource cleanup when possible. <sup>[<a href="#auto-release-resources">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad - you need to close the file descriptor explicitly f = File.open(&#8216;testfile&#8217;) # some action on the file f.close</p>
+<p># good - the file descriptor is closed automatically File.open(&#8216;testfile&#8217;) do |f| # some action on the file end ```</p>
+<ul>
+<li><a name="standard-exceptions"></a> Favor the use of exceptions from the standard library over introducing new exception classes. <sup>[<a href="#standard-exceptions">link</a>]</sup></li>
+</ul>
+<h2 id="collections">Collections</h2>
+<ul>
+<li><a name="literal-array-hash"></a> Prefer literal array and hash creation notation (unless you need to pass parameters to their constructors, that is). <sup>[<a href="#literal-array-hash">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad arr = Array.new hash = Hash.new</p>
+<p># good arr = [] arr = Array.new(10) hash = {} hash = Hash.new(0) ```</p>
+<ul>
+<li><a name="percent-w"></a> Prefer <code>%w</code> to the literal array syntax when you need an array of words (non-empty strings without spaces and special characters in them). Apply this rule only to arrays with two or more elements. <sup>[<a href="#percent-w">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad STATES = [&#8216;draft&#8217;, &#8216;open&#8217;, &#8216;closed&#8217;]</p>
+<p># good STATES = %w[draft open closed] ```</p>
+<ul>
+<li><a name="percent-i"></a> Prefer <code>%i</code> to the literal array syntax when you need an array of symbols (and you don&#8217;t need to maintain Ruby 1.9 compatibility). Apply this rule only to arrays with two or more elements. <sup>[<a href="#percent-i">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad STATES = [:draft, :open, :closed]</p>
+<p># good STATES = %i[draft open closed] ```</p>
+<ul>
+<li><a name="no-trailing-array-commas"></a> Avoid comma after the last item of an <code>Array</code> or <code>Hash</code> literal, especially when the items are not on separate lines. <sup>[<a href="#no-trailing-array-commas">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad - easier to move/add/remove items, but still not preferred VALUES = [ 1001, 2020, 3333, ]</p>
+<p># bad VALUES = [1001, 2020, 3333, ]</p>
+<p># good VALUES = [1001, 2020, 3333] ```</p>
+<ul>
+<li><a name="no-gappy-arrays"></a> Avoid the creation of huge gaps in arrays. <sup>[<a href="#no-gappy-arrays">link</a>]</sup></li>
+</ul>
+<p><code>ruby   arr = []   arr[100] = 1 # now you have an array with lots of nils</code></p>
+<ul>
+<li><p><a name="first-and-last"></a> When accessing the first or last element from an array, prefer <code>first</code> or <code>last</code> over <code>[0]</code> or <code>[-1]</code>. <sup>[<a href="#first-and-last">link</a>]</sup></p></li>
+<li><p><a name="set-vs-array"></a> Use <code>Set</code> instead of <code>Array</code> when dealing with unique elements. <code>Set</code> implements a collection of unordered values with no duplicates. This is a hybrid of <code>Array</code>&#8217;s intuitive inter-operation facilities and <code>Hash</code>&#8217;s fast lookup. <sup>[<a href="#set-vs-array">link</a>]</sup></p></li>
+<li><p><a name="symbols-as-keys"></a> Prefer symbols instead of strings as hash keys. <sup>[<a href="#symbols-as-keys">link</a>]</sup></p></li>
+</ul>
+<p>```ruby # bad hash = { &#8216;one&#8217; =&gt; 1, &#8216;two&#8217; =&gt; 2, &#8216;three&#8217; =&gt; 3 }</p>
+<p># good hash = { one: 1, two: 2, three: 3 } ```</p>
+<ul>
+<li><p><a name="no-mutable-keys"></a> Avoid the use of mutable objects as hash keys. <sup>[<a href="#no-mutable-keys">link</a>]</sup></p></li>
+<li><p><a name="hash-literals"></a> Use the Ruby 1.9 hash literal syntax when your hash keys are symbols. <sup>[<a href="#hash-literals">link</a>]</sup></p></li>
+</ul>
+<p>```ruby # bad hash = { :one =&gt; 1, :two =&gt; 2, :three =&gt; 3 }</p>
+<p># good hash = { one: 1, two: 2, three: 3 } ```</p>
+<ul>
+<li><a name="no-mixed-hash-syntaces"></a> Don&#8217;t mix the Ruby 1.9 hash syntax with hash rockets in the same hash literal. When you&#8217;ve got keys that are not symbols stick to the hash rockets syntax. <sup>[<a href="#no-mixed-hash-syntaces">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad { a: 1, &#8216;b&#8217; =&gt; 2 }</p>
+<p># good { :a =&gt; 1, &#8216;b&#8217; =&gt; 2 } ```</p>
+<ul>
+<li><a name="hash-key"></a> Use <code>Hash#key?</code> instead of <code>Hash#has_key?</code> and <code>Hash#value?</code> instead of <code>Hash#has_value?</code>. <sup>[<a href="#hash-key">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad hash.has_key?(:test) hash.has_value?(value)</p>
+<p># good hash.key?(:test) hash.value?(value) ```</p>
+<ul>
+<li><a name="hash-each"></a> Use <code>Hash#each_key</code> instead of <code>Hash#keys.each</code> and <code>Hash#each_value</code> instead of <code>Hash#values.each</code>. <sup>[<a href="#hash-each">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad hash.keys.each { |k| p k } hash.values.each { |v| p v } hash.each { |k, _v| p k } hash.each { |_k, v| p v }</p>
+<p># good hash.each_key { |k| p k } hash.each_value { |v| p v } ```</p>
+<ul>
+<li><a name="hash-fetch"></a> Use <code>Hash#fetch</code> when dealing with hash keys that should be present. <sup>[<a href="#hash-fetch">link</a>]</sup></li>
+</ul>
+<p>```ruby heroes = { batman: &#8216;Bruce Wayne&#8217;, superman: &#8216;Clark Kent&#8217; } # bad - if we make a mistake we might not spot it right away heroes[:batman] # =&gt; &#8216;Bruce Wayne&#8217; heroes[:supermann] # =&gt; nil</p>
+<p># good - fetch raises a KeyError making the problem obvious heroes.fetch(:supermann) ```</p>
+<ul>
+<li><a name="hash-fetch-defaults"></a> Introduce default values for hash keys via <code>Hash#fetch</code> as opposed to using custom logic. <sup>[<a href="#hash-fetch-defaults">link</a>]</sup></li>
+</ul>
+<p>```ruby batman = { name: &#8216;Bruce Wayne&#8217;, is_evil: false }</p>
+<p># bad - if we just use || operator with falsy value we won&#8217;t get the expected result batman[:is_evil] || true # =&gt; true</p>
+<p># good - fetch work correctly with falsy values batman.fetch(:is_evil, true) # =&gt; false ```</p>
+<ul>
+<li><a name="use-hash-blocks"></a> Prefer the use of the block instead of the default value in <code>Hash#fetch</code> if the code that has to be evaluated may have side effects or be expensive. <sup>[<a href="#use-hash-blocks">link</a>]</sup></li>
+</ul>
+<p>```ruby batman = { name: &#8216;Bruce Wayne&#8217; }</p>
+<p># bad - if we use the default value, we eager evaluate it # so it can slow the program down if done multiple times batman.fetch(:powers, obtain_batman_powers) # obtain_batman_powers is an expensive call</p>
+<p># good - blocks are lazy evaluated, so only triggered in case of KeyError exception batman.fetch(:powers) { obtain_batman_powers } ```</p>
+<ul>
+<li><a name="hash-values-at"></a> Use <code>Hash#values_at</code> when you need to retrieve several values consecutively from a hash. <sup>[<a href="#hash-values-at">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad email = data[&#8216;email&#8217;] username = data[&#8216;nickname&#8217;]</p>
+<p># good email, username = data.values_at(&#8216;email&#8217;, &#8216;nickname&#8217;) ```</p>
+<ul>
+<li><p><a name="ordered-hashes"></a> Rely on the fact that as of Ruby 1.9 hashes are ordered. <sup>[<a href="#ordered-hashes">link</a>]</sup></p></li>
+<li><p><a name="no-modifying-collections"></a> Do not modify a collection while traversing it. <sup>[<a href="#no-modifying-collections">link</a>]</sup></p></li>
+<li><p><a name="accessing-elements-directly"></a> When accessing elements of a collection, avoid direct access via <code>[n]</code> by using an alternate form of the reader method if it is supplied. This guards you from calling <code>[]</code> on <code>nil</code>. <sup>[<a href="#accessing-elements-directly">link</a>]</sup></p></li>
+</ul>
+<p>```ruby # bad Regexp.last_match[1]</p>
+<p># good Regexp.last_match(1) ```</p>
+<ul>
+<li><a name="provide-alternate-accessor-to-collections"></a> When providing an accessor for a collection, provide an alternate form to save users from checking for <code>nil</code> before accessing an element in the collection. <sup>[<a href="#provide-alternate-accessor-to-collections">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad def awesome_things <span class="citation">@awesome_things</span> end</p>
+<p># good def awesome_things(index = nil) if index &amp;&amp; <span class="citation">@awesome_things</span> <span class="citation">@awesome_things [index]</span> else <span class="citation">@awesome_things</span> end end ``` ## Numbers</p>
+<ul>
+<li><a name="integer-type-checking"></a> Use <code>Integer</code> check type of an integer number. Since <code>Fixnum</code> is platform-dependent, checking against it will return different results on 32-bit and 64-bit machines. <sup>[<a href="#integer-type-checking">link</a>]</sup></li>
+</ul>
+<p>```ruby timestamp = Time.now.to_i</p>
+<p># bad timestamp.is_a? Fixnum timestamp.is_a? Bignum</p>
+<p># good timestamp.is_a? Integer ```</p>
+<ul>
+<li><p><a name="random-numbers"></a> Prefer to use ranges when generating random numbers instead of integers with offsets, since it clearly states your intentions. Imagine simulating a role of a dice: <sup>[<a href="#random-numbers">link</a>]</sup></p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+rand(<span class="dv">6</span>) + <span class="dv">1</span>
+
+<span class="co"># good</span>
+rand(<span class="dv">1</span>..<span class="dv">6</span>)</code></pre></div></li>
+</ul>
+<h2 id="strings">Strings</h2>
+<ul>
+<li><a name="string-interpolation"></a> Prefer string interpolation and string formatting instead of string concatenation: <sup>[<a href="#string-interpolation">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad email_with_name = user.name + &#8216;&lt;&#8217; + user.email + &#8216;&gt;&#8217;</p>
+<p># good email_with_name = &#8220;#{user.name} &lt;#{user.email}&gt;&#8221;</p>
+<p># good email_with_name = format(&#8216;%s &lt;%s&gt;&#8217;, user.name, user.email) ```</p>
+<ul>
+<li><p><a name="consistent-string-literals"></a> Adopt a consistent string literal quoting style. There are two popular styles in the Ruby community, both of which are considered good&#8212;single quotes by default (Option A) and double quotes by default (Option B). <sup>[<a href="#consistent-string-literals">link</a>]</sup></p></li>
+<li><p><strong>(Option A)</strong> Prefer single-quoted strings when you don&#8217;t need string interpolation or special symbols such as <code>\t</code>, <code>\n</code>, <code>'</code>, etc.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+name = <span class="st">&quot;Bozhidar&quot;</span>
+
+<span class="co"># good</span>
+name = <span class="st">&#39;Bozhidar&#39;</span></code></pre></div></li>
+<li><p><strong>(Option B)</strong> Prefer double-quotes unless your string literal contains <code>&quot;</code> or escape characters you want to suppress.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+name = <span class="st">&#39;Bozhidar&#39;</span>
+
+<span class="co"># good</span>
+name = <span class="st">&quot;Bozhidar&quot;</span></code></pre></div></li>
+</ul>
+<p>The string literals in this guide are aligned with the first style.</p>
+<ul>
+<li><a name="no-character-literals"></a> Don&#8217;t use the character literal syntax <code>?x</code>. Since Ruby 1.9 it&#8217;s basically redundant&#8212;<code>?x</code> would interpreted as <code>'x'</code> (a string with a single character in it). <sup>[<a href="#no-character-literals">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad char = ?c</p>
+<p># good char = &#8216;c&#8217; ```</p>
+<ul>
+<li><a name="curlies-interpolate"></a> Don&#8217;t leave out <code>{}</code> around instance and global variables being interpolated into a string. <sup>[<a href="#curlies-interpolate">link</a>]</sup></li>
+</ul>
+<p>```ruby class Person attr_reader :first_name, :last_name</p>
+<pre><code>def initialize(first_name, last_name)
+  @first_name = first_name
+  @last_name = last_name
+end
+
+# bad - valid, but awkward
+def to_s
+  &quot;#@first_name #@last_name&quot;
+end
+
+# good
+def to_s
+  &quot;#{@first_name} #{@last_name}&quot;
+end</code></pre>
+<p>end</p>
+<p><span class="math inline">\(global = 0  # bad  puts &quot;\)</span>global = #$global&quot;</p>
+<p># good puts &#8220;<span class="math inline">\(global = #{\)</span>global}&#8221; ```</p>
+<ul>
+<li><a name="no-to-s"></a> Don&#8217;t use <code>Object#to_s</code> on interpolated objects. It&#8217;s invoked on them automatically. <sup>[<a href="#no-to-s">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad message = &#8220;This is the #{result.to_s}.&#8221;</p>
+<p># good message = &#8220;This is the #{result}.&#8221; ```</p>
+<ul>
+<li><a name="concat-strings"></a> Avoid using <code>String#+</code> when you need to construct large data chunks. Instead, use <code>String#&lt;&lt;</code>. Concatenation mutates the string instance in-place and is always faster than <code>String#+</code>, which creates a bunch of new string objects. <sup>[<a href="#concat-strings">link</a>]</sup></li>
+</ul>
+```ruby # bad html = &#8216;&#8217; html +=&#8217;
+<h1>
+Page title
+</h1>
+<p>&#8217;</p>
+paragraphs.each do |paragraph| html += &#8220;
+<p>
+#{paragraph}
+</p>
+<p>&quot; end</p>
+# good and also fast html = &#8216;&#8217; html &lt;&lt;&#8217;
+<h1>
+Page title
+</h1>
+<p>&#8217;</p>
+paragraphs.each do |paragraph| html &lt;&lt; &#8220;
+<p>
+#{paragraph}
+</p>
+<p>&quot; end ```</p>
+<ul>
+<li><p><a name="dont-abuse-gsub"></a> Don&#8217;t use <code>String#gsub</code> in scenarios in which you can use a faster more specialized alternative. <sup>[<a href="#dont-abuse-gsub">link</a>]</sup></p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">url = <span class="st">&#39;http://example.com&#39;</span>
+str = <span class="st">&#39;lisp-case-rules&#39;</span>
+
+<span class="co"># bad</span>
+url.gsub(<span class="st">&#39;http://&#39;</span>, <span class="st">&#39;https://&#39;</span>)
+str.gsub(<span class="st">&#39;-&#39;</span>, <span class="st">&#39;_&#39;</span>)
+
+<span class="co"># good</span>
+url.sub(<span class="st">&#39;http://&#39;</span>, <span class="st">&#39;https://&#39;</span>)
+str.tr(<span class="st">&#39;-&#39;</span>, <span class="st">&#39;_&#39;</span>)</code></pre></div></li>
+<li><p><a name="heredocs"></a> When using heredocs for multi-line strings keep in mind the fact that they preserve leading whitespace. It&#8217;s a good practice to employ some margin based on which to trim the excessive whitespace. <sup>[<a href="#heredocs">link</a>]</sup></p></li>
+</ul>
+<p><code>ruby   code = &lt;&lt;-END.gsub(/^\s+\|/, '')     |def test     |  some_method     |  other_method     |end   END   # =&gt; &quot;def test\n  some_method\n  other_method\nend\n&quot;</code></p>
+<ul>
+<li><a name="squiggly-heredocs"></a> Use Ruby 2.3&#8217;s squiggly heredocs for nicely indented multi-line strings. <sup>[<a href="#squiggly-heredocs">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad - using Powerpack String#strip_margin code = &lt;&lt;-END.strip_margin(&#8216;|&#8217;) |def test | some_method | other_method |end END</p>
+<p># also bad code = &lt;&lt;-END def test some_method other_method end END</p>
+<p># good code = &lt;&lt;~END def test some_method other_method end END ```</p>
+<h2 id="date-time">Date &amp; Time</h2>
+<ul>
+<li><p><a name="time-now"></a> Prefer <code>Time.now</code> over <code>Time.new</code> when retrieving the current system time. <sup>[<a href="#time-now">link</a>]</sup></p></li>
+<li><p><a name="no-datetime"></a> Don&#8217;t use <code>DateTime</code> unless you need to account for historical calendar reform &#8211; and if you do, explicitly specify the <code>start</code> argument to clearly state your intentions. <sup>[<a href="#no-datetime">link</a>]</sup></p></li>
+</ul>
+<p>```ruby # bad - uses DateTime for current time DateTime.now</p>
+<p># good - uses Time for current time Time.now</p>
+<p># bad - uses DateTime for modern date DateTime.iso8601(&#8216;2016-06-29&#8217;)</p>
+<p># good - uses Date for modern date Date.iso8601(&#8216;2016-06-29&#8217;)</p>
+<p># good - uses DateTime with start argument for historical date DateTime.iso8601(&#8216;1751-04-23&#8217;, Date::ENGLAND) ```</p>
+<h2 id="regular-expressions">Regular Expressions</h2>
+<blockquote>
+<p>Some people, when confronted with a problem, think &#8220;I know, I&#8217;ll use regular expressions.&#8221; Now they have two problems.<br> &#8211; Jamie Zawinski</p>
+</blockquote>
+<ul>
+<li><p><a name="no-regexp-for-plaintext"></a> Don&#8217;t use regular expressions if you just need plain text search in string: <code>string['text']</code> <sup>[<a href="#no-regexp-for-plaintext">link</a>]</sup></p></li>
+<li><p><a name="regexp-string-index"></a> For simple constructions you can use regexp directly through string index. <sup>[<a href="#regexp-string-index">link</a>]</sup></p></li>
+</ul>
+<p><code>ruby   match = string[/regexp/]             # get content of matched regexp   first_group = string[/text(grp)/, 1] # get content of captured group   string[/text (grp)/, 1] = 'replace'  # string =&gt; 'text replace'</code></p>
+<ul>
+<li><a name="non-capturing-regexp"></a> Use non-capturing groups when you don&#8217;t use the captured result. <sup>[<a href="#non-capturing-regexp">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad /(first|second)/</p>
+<p># good /(?:first|second)/ ```</p>
+<ul>
+<li><a name="no-perl-regexp-last-matchers"></a> Don&#8217;t use the cryptic Perl-legacy variables denoting last regexp group matches (<code>$1</code>, <code>$2</code>, etc). Use <code>Regexp.last_match(n)</code> instead. <sup>[<a href="#no-perl-regexp-last-matchers">link</a>]</sup></li>
+</ul>
+<p>```ruby /(regexp)/ =~ string &#8230;</p>
+<p># bad process $1</p>
+<p># good process Regexp.last_match(1) ```</p>
+<ul>
+<li><a name="no-numbered-regexes"></a> Avoid using numbered groups as it can be hard to track what they contain. Named groups can be used instead. <sup>[<a href="#no-numbered-regexes">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad /(regexp)/ =~ string # some code process Regexp.last_match(1)</p>
+<p># good /(?<meaningful_var>regexp)/ =~ string # some code process meaningful_var ```</p>
+<ul>
+<li><p><a name="limit-escapes"></a> Character classes have only a few special characters you should care about: <code>^</code>, <code>-</code>, <code>\</code>, <code>]</code>, so don&#8217;t escape <code>.</code> or brackets in <code>[]</code>. <sup>[<a href="#limit-escapes">link</a>]</sup></p></li>
+<li><p><a name="caret-and-dollar-regexp"></a> Be careful with <code>^</code> and <code>$</code> as they match start/end of line, not string endings. If you want to match the whole string use: <code>\A</code> and <code>\z</code> (not to be confused with <code>\Z</code> which is the equivalent of <code>/\n?\z/</code>). <sup>[<a href="#caret-and-dollar-regexp">link</a>]</sup></p></li>
+</ul>
+<p><code>ruby   string = &quot;some injection\nusername&quot;   string[/^username$/]   # matches   string[/\Ausername\z/] # doesn't match</code></p>
+<ul>
+<li><a name="comment-regexes"></a> Use <code>x</code> modifier for complex regexps. This makes them more readable and you can add some useful comments. Just be careful as spaces are ignored. <sup>[<a href="#comment-regexes">link</a>]</sup></li>
+</ul>
+<p><code>ruby   regexp = /     start         # some text     \s            # white space char     (group)       # first group     (?:alt1|alt2) # some alternation     end   /x</code></p>
+<ul>
+<li><a name="gsub-blocks"></a> For complex replacements <code>sub</code>/<code>gsub</code> can be used with a block or a hash. <sup>[<a href="#gsub-blocks">link</a>]</sup></li>
+</ul>
+<p><code>ruby   words = 'foo bar'   words.sub(/f/, 'f' =&gt; 'F') # =&gt; 'Foo bar'   words.gsub(/\w+/) { |word| word.capitalize } # =&gt; 'Foo Bar'</code></p>
+<h2 id="percent-literals">Percent Literals</h2>
+<ul>
+<li><a name="percent-q-shorthand"></a> Use <code>%()</code>(it&#8217;s a shorthand for <code>%Q</code>) for single-line strings which require both interpolation and embedded double-quotes. For multi-line strings, prefer heredocs. <sup>[<a href="#percent-q-shorthand">link</a>]</sup></li>
+</ul>
+```ruby # bad (no interpolation needed) %(
+<div class="text">
+Some text
+</div>
+) # should be &#8217;
+<div class="text">
+Some text
+</div>
+<p>&#8217;</p>
+<p># bad (no double-quotes) %(This is #{quality} style) # should be &#8220;This is #{quality} style&#8221;</p>
+# bad (multiple lines) %(
+<div>
+<p>#{exclamation}</span>) # should be a heredoc.</p>
+# good (requires interpolation, has quotes, single line) %(
+<tr>
+<td class="name">
+#{name}
+</td>
+<p>) ```</p>
+<ul>
+<li><a name="percent-q"></a> Avoid %() or the equivalent %q() unless you have a string with both <code>'</code> and <code>&quot;</code> in it. Regular string literals are more readable and should be preferred unless a lot of characters would have to be escaped in them. <sup>[<a href="#percent-q">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad name = %q(Bruce Wayne) time = %q(8 o&#8217;clock) question = %q(&#8220;What did you say?&#8221;)</p>
+# good name = &#8216;Bruce Wayne&#8217; time = &#8220;8 o&#8217;clock&#8221; question = &#8216;&#8220;What did you say?&#8221;&#8217; quote = %q(
+<p class="quote">
+&#8220;What did you say?&#8221;
+</p>
+<p>) ```</p>
+<ul>
+<li><a name="percent-r"></a> Use <code>%r</code> only for regular expressions matching <em>at least</em> one &#8216;/&#8217; character. <sup>[<a href="#percent-r">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad %r{+}</p>
+<p># good %r{^/(.*)<span class="math inline">\(}  %r{^/blog/2011/(.*)\)</span>} ```</p>
+<ul>
+<li><a name="percent-x"></a> Avoid the use of <code>%x</code> unless you&#8217;re going to invoke a command with backquotes in it(which is rather unlikely). <sup>[<a href="#percent-x">link</a>]</sup></li>
+</ul>
+<p>```ruby # bad date = %x(date)</p>
+<p># good date = <code>date</code> echo = %x(echo <code>date</code>) ```</p>
+<ul>
+<li><p><a name="percent-s"></a> Avoid the use of <code>%s</code>. It seems that the community has decided <code>:&quot;some   string&quot;</code> is the preferred way to create a symbol with spaces in it. <sup>[<a href="#percent-s">link</a>]</sup></p></li>
+<li><a name="percent-literal-braces"></a> Use the braces that are the most appropriate for the various kinds of percent literals. <sup>[<a href="#percent-literal-braces">link</a>]</sup></li>
+<li><code>()</code> for string literals(<code>%q</code>, <code>%Q</code>).</li>
+<li><code>[]</code> for array literals(<code>%w</code>, <code>%i</code>, <code>%W</code>, <code>%I</code>) as it is aligned with the standard array literals.</li>
+<li><code>{}</code> for regexp literals(<code>%r</code>) since parentheses often appear inside regular expressions. That&#8217;s why a less common character with <code>{</code> is usually the best delimiter for <code>%r</code> literals.</li>
+<li><p><code>()</code> for all other literals (e.g. <code>%s</code>, <code>%x</code>)</p></li>
+</ul>
+<p>```ruby # bad %q{&#8220;Test&#8217;s king!&#8221;, John said.}</p>
+<p># good %q(&#8220;Test&#8217;s king!&#8221;, John said.)</p>
+<p># bad %w(one two three) %i(one two three)</p>
+<p># good %w[one two three] %i[one two three]</p>
+<p># bad %r((+)-(+)) %r{}</p>
+<p># good %r{(+)-(+)} %r|| ```</p>
+<h2 id="metaprogramming">Metaprogramming</h2>
+<ul>
+<li><p><a name="no-needless-metaprogramming"></a> Avoid needless metaprogramming. <sup>[<a href="#no-needless-metaprogramming">link</a>]</sup></p></li>
+<li><p><a name="no-monkey-patching"></a> Do not mess around in core classes when writing libraries. (Do not monkey-patch them.) <sup>[<a href="#no-monkey-patching">link</a>]</sup></p></li>
+<li><p><a name="block-class-eval"></a> The block form of <code>class_eval</code> is preferable to the string-interpolated form. <sup>[<a href="#block-class-eval">link</a>]</sup></p></li>
+<li><p>when you use the string-interpolated form, always supply <code>__FILE__</code> and <code>__LINE__</code>, so that your backtraces make sense:</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">class_eval <span class="st">&#39;def use_relative_model_naming?; true; end&#39;</span>, <span class="dv">__FILE__</span>, <span class="dv">__LINE__</span></code></pre></div></li>
+<li><p><code>define_method</code> is preferable to <code>class_eval{ def ... }</code></p></li>
+<li><p><a name="eval-comment-docs"></a> When using <code>class_eval</code> (or other <code>eval</code>) with string interpolation, add a comment block showing its appearance if interpolated (a practice used in Rails code): <sup>[<a href="#eval-comment-docs">link</a>]</sup></p></li>
+</ul>
+<p>```ruby # from activesupport/lib/active_support/core_ext/string/output_safety.rb UNSAFE_STRING_METHODS.each do |unsafe_method| if &#8216;String&#8217;.respond_to?(unsafe_method) class_eval &lt;&lt;-EOT, <strong>FILE</strong>, <strong>LINE</strong> + 1 def #{unsafe_method}(<em>params, &amp;block) # def capitalize(</em>params, &amp;block) to_str.#{unsafe_method}(<em>params, &amp;block) # to_str.capitalize(</em>params, &amp;block) end # end</p>
+<pre><code>    def #{unsafe_method}!(*params)              # def capitalize!(*params)
+      @dirty = true                           #   @dirty = true
+      super                                   #   super
+    end                                       # end
+  EOT
+end</code></pre>
+<p>end ```</p>
+<ul>
+<li><p><a name="no-method-missing"></a> Avoid using <code>method_missing</code> for metaprogramming because backtraces become messy, the behavior is not listed in <code>#methods</code>, and misspelled method calls might silently work, e.g. <code>nukes.launch_state = false</code>. Consider using delegation, proxy, or <code>define_method</code> instead. If you must use <code>method_missing</code>: <sup>[<a href="#no-method-missing">link</a>]</sup></p></li>
+<li>Be sure to <a href="http://blog.marc-andre.ca/2010/11/methodmissing-politely.html">also define <code>respond_to_missing?</code></a></li>
+<li>Only catch methods with a well-defined prefix, such as <code>find_by_*</code> &#8211; make your code as assertive as possible.</li>
+<li>Call <code>super</code> at the end of your statement</li>
+<li><p>Delegate to assertive, non-magical methods:</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">def</span> method_missing?(meth, *params, &amp;block)
+  <span class="kw">if</span> <span class="ot">/^find_by_(?&lt;prop&gt;.*)/</span> =~ meth
+    <span class="co"># ... lots of code to do a find_by</span>
+  <span class="kw">else</span>
+    <span class="dv">super</span>
+  <span class="kw">end</span>
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">def</span> method_missing?(meth, *params, &amp;block)
+  <span class="kw">if</span> <span class="ot">/^find_by_(?&lt;prop&gt;.*)/</span> =~ meth
+    find_by(prop, *params, &amp;block)
+  <span class="kw">else</span>
+    <span class="dv">super</span>
+  <span class="kw">end</span>
+<span class="kw">end</span>
+
+<span class="co"># best of all, though, would to define_method as each findable attribute is declared</span></code></pre></div></li>
+<li><p><a name="prefer-public-send"></a> Prefer <code>public_send</code> over <code>send</code> so as not to circumvent <code>private</code>/<code>protected</code> visibility. <sup>[<a href="#prefer-public-send">link</a>]</sup></p></li>
+</ul>
+<p>```ruby # We have an ActiveModel Organization that includes concern Activatable module Activatable extend ActiveSupport::Concern</p>
+<pre><code>included do
+  before_create :create_token
+end
+
+private
+
+def reset_token
+  # some code
+end
+
+def create_token
+  # some code
+end
+
+def activate!
+  # some code
+end</code></pre>
+<p>end</p>
+<p>class Organization &lt; ActiveRecord::Base include Activatable end</p>
+<p>linux_organization = Organization.find(&#8230;) # BAD - violates privacy linux_organization.send(:reset_token) # GOOD - should throw an exception linux_organization.public_send(:reset_token) ```</p>
+<ul>
+<li><a name="prefer-__send__"></a> Prefer <code>__send__</code> over <code>send</code>, as <code>send</code> may overlap with existing methods. <sup>[<a href="#prefer-__send__">link</a>]</sup></li>
+</ul>
+<p>```ruby require &#8216;socket&#8217;</p>
+<p>u1 = UDPSocket.new u1.bind(&#8216;127.0.0.1&#8217;, 4913) u2 = UDPSocket.new u2.connect(&#8216;127.0.0.1&#8217;, 4913) # Won&#8217;t send a message to the receiver obj. # Instead it will send a message via UDP socket. u2.send :sleep, 0 # Will actually send a message to the receiver obj. u2.<strong>send</strong> &#8230; ```</p>
+<h2 id="misc">Misc</h2>
+<ul>
+<li><p><a name="always-warn"></a> Write <code>ruby -w</code> safe code. <sup>[<a href="#always-warn">link</a>]</sup></p></li>
+<li><p><a name="no-optional-hash-params"></a> Avoid hashes as optional parameters. Does the method do too much? (Object initializers are exceptions for this rule). <sup>[<a href="#no-optional-hash-params">link</a>]</sup></p></li>
+<li><p><a name="short-methods"></a> Avoid methods longer than 10 LOC (lines of code). Ideally, most methods will be shorter than 5 LOC. Empty lines do not contribute to the relevant LOC. <sup>[<a href="#short-methods">link</a>]</sup></p></li>
+<li><p><a name="too-many-params"></a> Avoid parameter lists longer than three or four parameters. <sup>[<a href="#too-many-params">link</a>]</sup></p></li>
+<li><p><a name="private-global-methods"></a> If you really need &#8220;global&#8221; methods, add them to Kernel and make them private. <sup>[<a href="#private-global-methods">link</a>]</sup></p></li>
+<li><p><a name="instance-vars"></a> Use module instance variables instead of global variables. <sup>[<a href="#instance-vars">link</a>]</sup></p></li>
+</ul>
+<p>```ruby # bad $foo_bar = 1</p>
+<p># good module Foo class &lt;&lt; self attr_accessor :bar end end</p>
+<p>Foo.bar = 1 ```</p>
+<ul>
+<li><p><a name="optionparser"></a> Use <code>OptionParser</code> for parsing complex command line options and <code>ruby -s</code> for trivial command line options. <sup>[<a href="#optionparser">link</a>]</sup></p></li>
+<li><p><a name="functional-code"></a> Code in a functional way, avoiding mutation when that makes sense. <sup>[<a href="#functional-code">link</a>]</sup></p></li>
+<li><p><a name="no-param-mutations"></a> Do not mutate parameters unless that is the purpose of the method. <sup>[<a href="#no-param-mutations">link</a>]</sup></p></li>
+<li><p><a name="three-is-the-number-thou-shalt-count"></a> Avoid more than three levels of block nesting. <sup>[<a href="#three-is-the-number-thou-shalt-count">link</a>]</sup></p></li>
+<li><p><a name="be-consistent"></a> Be consistent. In an ideal world, be consistent with these guidelines. <sup>[<a href="#be-consistent">link</a>]</sup></p></li>
+<li><p><a name="common-sense"></a> Use common sense. <sup>[<a href="#common-sense">link</a>]</sup></p></li>
+</ul>
+<h2 id="tools">Tools</h2>
+<p>Here are some tools to help you automatically check Ruby code against this guide.</p>
+<h3 id="rubocop">RuboCop</h3>
+<p><a href="https://github.com/bbatsov/rubocop">RuboCop</a> is a Ruby code style checker based on this style guide. RuboCop already covers a significant portion of the Guide, supports both MRI 1.9 and MRI 2.0 and has good Emacs integration.</p>
+<h3 id="rubymine">RubyMine</h3>
+<p><a href="http://www.jetbrains.com/ruby/">RubyMine</a>&#8217;s code inspections are <a href="http://confluence.jetbrains.com/display/RUBYDEV/RubyMine+Inspections">partially based</a> on this guide.</p>
+<h1 id="contributing">Contributing</h1>
+<p>The guide is still a work in progress&#8212;some rules are lacking examples, some rules don&#8217;t have examples that illustrate them clearly enough. Improving such rules is a great (and simple way) to help the Ruby community!</p>
+<p>In due time these issues will (hopefully) be addressed&#8212;just keep them in mind for now.</p>
+<p>Nothing written in this guide is set in stone. It&#8217;s my desire to work together with everyone interested in Ruby coding style, so that we could ultimately create a resource that will be beneficial to the entire Ruby community.</p>
+<p>Feel free to open tickets or send pull requests with improvements. Thanks in advance for your help!</p>
+<p>You can also support the project (and RuboCop) with financial contributions via <a href="https://gratipay.com/~bbatsov/">Gratipay</a>.</p>
+<p><a href="https://gratipay.com/~bbatsov/"><img src="https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png" alt="Support via Gratipay" /></a></p>
+<h2 id="how-to-contribute">How to Contribute?</h2>
+<p>It&#8217;s easy, just follow the <a href="https://github.com/bbatsov/ruby-style-guide/blob/master/CONTRIBUTING.md">contribution guidelines</a>.</p>
+<h1 id="license">License</h1>
+<p><img src="http://i.creativecommons.org/l/by/3.0/88x31.png" alt="Creative Commons License" /> This work is licensed under a <a href="http://creativecommons.org/licenses/by/3.0/deed.en_US">Creative Commons Attribution 3.0 Unported License</a></p>
+<h1 id="spread-the-word">Spread the Word</h1>
+<p>A community-driven style guide is of little use to a community that doesn&#8217;t know about its existence. Tweet about the guide, share it with your friends and colleagues. Every comment, suggestion or opinion we get makes the guide just a little bit better. And we want to have the best possible guide, don&#8217;t we?</p>
+<p>Cheers,<br> <a href="https://twitter.com/bbatsov">Bozhidar</a></p>
+<!-- body-after -->
+<!-- mh-info (true/false, default: true) -->
+<!-- <code id="mh-meta-json" style="display: none;"> {"ismarkdown":"true","files":[".gitattributes","CONTRIBUTING.md","Makefile","README.md","md2html.jar"],"title-prefix":"","generator":"pandoc+md2html.jar","mh-css":["main.css"],"thispath":"README.md","mh-native":true,"md2htmldir":"_md2html","rootdir":"","mh-nav":false,"mh-info":true,"mh-js":["lazyload.min.js","jquery-3.0.0.min.js","clipboard.min.js","main.js"]} </code> -->
+<script>
+    var mh = {
+        "rootdir": "",
+        "absoluteRootdirUrl": "",
+        "thisPath": "README.md",
+        "files": [".gitattributes", "CONTRIBUTING.md", "Makefile", "README.md", "md2html.jar"],
+        "pagetitle": "NO TITLE! (Use `title: <TITLE_NAME>' to set page title.)",
+    };
+</script>
+<!-- mh-js-before-cdn -->
+<!-- mh-js-before -->
+<!-- mh-js -->
+<script src="_md2html/lazyload.min.js"></script>
+<script src="_md2html/jquery-3.0.0.min.js"></script>
+<script src="_md2html/clipboard.min.js"></script>
+<script src="_md2html/main.js"></script>
+<!-- mh-js-after-cdn (alias: remote-js) -->
+<!-- mh-js-after (alias: local-js) -->
+<!-- mh-js-raw (alias: raw-js) -->
+</body>
+</html>
