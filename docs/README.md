@@ -2,7 +2,7 @@
 title: Ruby Style Guide
 ---
 
-【Ruby Style Guide】
+这边不再更新，整合到自己的笔记里面了：[notes/misc/ruby-style-guide.md](https://github.com/district10/notes/blob/master/misc/ruby-style-guide.md)
 
 # Prelude
 
@@ -2883,596 +2883,566 @@ Translations of the guide are available in the following languages:
     end
     ```
 
-* <a name="alias-method"></a>
-  Always use `alias_method` when aliasing methods of modules, classes, or
-  singleton classes at runtime, as the lexical scope of `alias` leads to
-  unpredictability in these cases.
-<sup>[[link](#alias-method)]</sup>
+-   Always use `alias_method` when aliasing methods of modules, classes, or
+    singleton classes at runtime, as the lexical scope of `alias` leads to
+    unpredictability in these cases.
 
-  ```ruby
-  module Mononymous
-    def self.included(other)
-      other.class_eval { alias_method :full_name, :given_name }
-    end
-  end
-
-  class Sting < Westerner
-    include Mononymous
-  end
-  ```
-
-* <a name="class-and-self"></a>
-  When class (or module) methods call other such methods, omit the use of a
-  leading `self` or own name followed by a `.` when calling other such methods.
-  This is often seen in "service classes" or other similar concepts where a
-  class is treated as though it were a function. This convention tends to reduce
-  repetitive boilerplate in such classes.
-  <sup>[[link](#class-and-self)]</sup>
-
-  ```ruby
-  class TestClass
-    # bad -- more work when class renamed/method moved
-    def self.call(param1, param2)
-      TestClass.new(param1).call(param2)
+    ```ruby
+    module Mononymous
+      def self.included(other)
+        other.class_eval { alias_method :full_name, :given_name }
+      end
     end
 
-    # bad -- more verbose than necessary
-    def self.call(param1, param2)
-      self.new(param1).call(param2)
+    class Sting < Westerner
+      include Mononymous
     end
+    ```
 
-    # good
-    def self.call(param1, param2)
-      new(param1).call(param2)
+-   When class (or module) methods call other such methods, omit the use of a
+    leading `self` or own name followed by a `.` when calling other such
+    methods.  This is often seen in "service classes" or other similar concepts
+    where a class is treated as though it were a function. This convention
+    tends to reduce repetitive boilerplate in such classes.
+    定义 class 或者 module methods 的时候要加上 self，但是互相调用的时候，不用
+    加 self。
+
+    ```ruby
+    class TestClass
+      # bad -- more work when class renamed/method moved
+      def self.call(param1, param2)
+        TestClass.new(param1).call(param2)
+      end
+
+      # bad -- more verbose than necessary
+      def self.call(param1, param2)
+        self.new(param1).call(param2)
+      end
+
+      # good
+      def self.call(param1, param2)
+        new(param1).call(param2)
+      end
+
+      # ...other methods...
     end
-
-    # ...other methods...
-  end
-  ```
+    ```
 
 ## Exceptions
 
-* <a name="prefer-raise-over-fail"></a>
-  Prefer `raise` over `fail` for exceptions.
-  <sup>[[link](#prefer-raise-over-fail)]</sup>
+-   Prefer `raise` over `fail` for exceptions.
+    raise 比 fail 好。
 
-  ```ruby
-  # bad
-  fail SomeException, 'message'
+    ```ruby
+    # bad
+    fail SomeException, 'message'
 
-  # good
-  raise SomeException, 'message'
-  ```
+    # good
+    raise SomeException, 'message'
+    ```
 
-* <a name="no-explicit-runtimeerror"></a>
-  Don't specify `RuntimeError` explicitly in the two argument version of
-  `raise`.
-<sup>[[link](#no-explicit-runtimeerror)]</sup>
+-   Don't specify `RuntimeError` explicitly in the two argument version of `raise`.
+    直接 raise 就好，不用加上 RuntimeError。
 
-  ```ruby
-  # bad
-  raise RuntimeError, 'message'
+    ```ruby
+    # bad
+    raise RuntimeError, 'message'
 
-  # good - signals a RuntimeError by default
-  raise 'message'
-  ```
+    # good - signals a RuntimeError by default
+    raise 'message'
+    ```
 
-* <a name="exception-class-messages"></a>
-  Prefer supplying an exception class and a message as two separate arguments
-  to `raise`, instead of an exception instance.
-<sup>[[link](#exception-class-messages)]</sup>
+-   Prefer supplying an exception class and a message as two separate arguments
+    to `raise`, instead of an exception instance.
+    在你 raise exception 的时候，不要用 new……直接用两个参数就好。
 
-  ```ruby
-  # bad
-  raise SomeException.new('message')
-  # Note that there is no way to do `raise SomeException.new('message'), backtrace`.
+    ```ruby
+    # bad
+    raise SomeException.new('message')
+    # Note that there is no way to do `raise SomeException.new('message'), backtrace`.
 
-  # good
-  raise SomeException, 'message'
-  # Consistent with `raise SomeException, 'message', backtrace`.
-  ```
+    # good
+    raise SomeException, 'message'
+    # Consistent with `raise SomeException, 'message', backtrace`.
+    ```
 
-* <a name="no-return-ensure"></a>
-  Do not return from an `ensure` block. If you explicitly return from a method
-  inside an `ensure` block, the return will take precedence over any exception
-  being raised, and the method will return as if no exception had been raised at
-  all. In effect, the exception will be silently thrown away.
-<sup>[[link](#no-return-ensure)]</sup>
+-   Do not return from an `ensure` block. If you explicitly return from a method
+    inside an `ensure` block, the return will take precedence over any
+    exception being raised, and the method will return as if no exception had
+    been raised at all. In effect, the exception will be silently thrown away.
+    这个很有意思，如果你在 enusre 里面 return，raise 的东西就不见了。好像没有
+    raise error 一样。
 
-  ```ruby
-  # bad
-  def foo
-    raise
-  ensure
-    return 'very bad idea'
-  end
-  ```
+    ```ruby
+    # bad
+    def foo
+      raise
+    ensure
+      return 'very bad idea'
+    end
+    ```
 
-* <a name="begin-implicit"></a>
-  Use *implicit begin blocks* where possible.
-<sup>[[link](#begin-implicit)]</sup>
+-   Use *implicit begin blocks* where possible.
+    总之不要多余的东西。能精炼就精炼。
 
-  ```ruby
-  # bad
-  def foo
-    begin
+    ```ruby
+    # bad
+    def foo
+      begin
+        # main logic goes here
+      rescue
+        # failure handling goes here
+      end
+    end
+
+    # good
+    def foo
       # main logic goes here
     rescue
       # failure handling goes here
     end
-  end
+    ```
 
-  # good
-  def foo
-    # main logic goes here
-  rescue
-    # failure handling goes here
-  end
-  ```
+-   Mitigate the **proliferation** of `begin` blocks by using *contingency methods*
+    (a term coined by Avdi Grimm).
 
-* <a name="contingency-methods"></a>
-  Mitigate the proliferation of `begin` blocks by using *contingency methods*
-  (a term coined by Avdi Grimm).
-<sup>[[link](#contingency-methods)]</sup>
+    ```
+    proliferation
+        [pro,lɪfə'reʃən; prəʊ,lɪfə'reɪʃn]
+        n. 增殖，扩散；分芽繁殖
 
-  ```ruby
-  # bad
-  begin
-    something_that_might_fail
-  rescue IOError
-    # handle IOError
-  end
+    contingency
+        英 [kən'tɪndʒ(ə)nsɪ] 美 [kən'tɪndʒənsi]
+        n. 偶然性；[安全] 意外事故；可能性；[审计] 意外开支；[离散数学或逻辑学]偶然式
+    ```
 
-  begin
-    something_else_that_might_fail
-  rescue IOError
-    # handle IOError
-  end
+    ```ruby
+    # bad
+    begin
+      something_that_might_fail
+    rescue IOError
+      # handle IOError
+    end
 
-  # good
-  def with_io_error_handling
-     yield
-  rescue IOError
-    # handle IOError
-  end
+    begin
+      something_else_that_might_fail
+    rescue IOError
+      # handle IOError
+    end
 
-  with_io_error_handling { something_that_might_fail }
+    # good
+    def with_io_error_handling
+       yield
+    rescue IOError
+      # handle IOError
+    end
 
-  with_io_error_handling { something_else_that_might_fail }
-  ```
+    with_io_error_handling { something_that_might_fail }
+    with_io_error_handling { something_else_that_might_fail }
+    ```
 
-* <a name="dont-hide-exceptions"></a>
-  Don't suppress exceptions.
-<sup>[[link](#dont-hide-exceptions)]</sup>
+-   Don't suppress exceptions.
+    看了这个……我学到的是如何 supress exceptions……
 
-  ```ruby
-  # bad
-  begin
-    # an exception occurs here
-  rescue SomeError
-    # the rescue clause does absolutely nothing
-  end
+    ```ruby
+    # bad
+    begin
+      # an exception occurs here
+    rescue SomeError
+      # the rescue clause does absolutely nothing
+    end
 
-  # bad
-  do_something rescue nil
-  ```
+    # bad
+    do_something rescue nil
+    ```
 
-* <a name="no-rescue-modifiers"></a>
-  Avoid using `rescue` in its modifier form.
-<sup>[[link](#no-rescue-modifiers)]</sup>
+-   Avoid using `rescue` in its modifier form.
+    不要用 modifier 的 rescue（后置的）。咋说呢，
+    你最好一个一个 rescue……（好累的赶脚）
 
-  ```ruby
-  # bad - this catches exceptions of StandardError class and its descendant classes
-  read_file rescue handle_error($!)
+    ```ruby
+    # bad - this catches exceptions of StandardError class and its descendant classes
+    read_file rescue handle_error($!)
 
-  # good - this catches only the exceptions of Errno::ENOENT class and its descendant classes
-  def foo
-    read_file
-  rescue Errno::ENOENT => ex
-    handle_error(ex)
-  end
-  ```
+    # good - this catches only the exceptions of Errno::ENOENT class and its descendant classes
+    def foo
+      read_file
+    rescue Errno::ENOENT => ex
+      handle_error(ex)
+    end
+    ```
 
-* <a name="no-exceptional-flows"></a>
-  Don't use exceptions for flow of control.
-<sup>[[link](#no-exceptional-flows)]</sup>
+-   Don't use exceptions for flow of control.
+    其实……这是在权衡啥样的是程序应该处理的，啥样的是输入有问题，应当从输入上消弭的。
 
-  ```ruby
-  # bad
-  begin
-    n / d
-  rescue ZeroDivisionError
-    puts 'Cannot divide by 0!'
-  end
+    ```ruby
+    # bad
+    begin
+      n / d
+    rescue ZeroDivisionError
+      puts 'Cannot divide by 0!'
+    end
 
-  # good
-  if d.zero?
-    puts 'Cannot divide by 0!'
-  else
-    n / d
-  end
-  ```
+    # good
+    if d.zero?
+      puts 'Cannot divide by 0!'
+    else
+      n / d
+    end
+    ```
 
-* <a name="no-blind-rescues"></a>
-  Avoid rescuing the `Exception` class.  This will trap signals and calls to
-  `exit`, requiring you to `kill -9` the process.
-<sup>[[link](#no-blind-rescues)]</sup>
+-   Avoid rescuing the `Exception` class.  This will trap signals and calls to
+    `exit`, requiring you to `kill -9` the process.
 
-  ```ruby
-  # bad
-  begin
-    # calls to exit and kill signals will be caught (except kill -9)
-    exit
-  rescue Exception
-    puts "you didn't really want to exit, right?"
-    # exception handling
-  end
+    ```ruby
+    # bad
+    begin
+      # calls to exit and kill signals will be caught (except kill -9)
+      exit
+    rescue Exception
+      puts "you didn't really want to exit, right?"
+      # exception handling
+    end
 
-  # good
-  begin
-    # a blind rescue rescues from StandardError, not Exception as many
-    # programmers assume.
-  rescue => e
-    # exception handling
-  end
+    # good
+    begin
+      # a blind rescue rescues from StandardError, not Exception as many
+      # programmers assume.
+    rescue => e
+      # exception handling
+    end
 
-  # also good
-  begin
-    # an exception occurs here
-  rescue StandardError => e
-    # exception handling
-  end
-  ```
+    # also good
+    begin
+      # an exception occurs here
+    rescue StandardError => e
+      # exception handling
+    end
+    ```
 
-* <a name="exception-ordering"></a>
-  Put more specific exceptions higher up the rescue chain, otherwise they'll
-  never be rescued from.
-<sup>[[link](#exception-ordering)]</sup>
+-   Put more specific exceptions higher up the rescue chain, otherwise they'll
+    never be rescued from.
+    这个和 Ruby 也无关啊……rescue 是不断 fall back，当然要把最后的“default”放后面咯。
 
-  ```ruby
-  # bad
-  begin
-    # some code
-  rescue StandardError => e
-    # some handling
-  rescue IOError => e
-    # some handling that will never be executed
-  end
+    ```ruby
+    # bad
+    begin
+      # some code
+    rescue StandardError => e
+      # some handling
+    rescue IOError => e
+      # some handling that will never be executed
+    end
 
-  # good
-  begin
-    # some code
-  rescue IOError => e
-    # some handling
-  rescue StandardError => e
-    # some handling
-  end
-  ```
+    # good
+    begin
+      # some code
+    rescue IOError => e
+      # some handling
+    rescue StandardError => e
+      # some handling
+    end
+    ```
 
-* <a name="release-resources"></a>
-  Release external resources obtained by your program in an `ensure` block.
-<sup>[[link](#release-resources)]</sup>
+-   Release external resources obtained by your program in an `ensure` block.
+    这时，应当怀念 Java 的 try with resources 语法……
 
-  ```ruby
-  f = File.open('testfile')
-  begin
-    # .. process
-  rescue
-    # .. handle error
-  ensure
-    f.close if f
-  end
-  ```
+    ```ruby
+    f = File.open('testfile')
+    begin
+      # .. process
+    rescue
+      # .. handle error
+    ensure
+      f.close if f
+    end
+    ```
 
-* <a name="auto-release-resources"></a>
-Use versions of resource obtaining methods that do automatic
-resource cleanup when possible.
-<sup>[[link](#auto-release-resources)]</sup>
+-   Use versions of resource obtaining methods that do automatic
+    resource cleanup when possible.
+    有自动的，好用的，特么干嘛自己造稀烂的轮子啊！
 
-  ```ruby
-  # bad - you need to close the file descriptor explicitly
-  f = File.open('testfile')
-  # some action on the file
-  f.close
-
-  # good - the file descriptor is closed automatically
-  File.open('testfile') do |f|
+    ```ruby
+    # bad - you need to close the file descriptor explicitly
+    f = File.open('testfile')
     # some action on the file
-  end
-  ```
+    f.close
 
-* <a name="standard-exceptions"></a>
-  Favor the use of exceptions from the standard library over introducing new
-  exception classes.
-<sup>[[link](#standard-exceptions)]</sup>
+    # good - the file descriptor is closed automatically
+    File.open('testfile') do |f|
+      # some action on the file
+    end
+    ```
+
+-   Favor the use of exceptions from the standard library over introducing new
+    exception classes.
 
 ## Collections
 
-* <a name="literal-array-hash"></a>
-  Prefer literal array and hash creation notation (unless you need to pass
-  parameters to their constructors, that is).
-<sup>[[link](#literal-array-hash)]</sup>
+-   Prefer literal array and hash creation notation (unless you need to pass
+    parameters to their constructors, that is).
+    跟 JavaScript 一样，能用 `var list = []` 干嘛用那个恶心的构造函数语法啊！
 
-  ```ruby
-  # bad
-  arr = Array.new
-  hash = Hash.new
+    ```ruby
+    # bad
+    arr = Array.new
+    hash = Hash.new
 
-  # good
-  arr = []
-  arr = Array.new(10)
-  hash = {}
-  hash = Hash.new(0)
-  ```
+    # good
+    arr = []
+    arr = Array.new(10)
+    hash = {}
+    hash = Hash.new(0)
+    ```
 
-* <a name="percent-w"></a>
-  Prefer `%w` to the literal array syntax when you need an array of words
-  (non-empty strings without spaces and special characters in them).  Apply this
-  rule only to arrays with two or more elements.
-<sup>[[link](#percent-w)]</sup>
+-   Prefer `%w` to the literal array syntax when you need an array of words
+    (non-empty strings without spaces and special characters in them).  Apply
+    this rule only to arrays with two or more elements.
+    这个其实也是见仁见智的……后者显然更清晰。
+    从别的地方拷贝来一串路径啥的，用这样的语法也能直接用，不必放到 Vim 里面修改。
 
-  ```ruby
-  # bad
-  STATES = ['draft', 'open', 'closed']
+    ```ruby
+    # bad
+    STATES = ['draft', 'open', 'closed']
 
-  # good
-  STATES = %w[draft open closed]
-  ```
+    # good
+    STATES = %w[draft open closed]
+    ```
 
-* <a name="percent-i"></a>
-  Prefer `%i` to the literal array syntax when you need an array of symbols
-  (and you don't need to maintain Ruby 1.9 compatibility). Apply this rule only
-  to arrays with two or more elements.
-<sup>[[link](#percent-i)]</sup>
+-   Prefer `%i` to the literal array syntax when you need an array of symbols
+    (and you don't need to maintain Ruby 1.9 compatibility). Apply this rule only
+    to arrays with two or more elements.
+    这是 symbol 的快速构造。
 
-  ```ruby
-  # bad
-  STATES = [:draft, :open, :closed]
+    ```ruby
+    # bad
+    STATES = [:draft, :open, :closed]
 
-  # good
-  STATES = %i[draft open closed]
-  ```
+    # good
+    STATES = %i[draft open closed]
+    ```
 
-* <a name="no-trailing-array-commas"></a>
-  Avoid comma after the last item of an `Array` or `Hash` literal, especially
-  when the items are not on separate lines.
-<sup>[[link](#no-trailing-array-commas)]</sup>
+-   Avoid comma after the last item of an `Array` or `Hash` literal, especially
+    when the items are not on separate lines.
+    这个上面说过……其实我还挺喜欢的……
 
-  ```ruby
-  # bad - easier to move/add/remove items, but still not preferred
-  VALUES = [
-             1001,
-             2020,
-             3333,
-           ]
+    ```ruby
+    # bad - easier to move/add/remove items, but still not preferred
+    VALUES = [
+               1001,
+               2020,
+               3333,
+             ]
 
-  # bad
-  VALUES = [1001, 2020, 3333, ]
+    # bad
+    VALUES = [1001, 2020, 3333, ]
 
-  # good
-  VALUES = [1001, 2020, 3333]
-  ```
+    # good
+    VALUES = [1001, 2020, 3333]
+    ```
 
-* <a name="no-gappy-arrays"></a>
-  Avoid the creation of huge gaps in arrays.
-<sup>[[link](#no-gappy-arrays)]</sup>
+-   Avoid the creation of huge gaps in arrays.
+    这个是程序设计上的问题。干嘛不用 Hash 呢？
 
-  ```ruby
-  arr = []
-  arr[100] = 1 # now you have an array with lots of nils
-  ```
+    ```ruby
+    arr = []
+    arr[100] = 1 # now you have an array with lots of nils
+    ```
 
-* <a name="first-and-last"></a>
-  When accessing the first or last element from an array, prefer `first` or
-  `last` over `[0]` or `[-1]`.
-<sup>[[link](#first-and-last)]</sup>
+-   When accessing the first or last element from an array, prefer `first` or
+    `last` over `[0]` or `[-1]`.
+    蛤……这个……还好吧。first，last 确实好用。但是 `[0]` 和 `[-1]` 好记啊！
 
-* <a name="set-vs-array"></a>
-  Use `Set` instead of `Array` when dealing with unique elements. `Set`
-  implements a collection of unordered values with no duplicates. This is a
-  hybrid of `Array`'s intuitive inter-operation facilities and `Hash`'s fast
-  lookup.
-<sup>[[link](#set-vs-array)]</sup>
+-   Use `Set` instead of `Array` when dealing with unique elements. `Set`
+    implements a collection of unordered values with no duplicates. This is a
+    hybrid of `Array`'s intuitive inter-operation facilities and `Hash`'s fast
+    lookup.
+    这个是数据结构的选择，和 Ruby 也没啥关系。
 
-* <a name="symbols-as-keys"></a>
-  Prefer symbols instead of strings as hash keys.
-<sup>[[link](#symbols-as-keys)]</sup>
+-   Prefer symbols instead of strings as hash keys.
+    我想知道这两个 hash 是一样的嘛？
 
-  ```ruby
-  # bad
-  hash = { 'one' => 1, 'two' => 2, 'three' => 3 }
+    ```ruby
+    # bad
+    hash = { 'one' => 1, 'two' => 2, 'three' => 3 }
 
-  # good
-  hash = { one: 1, two: 2, three: 3 }
-  ```
+    # good
+    hash = { one: 1, two: 2, three: 3 }
+    ```
 
-* <a name="no-mutable-keys"></a>
-  Avoid the use of mutable objects as hash keys.
-<sup>[[link](#no-mutable-keys)]</sup>
+-   Avoid the use of mutable objects as hash keys.
+    这个……是 hash 的特性，如果 key 变了，它的 entry 就应当变，
+    这个和 hash 冲突。
 
-* <a name="hash-literals"></a>
-  Use the Ruby 1.9 hash literal syntax when your hash keys are symbols.
-<sup>[[link](#hash-literals)]</sup>
+-   Use the Ruby 1.9 hash literal syntax when your hash keys are symbols.
+    似乎是不一样的。不过这个语法看上去和 JS 一样了。
 
-  ```ruby
-  # bad
-  hash = { :one => 1, :two => 2, :three => 3 }
+    ```ruby
+    # bad
+    hash = { :one => 1, :two => 2, :three => 3 }
 
-  # good
-  hash = { one: 1, two: 2, three: 3 }
-  ```
+    # good
+    hash = { one: 1, two: 2, three: 3 }
+    ```
 
-* <a name="no-mixed-hash-syntaces"></a>
-  Don't mix the Ruby 1.9 hash syntax with hash rockets in the same hash
-  literal. When you've got keys that are not symbols stick to the hash rockets
-  syntax.
-<sup>[[link](#no-mixed-hash-syntaces)]</sup>
+-   Don't mix the Ruby 1.9 hash syntax with hash rockets in the same hash
+    literal. When you've got keys that are not symbols stick to the hash
+    rockets syntax.
+    这个符号又叫 rocket syntax 了啊……？！有人叫它 fat arrow……
 
-  ```ruby
-  # bad
-  { a: 1, 'b' => 2 }
+    ```ruby
+    # bad
+    { a: 1, 'b' => 2 }
 
-  # good
-  { :a => 1, 'b' => 2 }
-  ```
+    # good
+    { :a => 1, 'b' => 2 }
+    ```
 
-* <a name="hash-key"></a>
-  Use `Hash#key?` instead of `Hash#has_key?` and `Hash#value?` instead of
-  `Hash#has_value?`.
-<sup>[[link](#hash-key)]</sup>
+-   Use `Hash#key?` instead of `Hash#has_key?` and `Hash#value?` instead of
+    `Hash#has_value?`.
+    有“？”号就不要画蛇添足啦。
 
-  ```ruby
-  # bad
-  hash.has_key?(:test)
-  hash.has_value?(value)
+    ```ruby
+    # bad
+    hash.has_key?(:test)
+    hash.has_value?(value)
 
-  # good
-  hash.key?(:test)
-  hash.value?(value)
-  ```
+    # good
+    hash.key?(:test)
+    hash.value?(value)
+    ```
 
-* <a name="hash-each"></a>
-  Use `Hash#each_key` instead of `Hash#keys.each` and `Hash#each_value`
-  instead of `Hash#values.each`.
-<sup>[[link](#hash-each)]</sup>
+-   Use `Hash#each_key` instead of `Hash#keys.each` and `Hash#each_value`
+    instead of `Hash#values.each`.
+    `each_key` 和 `each_value` 估计效率好点。
 
-  ```ruby
-  # bad
-  hash.keys.each { |k| p k }
-  hash.values.each { |v| p v }
-  hash.each { |k, _v| p k }
-  hash.each { |_k, v| p v }
+    ```ruby
+    # bad
+    hash.keys.each { |k| p k }
+    hash.values.each { |v| p v }
+    hash.each { |k, _v| p k }
+    hash.each { |_k, v| p v }
 
-  # good
-  hash.each_key { |k| p k }
-  hash.each_value { |v| p v }
-  ```
+    # good
+    hash.each_key { |k| p k }
+    hash.each_value { |v| p v }
+    ```
 
-* <a name="hash-fetch"></a>
-  Use `Hash#fetch` when dealing with hash keys that should be present.
-<sup>[[link](#hash-fetch)]</sup>
+-   Use `Hash#fetch` when dealing with hash keys that should be present.
+    接送函数不错。== fetch。还可以设定默认值。
 
-  ```ruby
-  heroes = { batman: 'Bruce Wayne', superman: 'Clark Kent' }
-  # bad - if we make a mistake we might not spot it right away
-  heroes[:batman] # => 'Bruce Wayne'
-  heroes[:supermann] # => nil
+    ```ruby
+    heroes = { batman: 'Bruce Wayne', superman: 'Clark Kent' }
+    # bad - if we make a mistake we might not spot it right away
+    heroes[:batman] # => 'Bruce Wayne'
+    heroes[:supermann] # => nil
 
-  # good - fetch raises a KeyError making the problem obvious
-  heroes.fetch(:supermann)
-  ```
+    # good - fetch raises a KeyError making the problem obvious
+    heroes.fetch(:supermann)
+    ```
 
-* <a name="hash-fetch-defaults"></a>
-  Introduce default values for hash keys via `Hash#fetch` as opposed to using
-  custom logic.
-<sup>[[link](#hash-fetch-defaults)]</sup>
+    Introduce default values for hash keys via `Hash#fetch` as opposed to using
+    custom logic.
 
-  ```ruby
-  batman = { name: 'Bruce Wayne', is_evil: false }
+    ```ruby
+    batman = { name: 'Bruce Wayne', is_evil: false }
 
-  # bad - if we just use || operator with falsy value we won't get the expected result
-  batman[:is_evil] || true # => true
+    # bad - if we just use || operator with falsy value we won't get the expected result
+    # 所以这特么还是错的……所以这根本不叫风格！这叫误用。
+    batman[:is_evil] || true # => true
 
-  # good - fetch work correctly with falsy values
-  batman.fetch(:is_evil, true) # => false
-  ```
+    # good - fetch work correctly with falsy values
+    batman.fetch(:is_evil, true) # => false
+    ```
 
-* <a name="use-hash-blocks"></a>
-  Prefer the use of the block instead of the default value in `Hash#fetch`
-  if the code that has to be evaluated may have side effects or be expensive.
-  <sup>[[link](#use-hash-blocks)]</sup>
+-   Prefer the use of the block instead of the default value in `Hash#fetch`
+    if the code that has to be evaluated may have side effects or be expensive.
+    这个……蛤？
 
-  ```ruby
-  batman = { name: 'Bruce Wayne' }
+    ```ruby
+    batman = { name: 'Bruce Wayne' }
 
-  # bad - if we use the default value, we eager evaluate it
-  # so it can slow the program down if done multiple times
-  batman.fetch(:powers, obtain_batman_powers) # obtain_batman_powers is an expensive call
+    # bad - if we use the default value, we eager evaluate it
+    # so it can slow the program down if done multiple times
+    batman.fetch(:powers, obtain_batman_powers) # obtain_batman_powers is an expensive call
 
-  # good - blocks are lazy evaluated, so only triggered in case of KeyError exception
-  batman.fetch(:powers) { obtain_batman_powers }
-  ```
+    # good - blocks are lazy evaluated, so only triggered in case of KeyError exception
+    batman.fetch(:powers) { obtain_batman_powers }
+    ```
 
-* <a name="hash-values-at"></a>
-  Use `Hash#values_at` when you need to retrieve several values consecutively
-  from a hash.
-<sup>[[link](#hash-values-at)]</sup>
+-   Use `Hash#values_at` when you need to retrieve several values consecutively
+    from a hash.
+    一次取出好几个，就用 values_at……
 
-  ```ruby
-  # bad
-  email = data['email']
-  username = data['nickname']
+    ```ruby
+    # bad
+    email = data['email']
+    username = data['nickname']
 
-  # good
-  email, username = data.values_at('email', 'nickname')
-  ```
+    # good
+    email, username = data.values_at('email', 'nickname')
+    ```
 
-* <a name="ordered-hashes"></a>
-  Rely on the fact that as of Ruby 1.9 hashes are ordered.
-<sup>[[link](#ordered-hashes)]</sup>
+-   Rely on the fact that as of Ruby 1.9 hashes are ordered.
+    蛤，hash 都是 ordered_hash……==Java 反正是提供了好几种 Hash。
 
-* <a name="no-modifying-collections"></a>
-  Do not modify a collection while traversing it.
-<sup>[[link](#no-modifying-collections)]</sup>
+-   Do not modify a collection while traversing it.
+    这是数据结构上的建议。
 
-* <a name="accessing-elements-directly"></a>
-  When accessing elements of a collection, avoid direct access
-  via `[n]` by using an alternate form of the reader method if it is
-  supplied. This guards you from calling `[]` on `nil`.
-<sup>[[link](#accessing-elements-directly)]</sup>
+-   When accessing elements of a collection, avoid direct access
+    via `[n]` by using an alternate form of the reader method if it is
+    supplied. This guards you from calling `[]` on `nil`.
+    哈哈哈哈好吧。原来这样更好。
 
-  ```ruby
-  # bad
-  Regexp.last_match[1]
+    ```ruby
+    # bad
+    Regexp.last_match[1]
 
-  # good
-  Regexp.last_match(1)
-  ```
+    # good
+    Regexp.last_match(1)
+    ```
 
-* <a name="provide-alternate-accessor-to-collections"></a>
-  When providing an accessor for a collection, provide an alternate form
-  to save users from checking for `nil` before accessing an element in
-  the collection.
-<sup>[[link](#provide-alternate-accessor-to-collections)]</sup>
+-   When providing an accessor for a collection, provide an alternate form
+    to save users from checking for `nil` before accessing an element in the
+    collection.
+    用默认值设定为 nil 来避免过多的无畏判断。
 
-  ```ruby
-  # bad
-  def awesome_things
-    @awesome_things
-  end
-
-  # good
-  def awesome_things(index = nil)
-    if index && @awesome_things
-      @awesome_things[index]
-    else
+    ```ruby
+    # bad
+    def awesome_things
       @awesome_things
     end
-  end
-  ```
+
+    # good
+    def awesome_things(index = nil)
+      if index && @awesome_things
+        @awesome_things[index]
+      else
+        @awesome_things
+      end
+    end
+    ```
+
 ## Numbers
 
-* <a name="integer-type-checking"></a>
-  Use `Integer` check type of an integer number. Since `Fixnum` is
-  platform-dependent, checking against it will return different results on
-  32-bit and 64-bit machines.
-<sup>[[link](#integer-type-checking)]</sup>
+-   Use `Integer` check type of an integer number. Since `Fixnum` is
+    platform-dependent, checking against it will return different results on
+    32-bit and 64-bit machines.
 
-  ```ruby
-  timestamp = Time.now.to_i
+    ```ruby
+    timestamp = Time.now.to_i
 
-  # bad
-  timestamp.is_a? Fixnum
-  timestamp.is_a? Bignum
+    # bad
+    timestamp.is_a? Fixnum
+    timestamp.is_a? Bignum
 
-  # good
-  timestamp.is_a? Integer
-  ```
+    # good
+    timestamp.is_a? Integer
+    ```
 
-  * <a name="random-numbers"></a>
-    Prefer to use ranges when generating random numbers instead of integers with offsets,
+-   Prefer to use ranges when generating random numbers instead of integers with offsets,
     since it clearly states your intentions. Imagine simulating a role of a dice:
-  <sup>[[link](#random-numbers)]</sup>
+    还可以这样 rand……
 
     ```ruby
     # bad
@@ -3484,141 +3454,134 @@ resource cleanup when possible.
 
 ## Strings
 
-* <a name="string-interpolation"></a>
-  Prefer string interpolation and string formatting instead of string
-  concatenation:
-<sup>[[link](#string-interpolation)]</sup>
-
-  ```ruby
-  # bad
-  email_with_name = user.name + ' <' + user.email + '>'
-
-  # good
-  email_with_name = "#{user.name} <#{user.email}>"
-
-  # good
-  email_with_name = format('%s <%s>', user.name, user.email)
-  ```
-
-* <a name="consistent-string-literals"></a>
-  Adopt a consistent string literal quoting style. There are two popular
-  styles in the Ruby community, both of which are considered good&mdash;single
-  quotes by default (Option A) and double quotes by default (Option B).
-<sup>[[link](#consistent-string-literals)]</sup>
-
-  * **(Option A)** Prefer single-quoted strings when you don't need
-    string interpolation or special symbols such as `\t`, `\n`, `'`,
-    etc.
+-   Prefer string interpolation and string formatting instead of string
+    concatenation:
+    字符串拼接总是效率差，而且难看。
 
     ```ruby
     # bad
-    name = "Bozhidar"
+    email_with_name = user.name + ' <' + user.email + '>'
 
     # good
-    name = 'Bozhidar'
+    email_with_name = "#{user.name} <#{user.email}>"
+
+    # good
+    email_with_name = format('%s <%s>', user.name, user.email)
     ```
 
-  * **(Option B)** Prefer double-quotes unless your string literal
-    contains `"` or escape characters you want to suppress.
+-   Adopt a consistent string literal quoting style. There are two popular
+    styles in the Ruby community, both of which are considered
+    good&mdash;single quotes by default (Option A) and double quotes by default
+    (Option B).
+    如果不需要 escape char，也没有 string interpolation 的话……就用单引号。
+
+    -   **(Option A)** Prefer single-quoted strings when you don't need
+        string interpolation or special symbols such as `\t`, `\n`, `'`,
+        etc.
+
+        ```ruby
+        # bad
+        name = "Bozhidar"
+
+        # good
+        name = 'Bozhidar'
+        ```
+
+    -   **(Option B)** Prefer double-quotes unless your string literal
+        contains `"` or escape characters you want to suppress.
+
+        ```ruby
+        # bad
+        name = 'Bozhidar'
+
+        # good
+        name = "Bozhidar"
+        ```
+
+    The string literals in this guide are aligned with the first style.
+
+-   Don't use the character literal syntax `?x`. Since Ruby 1.9 it's basically
+    redundant&mdash;`?x` would interpreted as `'x'` (a string with a single
+    character in it).
+    哦……看得书老，还觉得这样好呢……
 
     ```ruby
     # bad
-    name = 'Bozhidar'
+    char = ?c
 
     # good
-    name = "Bozhidar"
+    char = 'c'
     ```
 
-  The string literals in this guide are aligned with the first style.
+-   Don't leave out `{}` around instance and global variables being interpolated
+    into a string.
+    这特么上面说过了……
 
-* <a name="no-character-literals"></a>
-  Don't use the character literal syntax `?x`. Since Ruby 1.9 it's basically
-  redundant&mdash;`?x` would interpreted as `'x'` (a string with a single
-  character in it).
-<sup>[[link](#no-character-literals)]</sup>
+    ```ruby
+    class Person
+      attr_reader :first_name, :last_name
 
-  ```ruby
-  # bad
-  char = ?c
+      def initialize(first_name, last_name)
+        @first_name = first_name
+        @last_name = last_name
+      end
 
-  # good
-  char = 'c'
-  ```
+      # bad - valid, but awkward
+      def to_s
+        "#@first_name #@last_name"
+      end
 
-* <a name="curlies-interpolate"></a>
-  Don't leave out `{}` around instance and global variables being interpolated
-  into a string.
-<sup>[[link](#curlies-interpolate)]</sup>
-
-  ```ruby
-  class Person
-    attr_reader :first_name, :last_name
-
-    def initialize(first_name, last_name)
-      @first_name = first_name
-      @last_name = last_name
+      # good
+      def to_s
+        "#{@first_name} #{@last_name}"
+      end
     end
 
-    # bad - valid, but awkward
-    def to_s
-      "#@first_name #@last_name"
-    end
+    $global = 0
+    # bad
+    puts "$global = #$global"
 
     # good
-    def to_s
-      "#{@first_name} #{@last_name}"
+    puts "$global = #{$global}"
+    ```
+
+-   Don't use `Object#to_s` on interpolated objects. It's invoked on them
+    automatically.
+    同样，不要画蛇添足，这个自动 implicitely 转化的……
+
+    ```ruby
+    # bad
+    message = "This is the #{result.to_s}."
+
+    # good
+    message = "This is the #{result}."
+    ```
+
+-   Avoid using `String#+` when you need to construct large data chunks.
+    Instead, use `String#<<`. Concatenation mutates the string instance
+    in-place and is always faster than `String#+`, which creates a bunch of new
+    string objects.
+    即使要 string concat，也要用 `String#<<` 函数。
+
+    ```ruby
+    # bad
+    html = ''
+    html += '<h1>Page title</h1>'
+
+    paragraphs.each do |paragraph|
+      html += "<p>#{paragraph}</p>"
     end
-  end
 
-  $global = 0
-  # bad
-  puts "$global = #$global"
+    # good and also fast
+    html = ''
+    html << '<h1>Page title</h1>'
 
-  # good
-  puts "$global = #{$global}"
-  ```
+    paragraphs.each do |paragraph|
+      html << "<p>#{paragraph}</p>"
+    end
+    ```
 
-* <a name="no-to-s"></a>
-  Don't use `Object#to_s` on interpolated objects. It's invoked on them
-  automatically.
-<sup>[[link](#no-to-s)]</sup>
-
-  ```ruby
-  # bad
-  message = "This is the #{result.to_s}."
-
-  # good
-  message = "This is the #{result}."
-  ```
-
-* <a name="concat-strings"></a>
-  Avoid using `String#+` when you need to construct large data chunks.
-  Instead, use `String#<<`. Concatenation mutates the string instance in-place
-  and is always faster than `String#+`, which creates a bunch of new string
-  objects.
-<sup>[[link](#concat-strings)]</sup>
-
-  ```ruby
-  # bad
-  html = ''
-  html += '<h1>Page title</h1>'
-
-  paragraphs.each do |paragraph|
-    html += "<p>#{paragraph}</p>"
-  end
-
-  # good and also fast
-  html = ''
-  html << '<h1>Page title</h1>'
-
-  paragraphs.each do |paragraph|
-    html << "<p>#{paragraph}</p>"
-  end
-  ```
-
-* <a name="dont-abuse-gsub"></a>
-  Don't use `String#gsub` in scenarios in which you can use a faster more specialized alternative.
-<sup>[[link](#dont-abuse-gsub)]</sup>
+-   Don't use `String#gsub` in scenarios in which you can use a faster more specialized alternative.
 
     ```ruby
     url = 'http://example.com'
@@ -3633,363 +3596,331 @@ resource cleanup when possible.
     str.tr('-', '_')
     ```
 
-* <a name="heredocs"></a>
-  When using heredocs for multi-line strings keep in mind the fact that they
-  preserve leading whitespace. It's a good practice to employ some margin based
-  on which to trim the excessive whitespace.
-<sup>[[link](#heredocs)]</sup>
+-   When using heredocs for multi-line strings keep in mind the fact that they
+    preserve leading whitespace. It's a good practice to employ some margin
+    based on which to trim the excessive whitespace.
+    这个酷毙了……不过……好像有点效率问题。
 
-  ```ruby
-  code = <<-END.gsub(/^\s+\|/, '')
-    |def test
-    |  some_method
-    |  other_method
-    |end
-  END
-  # => "def test\n  some_method\n  other_method\nend\n"
-  ```
+    ```ruby
+    code = <<-END.gsub(/^\s+\|/, '')
+      |def test
+      |  some_method
+      |  other_method
+      |end
+    END
+    # => "def test\n  some_method\n  other_method\nend\n"
+    ```
 
-* <a name="squiggly-heredocs"></a>
-  Use Ruby 2.3's squiggly heredocs for nicely indented multi-line strings.
-<sup>[[link](#squiggly-heredocs)]</sup>
+-   Use Ruby 2.3's **squiggly heredocs** for nicely indented multi-line strings.
 
-  ```ruby
-  # bad - using Powerpack String#strip_margin
-  code = <<-END.strip_margin('|')
-    |def test
-    |  some_method
-    |  other_method
-    |end
-  END
+    ```ruby
+    # bad - using Powerpack String#strip_margin
+    code = <<-END.strip_margin('|')
+      |def test
+      |  some_method
+      |  other_method
+      |end
+    END
 
-  # also bad
-  code = <<-END
-  def test
-    some_method
-    other_method
-  end
-  END
-
-  # good
-  code = <<~END
+    # also bad
+    code = <<-END
     def test
       some_method
       other_method
     end
-  END
-  ```
+    END
+
+    # good
+    code = <<~END
+      def test
+        some_method
+        other_method
+      end
+    END
+    ```
 
 ## Date & Time
 
-* <a name="time-now"></a>
-  Prefer `Time.now` over `Time.new` when retrieving the current system time.
-<sup>[[link](#time-now)]</sup>
+-   Prefer `Time.now` over `Time.new` when retrieving the current system time.
 
-* <a name="no-datetime"></a>
-  Don't use `DateTime` unless you need to account for historical calendar
-  reform -- and if you do, explicitly specify the `start` argument to
-  clearly state your intentions.
-<sup>[[link](#no-datetime)]</sup>
+-   Don't use `DateTime` unless you need to account for historical calendar
+    reform -- and if you do, explicitly specify the `start` argument to clearly
+    state your intentions.
+    :hearts:
 
-  ```ruby
-  # bad - uses DateTime for current time
-  DateTime.now
+    ```ruby
+    # bad - uses DateTime for current time
+    DateTime.now
 
-  # good - uses Time for current time
-  Time.now
+    # good - uses Time for current time
+    Time.now
 
-  # bad - uses DateTime for modern date
-  DateTime.iso8601('2016-06-29')
+    # bad - uses DateTime for modern date
+    DateTime.iso8601('2016-06-29')
 
-  # good - uses Date for modern date
-  Date.iso8601('2016-06-29')
+    # good - uses Date for modern date
+    Date.iso8601('2016-06-29')
 
-  # good - uses DateTime with start argument for historical date
-  DateTime.iso8601('1751-04-23', Date::ENGLAND)
-  ```
+    # good - uses DateTime with start argument for historical date
+    DateTime.iso8601('1751-04-23', Date::ENGLAND)
+    ```
 
 ## Regular Expressions
 
-> Some people, when confronted with a problem, think
-> "I know, I'll use regular expressions." Now they have two problems.<br>
-> -- Jamie Zawinski
+>   Some people, when confronted with a problem, think
+>   "I know, I'll use regular expressions." Now they have two problems.
+>
+>   -- Jamie Zawinski
 
-* <a name="no-regexp-for-plaintext"></a>
-  Don't use regular expressions if you just need plain text search in string:
-  `string['text']`
-<sup>[[link](#no-regexp-for-plaintext)]</sup>
+-   Don't use regular expressions if you just need plain text search in string:
+    `string['text']`
 
-* <a name="regexp-string-index"></a>
-  For simple constructions you can use regexp directly through string index.
-<sup>[[link](#regexp-string-index)]</sup>
+-   For simple constructions you can use regexp directly through string index.
 
-  ```ruby
-  match = string[/regexp/]             # get content of matched regexp
-  first_group = string[/text(grp)/, 1] # get content of captured group
-  string[/text (grp)/, 1] = 'replace'  # string => 'text replace'
-  ```
+    ```ruby
+    match = string[/regexp/]             # get content of matched regexp
+    first_group = string[/text(grp)/, 1] # get content of captured group
+    string[/text (grp)/, 1] = 'replace'  # string => 'text replace'
+    ```
 
-* <a name="non-capturing-regexp"></a>
-  Use non-capturing groups when you don't use the captured result.
-<sup>[[link](#non-capturing-regexp)]</sup>
+-   Use non-capturing groups when you don't use the captured result.
 
-  ```ruby
-  # bad
-  /(first|second)/
+    ```ruby
+    # bad
+    /(first|second)/
 
-  # good
-  /(?:first|second)/
-  ```
+    # good
+    /(?:first|second)/
+    ```
 
-* <a name="no-perl-regexp-last-matchers"></a>
-  Don't use the cryptic Perl-legacy variables denoting last regexp group
-  matches (`$1`, `$2`, etc). Use `Regexp.last_match(n)` instead.
-<sup>[[link](#no-perl-regexp-last-matchers)]</sup>
+-   Don't use the cryptic Perl-legacy variables denoting last regexp group
+    matches (`$1`, `$2`, etc). Use `Regexp.last_match(n)` instead.
+    哈哈，Ruby 也有这样的东西啊！
 
-  ```ruby
-  /(regexp)/ =~ string
-  ...
+    ```ruby
+    /(regexp)/ =~ string
+    ...
 
-  # bad
-  process $1
+    # bad
+    process $1
 
-  # good
-  process Regexp.last_match(1)
-  ```
+    # good
+    process Regexp.last_match(1)
+    ```
 
-* <a name="no-numbered-regexes"></a>
-  Avoid using numbered groups as it can be hard to track what they contain.
-  Named groups can be used instead.
-<sup>[[link](#no-numbered-regexes)]</sup>
+-   Avoid using numbered groups as it can be hard to track what they contain.
+    Named groups can be used instead.
+    当然要用 named captutre 啊！
 
-  ```ruby
-  # bad
-  /(regexp)/ =~ string
-  # some code
-  process Regexp.last_match(1)
+    ```ruby
+    # bad
+    /(regexp)/ =~ string
+    # some code
+    process Regexp.last_match(1)
 
-  # good
-  /(?<meaningful_var>regexp)/ =~ string
-  # some code
-  process meaningful_var
-  ```
+    # good
+    /(?<meaningful_var>regexp)/ =~ string
+    # some code
+    process meaningful_var
+    ```
 
-* <a name="limit-escapes"></a>
-  Character classes have only a few special characters you should care about:
-  `^`, `-`, `\`, `]`, so don't escape `.` or brackets in `[]`.
-<sup>[[link](#limit-escapes)]</sup>
+-   Character classes have only a few special characters you should care about:
+    `^`, `-`, `\`, `]`, so don't escape `.` or brackets in `[]`.
 
-* <a name="caret-and-dollar-regexp"></a>
-  Be careful with `^` and `$` as they match start/end of line, not string
-  endings.  If you want to match the whole string use: `\A` and `\z` (not to be
-  confused with `\Z` which is the equivalent of `/\n?\z/`).
-<sup>[[link](#caret-and-dollar-regexp)]</sup>
+-   Be careful with `^` and `$` as they match start/end of line, not string
+    endings.  If you want to match the whole string use: `\A` and `\z` (not to
+    be confused with `\Z` which is the equivalent of `/\n?\z/`).
 
-  ```ruby
-  string = "some injection\nusername"
-  string[/^username$/]   # matches
-  string[/\Ausername\z/] # doesn't match
-  ```
+    ```ruby
+    string = "some injection\nusername"
+    string[/^username$/]   # matches
+    string[/\Ausername\z/] # doesn't match
+    ```
 
-* <a name="comment-regexes"></a>
-  Use `x` modifier for complex regexps. This makes them more readable and you
-  can add some useful comments. Just be careful as spaces are ignored.
-<sup>[[link](#comment-regexes)]</sup>
+-   Use `x` modifier for complex regexps. This makes them more readable and you
+    can add some useful comments. Just be careful as spaces are ignored.
+    这个 Perl 也有的。
 
-  ```ruby
-  regexp = /
-    start         # some text
-    \s            # white space char
-    (group)       # first group
-    (?:alt1|alt2) # some alternation
-    end
-  /x
-  ```
+    ```ruby
+    regexp = /
+      start         # some text
+      \s            # white space char
+      (group)       # first group
+      (?:alt1|alt2) # some alternation
+      end
+    /x
+    ```
 
-* <a name="gsub-blocks"></a>
-  For complex replacements `sub`/`gsub` can be used with a block or a hash.
-<sup>[[link](#gsub-blocks)]</sup>
+-   For complex replacements `sub`/`gsub` can be used with a block or a hash.
 
-  ```ruby
-  words = 'foo bar'
-  words.sub(/f/, 'f' => 'F') # => 'Foo bar'
-  words.gsub(/\w+/) { |word| word.capitalize } # => 'Foo Bar'
-  ```
+    ```ruby
+    words = 'foo bar'
+    words.sub(/f/, 'f' => 'F') # => 'Foo bar'
+    words.gsub(/\w+/) { |word| word.capitalize } # => 'Foo Bar'
+    ```
 
 ## Percent Literals
 
-* <a name="percent-q-shorthand"></a>
-  Use `%()`(it's a shorthand for `%Q`) for single-line strings which require
-  both interpolation and embedded double-quotes. For multi-line strings, prefer
-  heredocs.
-<sup>[[link](#percent-q-shorthand)]</sup>
+-   Use `%()`(it's a shorthand for `%Q`) for single-line strings which require
+    both interpolation and embedded double-quotes. For multi-line strings,
+    prefer heredocs.
 
-  ```ruby
-  # bad (no interpolation needed)
-  %(<div class="text">Some text</div>)
-  # should be '<div class="text">Some text</div>'
+    ```ruby
+    # bad (no interpolation needed)
+    %(<div class="text">Some text</div>)
+    # should be '<div class="text">Some text</div>'
 
-  # bad (no double-quotes)
-  %(This is #{quality} style)
-  # should be "This is #{quality} style"
+    # bad (no double-quotes)
+    %(This is #{quality} style)
+    # should be "This is #{quality} style"
 
-  # bad (multiple lines)
-  %(<div>\n<span class="big">#{exclamation}</span>\n</div>)
-  # should be a heredoc.
+    # bad (multiple lines)
+    %(<div>\n<span class="big">#{exclamation}</span>\n</div>)
+    # should be a heredoc.
 
-  # good (requires interpolation, has quotes, single line)
-  %(<tr><td class="name">#{name}</td>)
-  ```
+    # good (requires interpolation, has quotes, single line)
+    %(<tr><td class="name">#{name}</td>)
+    ```
 
-* <a name="percent-q"></a>
-  Avoid %() or the equivalent %q() unless you have a string with both `'` and
-  `"` in it. Regular string literals are more readable and should be preferred
-  unless a lot of characters would have to be escaped in them.
-<sup>[[link](#percent-q)]</sup>
+-   Avoid %() or the equivalent %q() unless you have a string with both `'` and
+    `"` in it. Regular string literals are more readable and should be
+    preferred unless a lot of characters would have to be escaped in them.
 
-  ```ruby
-  # bad
-  name = %q(Bruce Wayne)
-  time = %q(8 o'clock)
-  question = %q("What did you say?")
+    ```ruby
+    # bad
+    name = %q(Bruce Wayne)
+    time = %q(8 o'clock)
+    question = %q("What did you say?")
 
-  # good
-  name = 'Bruce Wayne'
-  time = "8 o'clock"
-  question = '"What did you say?"'
-  quote = %q(<p class='quote'>"What did you say?"</p>)
-  ```
+    # good
+    name = 'Bruce Wayne'
+    time = "8 o'clock"
+    question = '"What did you say?"'
+    quote = %q(<p class='quote'>"What did you say?"</p>)
+    ```
 
-* <a name="percent-r"></a>
-  Use `%r` only for regular expressions matching *at least* one '/'
-  character.
-<sup>[[link](#percent-r)]</sup>
+-   Use `%r` only for regular expressions matching *at least* one '/'
+    character.
 
-  ```ruby
-  # bad
-  %r{\s+}
+    ```ruby
+    # bad
+    %r{\s+}
 
-  # good
-  %r{^/(.*)$}
-  %r{^/blog/2011/(.*)$}
-  ```
+    # good
+    %r{^/(.*)$}
+    %r{^/blog/2011/(.*)$}
+    ```
 
-* <a name="percent-x"></a>
-  Avoid the use of `%x` unless you're going to invoke a command with
-  backquotes in it(which is rather unlikely).
-<sup>[[link](#percent-x)]</sup>
+-   Avoid the use of `%x` unless you're going to invoke a command with
+    backquotes in it(which is rather unlikely).
 
-  ```ruby
-  # bad
-  date = %x(date)
+    ```ruby
+    # bad
+    date = %x(date)
 
-  # good
-  date = `date`
-  echo = %x(echo `date`)
-  ```
+    # good
+    date = `date`
+    echo = %x(echo `date`)
+    ```
 
-* <a name="percent-s"></a>
-  Avoid the use of `%s`. It seems that the community has decided `:"some
-  string"` is the preferred way to create a symbol with spaces in it.
-<sup>[[link](#percent-s)]</sup>
+-   Avoid the use of `%s`. It seems that the community has decided `:"some
+    string"` is the preferred way to create a symbol with spaces in it.
+    好吧……因为手写确实也不麻烦。
 
-* <a name="percent-literal-braces"></a>
-  Use the braces that are the most appropriate for the various kinds of percent
-  literals.
-  <sup>[[link](#percent-literal-braces)]</sup>
-  - `()` for string literals(`%q`, `%Q`).
-  - `[]` for array literals(`%w`, `%i`, `%W`, `%I`) as it is aligned with
-  the standard array literals.
-  - `{}` for regexp literals(`%r`) since parentheses often appear inside regular
-  expressions. That's why a less common character with `{` is usually the best
-  delimiter for `%r` literals.
-  - `()` for all other literals (e.g. `%s`, `%x`)
+-   Use the braces that are the most appropriate for the various kinds of percent
+    literals.
+    这个……也有倾向性哈哈。
 
-  ```ruby
-  # bad
-  %q{"Test's king!", John said.}
+    -   `()` for string literals(`%q`, `%Q`).
+    -   `[]` for array literals(`%w`, `%i`, `%W`, `%I`) as it is aligned with
+        the standard array literals.
+    -   `{}` for regexp literals(`%r`) since parentheses often appear inside regular
+        expressions. That's why a less common character with `{` is usually the best
+        delimiter for `%r` literals.
+    -   `()` for all other literals (e.g. `%s`, `%x`)
 
-  # good
-  %q("Test's king!", John said.)
+    ```ruby
+    # bad
+    %q{"Test's king!", John said.}
 
-  # bad
-  %w(one two three)
-  %i(one two three)
+    # good
+    %q("Test's king!", John said.)
 
-  # good
-  %w[one two three]
-  %i[one two three]
+    # bad
+    %w(one two three)
+    %i(one two three)
 
-  # bad
-  %r((\w+)-(\d+))
-  %r{\w{1,2}\d{2,5}}
+    # good，确实看上去好点
+    %w[one two three]
+    %i[one two three]
 
-  # good
-  %r{(\w+)-(\d+)}
-  %r|\w{1,2}\d{2,5}|
-  ```
+    # bad
+    %r((\w+)-(\d+))
+    %r{\w{1,2}\d{2,5}}
+
+    # good
+    %r{(\w+)-(\d+)}
+    %r|\w{1,2}\d{2,5}|
+    ```
 
 ## Metaprogramming
 
-* <a name="no-needless-metaprogramming"></a>
-  Avoid needless metaprogramming.
-<sup>[[link](#no-needless-metaprogramming)]</sup>
+（这部分我似乎看不懂啊……）
 
-* <a name="no-monkey-patching"></a>
-  Do not mess around in core classes when writing libraries.  (Do not
-  monkey-patch them.)
-<sup>[[link](#no-monkey-patching)]</sup>
+-   Avoid needless metaprogramming.
+    当头一棒……（叫你炫技……）
 
-* <a name="block-class-eval"></a>
-  The block form of `class_eval` is preferable to the string-interpolated
-  form.
-<sup>[[link](#block-class-eval)]</sup>
+-   Do not mess around in core classes when writing libraries.  (Do not
+    monkey-patch them.)
 
-  - when you use the string-interpolated form, always supply `__FILE__`
-  and `__LINE__`, so that your backtraces make sense:
+-   The block form of `class_eval` is preferable to the string-interpolated
+    form.
+
+    when you use the string-interpolated form, always supply `__FILE__`
+    and `__LINE__`, so that your backtraces make sense:
 
     ```ruby
     class_eval 'def use_relative_model_naming?; true; end', __FILE__, __LINE__
     ```
 
-  - `define_method` is preferable to `class_eval{ def ... }`
+-   `define_method` is preferable to `class_eval{ def ... }`
 
-* <a name="eval-comment-docs"></a>
-  When using `class_eval` (or other `eval`) with string interpolation, add a
-  comment block showing its appearance if interpolated (a practice used in Rails
-  code):
-<sup>[[link](#eval-comment-docs)]</sup>
+-   When using `class_eval` (or other `eval`) with string interpolation, add a
+    comment block showing its appearance if interpolated (a practice used in
+    Rails code):
 
-  ```ruby
-  # from activesupport/lib/active_support/core_ext/string/output_safety.rb
-  UNSAFE_STRING_METHODS.each do |unsafe_method|
-    if 'String'.respond_to?(unsafe_method)
-      class_eval <<-EOT, __FILE__, __LINE__ + 1
-        def #{unsafe_method}(*params, &block)       # def capitalize(*params, &block)
-          to_str.#{unsafe_method}(*params, &block)  #   to_str.capitalize(*params, &block)
-        end                                       # end
+    ```ruby
+    # from activesupport/lib/active_support/core_ext/string/output_safety.rb
+    UNSAFE_STRING_METHODS.each do |unsafe_method|
+      if 'String'.respond_to?(unsafe_method)
+        class_eval <<-EOT, __FILE__, __LINE__ + 1
+          def #{unsafe_method}(*params, &block)       # def capitalize(*params, &block)
+            to_str.#{unsafe_method}(*params, &block)  #   to_str.capitalize(*params, &block)
+          end                                       # end
 
-        def #{unsafe_method}!(*params)              # def capitalize!(*params)
-          @dirty = true                           #   @dirty = true
-          super                                   #   super
-        end                                       # end
-      EOT
+          def #{unsafe_method}!(*params)              # def capitalize!(*params)
+            @dirty = true                           #   @dirty = true
+            super                                   #   super
+          end                                       # end
+        EOT
+      end
     end
-  end
-  ```
+    ```
 
-* <a name="no-method-missing"></a>
-  Avoid using `method_missing` for metaprogramming because backtraces become
-  messy, the behavior is not listed in `#methods`, and misspelled method calls
-  might silently work, e.g. `nukes.launch_state = false`. Consider using
-  delegation, proxy, or `define_method` instead. If you must use
-  `method_missing`:
-<sup>[[link](#no-method-missing)]</sup>
+-   Avoid using `method_missing` for metaprogramming because backtraces become
+    messy, the behavior is not listed in `#methods`, and misspelled method
+    calls might silently work, e.g. `nukes.launch_state = false`. Consider
+    using delegation, proxy, or `define_method` instead. If you must use
+    `method_missing`:
 
-  - Be sure to [also define `respond_to_missing?`](http://blog.marc-andre.ca/2010/11/methodmissing-politely.html)
-  - Only catch methods with a well-defined prefix, such as `find_by_*` -- make your code as assertive as possible.
-  - Call `super` at the end of your statement
-  - Delegate to assertive, non-magical methods:
+-   Be sure to [also define `respond_to_missing?`](http://blog.marc-andre.ca/2010/11/methodmissing-politely.html)
+
+-   Only catch methods with a well-defined prefix, such as `find_by_*` -- make
+    your code as assertive as possible.
+
+-   Call `super` at the end of your statement
+
+-   Delegate to assertive, non-magical methods:
 
     ```ruby
     # bad
@@ -4013,135 +3944,108 @@ resource cleanup when possible.
     # best of all, though, would to define_method as each findable attribute is declared
     ```
 
-* <a name="prefer-public-send"></a>
-  Prefer `public_send` over `send` so as not to circumvent `private`/`protected` visibility.
-<sup>[[link](#prefer-public-send)]</sup>
+-   Prefer `public_send` over `send` so as not to circumvent
+    `private`/`protected` visibility.
 
-  ```ruby
-  # We have  an ActiveModel Organization that includes concern Activatable
-  module Activatable
-    extend ActiveSupport::Concern
+    ```ruby
+    # We have  an ActiveModel Organization that includes concern Activatable
+    module Activatable
+      extend ActiveSupport::Concern
 
-    included do
-      before_create :create_token
+      included do
+        before_create :create_token
+      end
+
+      private
+
+      def reset_token
+        # some code
+      end
+
+      def create_token
+        # some code
+      end
+
+      def activate!
+        # some code
+      end
     end
 
-    private
-
-    def reset_token
-      # some code
+    class Organization < ActiveRecord::Base
+      include Activatable
     end
 
-    def create_token
-      # some code
-    end
+    linux_organization = Organization.find(...)
+    # BAD - violates privacy
+    linux_organization.send(:reset_token)
+    # GOOD - should throw an exception
+    linux_organization.public_send(:reset_token)
+    ```
 
-    def activate!
-      # some code
-    end
-  end
+-   Prefer `__send__` over `send`, as `send` may overlap with existing methods.
 
-  class Organization < ActiveRecord::Base
-    include Activatable
-  end
+    ```ruby
+    require 'socket'
 
-  linux_organization = Organization.find(...)
-  # BAD - violates privacy
-  linux_organization.send(:reset_token)
-  # GOOD - should throw an exception
-  linux_organization.public_send(:reset_token)
-  ```
-
-* <a name="prefer-__send__"></a>
-  Prefer `__send__` over `send`, as `send` may overlap with existing methods.
-<sup>[[link](#prefer-__send__)]</sup>
-
-  ```ruby
-  require 'socket'
-
-  u1 = UDPSocket.new
-  u1.bind('127.0.0.1', 4913)
-  u2 = UDPSocket.new
-  u2.connect('127.0.0.1', 4913)
-  # Won't send a message to the receiver obj.
-  # Instead it will send a message via UDP socket.
-  u2.send :sleep, 0
-  # Will actually send a message to the receiver obj.
-  u2.__send__ ...
-  ```
+    u1 = UDPSocket.new
+    u1.bind('127.0.0.1', 4913)
+    u2 = UDPSocket.new
+    u2.connect('127.0.0.1', 4913)
+    # Won't send a message to the receiver obj.
+    # Instead it will send a message via UDP socket.
+    u2.send :sleep, 0
+    # Will actually send a message to the receiver obj.
+    u2.__send__ ...
+    ```
 
 ## Misc
 
-* <a name="always-warn"></a>
-  Write `ruby -w` safe code.
-<sup>[[link](#always-warn)]</sup>
+-   Write `ruby -w` safe code.
 
-* <a name="no-optional-hash-params"></a>
-  Avoid hashes as optional parameters. Does the method do too much? (Object
-  initializers are exceptions for this rule).
-<sup>[[link](#no-optional-hash-params)]</sup>
+-   Avoid hashes as optional parameters. Does the method do too much? (Object
+    initializers are exceptions for this rule).
 
-* <a name="short-methods"></a>
-  Avoid methods longer than 10 LOC (lines of code). Ideally, most methods will
-  be shorter than 5 LOC. Empty lines do not contribute to the relevant LOC.
-<sup>[[link](#short-methods)]</sup>
+-   Avoid methods longer than 10 LOC (lines of code). Ideally, most methods will
+    be shorter than 5 LOC. Empty lines do not contribute to the relevant LOC.
 
-* <a name="too-many-params"></a>
-  Avoid parameter lists longer than three or four parameters.
-<sup>[[link](#too-many-params)]</sup>
+-   Avoid parameter lists longer than three or four parameters.
 
-* <a name="private-global-methods"></a>
-  If you really need "global" methods, add them to Kernel and make them
-  private.
-<sup>[[link](#private-global-methods)]</sup>
+-   If you really need "global" methods, add them to Kernel and make them
+    private.
 
-* <a name="instance-vars"></a>
-  Use module instance variables instead of global variables.
-<sup>[[link](#instance-vars)]</sup>
+-   Use module instance variables instead of global variables.
 
-  ```ruby
-  # bad
-  $foo_bar = 1
+    ```ruby
+    # bad
+    $foo_bar = 1
 
-  # good
-  module Foo
-    class << self
-      attr_accessor :bar
+    # good
+    module Foo
+      class << self
+        attr_accessor :bar
+      end
     end
-  end
 
-  Foo.bar = 1
-  ```
+    Foo.bar = 1
+    ```
 
-* <a name="optionparser"></a>
-  Use `OptionParser` for parsing complex command line options and `ruby -s`
-  for trivial command line options.
-<sup>[[link](#optionparser)]</sup>
+-   Use `OptionParser` for parsing complex command line options and `ruby -s`
+    for trivial command line options.
 
-* <a name="functional-code"></a>
-  Code in a functional way, avoiding mutation when that makes sense.
-<sup>[[link](#functional-code)]</sup>
+-   Code in a functional way, avoiding mutation when that makes sense.
 
-* <a name="no-param-mutations"></a>
-  Do not mutate parameters unless that is the purpose of the method.
-<sup>[[link](#no-param-mutations)]</sup>
+-   Do not mutate parameters unless that is the purpose of the method.
 
-* <a name="three-is-the-number-thou-shalt-count"></a>
-  Avoid more than three levels of block nesting.
-<sup>[[link](#three-is-the-number-thou-shalt-count)]</sup>
+-   Avoid more than three levels of block nesting.
 
-* <a name="be-consistent"></a>
-  Be consistent. In an ideal world, be consistent with these guidelines.
-<sup>[[link](#be-consistent)]</sup>
+-   Be consistent. In an ideal world, be consistent with these guidelines.
 
-* <a name="common-sense"></a>
-  Use common sense.
-<sup>[[link](#common-sense)]</sup>
+-   Use common sense.
 
 ## Tools
 
-Here are some tools to help you automatically check Ruby code against
-this guide.
+Here are some tools to help you automatically check Ruby code against this
+guide.
 
 ### RuboCop
 

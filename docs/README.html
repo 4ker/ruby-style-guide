@@ -16,14 +16,13 @@
     <!-- mh-css-after-cdn (alias: remote-css )-->
     <!-- mh-css-after (alias: local-css) -->
     <!-- mh-css-raw (alias: raw-css) -->
-    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
     <!-- mh-head-tail -->
 </head>
 <body id ="md2html-body" class="markdown-body">
 <!-- mh-nav (true/false, default: false) -->
 <!-- body-before -->
 <!-- body (Modify with CAUSION) -->
-<p>&#12304;Ruby Style Guide&#12305;</p>
+<p>&#36825;&#36793;&#19981;&#20877;&#26356;&#26032;&#65292;&#25972;&#21512;&#21040;&#33258;&#24049;&#30340;&#31508;&#35760;&#37324;&#38754;&#20102;&#65306;<a href="https://github.com/district10/notes/blob/master/misc/ruby-style-guide.md">notes/misc/ruby-style-guide.md</a></p>
 <h1 id="prelude">Prelude</h1>
 <blockquote>
 <p>Role models are important. <br> &#8211; Officer Alex J. Murphy / RoboCop</p>
@@ -1935,193 +1934,355 @@ attr <span class="st">:one</span>, <span class="st">:two</span>, <span class="st
 
   <span class="kw">alias</span> given_name first_name
 <span class="kw">end</span></code></pre></div></li>
-<li><p><a name="alias-method"></a> Always use <code>alias_method</code> when aliasing methods of modules, classes, or singleton classes at runtime, as the lexical scope of <code>alias</code> leads to unpredictability in these cases. <sup>[<a href="#alias-method">link</a>]</sup></p></li>
-</ul>
-<p>```ruby module Mononymous def self.included(other) other.class_eval { alias_method :full_name, :given_name } end end</p>
-<p>class Sting &lt; Westerner include Mononymous end ```</p>
-<ul>
-<li><a name="class-and-self"></a> When class (or module) methods call other such methods, omit the use of a leading <code>self</code> or own name followed by a <code>.</code> when calling other such methods. This is often seen in &#8220;service classes&#8221; or other similar concepts where a class is treated as though it were a function. This convention tends to reduce repetitive boilerplate in such classes. <sup>[<a href="#class-and-self">link</a>]</sup></li>
-</ul>
-<p>```ruby class TestClass # bad &#8211; more work when class renamed/method moved def self.call(param1, param2) TestClass.new(param1).call(param2) end</p>
-<pre><code># bad -- more verbose than necessary
-def self.call(param1, param2)
-  self.new(param1).call(param2)
-end
+<li><p>Always use <code>alias_method</code> when aliasing methods of modules, classes, or singleton classes at runtime, as the lexical scope of <code>alias</code> leads to unpredictability in these cases.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="kw">module</span> <span class="dt">Mononymous</span>
+  <span class="kw">def</span> <span class="dv">self</span>.included(other)
+    other.class_eval { alias_method <span class="st">:full_name</span>, <span class="st">:given_name</span> }
+  <span class="kw">end</span>
+<span class="kw">end</span>
 
-# good
-def self.call(param1, param2)
-  new(param1).call(param2)
-end
+<span class="kw">class</span> <span class="dt">Sting</span> &lt; <span class="dt">Westerner</span>
+  include <span class="dt">Mononymous</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>When class (or module) methods call other such methods, omit the use of a leading <code>self</code> or own name followed by a <code>.</code> when calling other such methods. This is often seen in &#8220;service classes&#8221; or other similar concepts where a class is treated as though it were a function. This convention tends to reduce repetitive boilerplate in such classes. &#23450;&#20041; class &#25110;&#32773; module methods &#30340;&#26102;&#20505;&#35201;&#21152;&#19978; self&#65292;&#20294;&#26159;&#20114;&#30456;&#35843;&#29992;&#30340;&#26102;&#20505;&#65292;&#19981;&#29992;&#21152; self&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="kw">class</span> <span class="dt">TestClass</span>
+  <span class="co"># bad -- more work when class renamed/method moved</span>
+  <span class="kw">def</span> <span class="dv">self</span>.call(param1, param2)
+    <span class="dt">TestClass</span>.new(param1).call(param2)
+  <span class="kw">end</span>
 
-# ...other methods...</code></pre>
-<p>end ```</p>
+  <span class="co"># bad -- more verbose than necessary</span>
+  <span class="kw">def</span> <span class="dv">self</span>.call(param1, param2)
+    <span class="dv">self</span>.new(param1).call(param2)
+  <span class="kw">end</span>
+
+  <span class="co"># good</span>
+  <span class="kw">def</span> <span class="dv">self</span>.call(param1, param2)
+    new(param1).call(param2)
+  <span class="kw">end</span>
+
+  <span class="co"># ...other methods...</span>
+<span class="kw">end</span></code></pre></div></li>
+</ul>
 <h2 id="exceptions">Exceptions</h2>
 <ul>
-<li><a name="prefer-raise-over-fail"></a> Prefer <code>raise</code> over <code>fail</code> for exceptions. <sup>[<a href="#prefer-raise-over-fail">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad fail SomeException, &#8216;message&#8217;</p>
-<p># good raise SomeException, &#8216;message&#8217; ```</p>
-<ul>
-<li><a name="no-explicit-runtimeerror"></a> Don&#8217;t specify <code>RuntimeError</code> explicitly in the two argument version of <code>raise</code>. <sup>[<a href="#no-explicit-runtimeerror">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad raise RuntimeError, &#8216;message&#8217;</p>
-<p># good - signals a RuntimeError by default raise &#8216;message&#8217; ```</p>
-<ul>
-<li><a name="exception-class-messages"></a> Prefer supplying an exception class and a message as two separate arguments to <code>raise</code>, instead of an exception instance. <sup>[<a href="#exception-class-messages">link</a>]</sup></li>
-</ul>
-<p>``<code>ruby   # bad   raise SomeException.new('message')   # Note that there is no way to do</code>raise SomeException.new(&#8216;message&#8217;), backtrace`.</p>
-<p># good raise SomeException, &#8216;message&#8217; # Consistent with <code>raise SomeException, 'message', backtrace</code>. ```</p>
-<ul>
-<li><a name="no-return-ensure"></a> Do not return from an <code>ensure</code> block. If you explicitly return from a method inside an <code>ensure</code> block, the return will take precedence over any exception being raised, and the method will return as if no exception had been raised at all. In effect, the exception will be silently thrown away. <sup>[<a href="#no-return-ensure">link</a>]</sup></li>
-</ul>
-<p><code>ruby   # bad   def foo     raise   ensure     return 'very bad idea'   end</code></p>
-<ul>
-<li><a name="begin-implicit"></a> Use <em>implicit begin blocks</em> where possible. <sup>[<a href="#begin-implicit">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad def foo begin # main logic goes here rescue # failure handling goes here end end</p>
-<p># good def foo # main logic goes here rescue # failure handling goes here end ```</p>
-<ul>
-<li><a name="contingency-methods"></a> Mitigate the proliferation of <code>begin</code> blocks by using <em>contingency methods</em> (a term coined by Avdi Grimm). <sup>[<a href="#contingency-methods">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad begin something_that_might_fail rescue IOError # handle IOError end</p>
-<p>begin something_else_that_might_fail rescue IOError # handle IOError end</p>
-<p># good def with_io_error_handling yield rescue IOError # handle IOError end</p>
-<p>with_io_error_handling { something_that_might_fail }</p>
-<p>with_io_error_handling { something_else_that_might_fail } ```</p>
-<ul>
-<li><a name="dont-hide-exceptions"></a> Don&#8217;t suppress exceptions. <sup>[<a href="#dont-hide-exceptions">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad begin # an exception occurs here rescue SomeError # the rescue clause does absolutely nothing end</p>
-<p># bad do_something rescue nil ```</p>
-<ul>
-<li><a name="no-rescue-modifiers"></a> Avoid using <code>rescue</code> in its modifier form. <sup>[<a href="#no-rescue-modifiers">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad - this catches exceptions of StandardError class and its descendant classes read_file rescue handle_error($!)</p>
-<p># good - this catches only the exceptions of Errno::ENOENT class and its descendant classes def foo read_file rescue Errno::ENOENT =&gt; ex handle_error(ex) end ```</p>
-<ul>
-<li><a name="no-exceptional-flows"></a> Don&#8217;t use exceptions for flow of control. <sup>[<a href="#no-exceptional-flows">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad begin n / d rescue ZeroDivisionError puts &#8216;Cannot divide by 0!&#8217; end</p>
-<p># good if d.zero? puts &#8216;Cannot divide by 0!&#8217; else n / d end ```</p>
-<ul>
-<li><a name="no-blind-rescues"></a> Avoid rescuing the <code>Exception</code> class. This will trap signals and calls to <code>exit</code>, requiring you to <code>kill -9</code> the process. <sup>[<a href="#no-blind-rescues">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad begin # calls to exit and kill signals will be caught (except kill -9) exit rescue Exception puts &#8220;you didn&#8217;t really want to exit, right?&#8221; # exception handling end</p>
-<p># good begin # a blind rescue rescues from StandardError, not Exception as many # programmers assume. rescue =&gt; e # exception handling end</p>
-<p># also good begin # an exception occurs here rescue StandardError =&gt; e # exception handling end ```</p>
-<ul>
-<li><a name="exception-ordering"></a> Put more specific exceptions higher up the rescue chain, otherwise they&#8217;ll never be rescued from. <sup>[<a href="#exception-ordering">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad begin # some code rescue StandardError =&gt; e # some handling rescue IOError =&gt; e # some handling that will never be executed end</p>
-<p># good begin # some code rescue IOError =&gt; e # some handling rescue StandardError =&gt; e # some handling end ```</p>
-<ul>
-<li><a name="release-resources"></a> Release external resources obtained by your program in an <code>ensure</code> block. <sup>[<a href="#release-resources">link</a>]</sup></li>
-</ul>
-<p><code>ruby   f = File.open('testfile')   begin     # .. process   rescue     # .. handle error   ensure     f.close if f   end</code></p>
-<ul>
-<li><a name="auto-release-resources"></a> Use versions of resource obtaining methods that do automatic resource cleanup when possible. <sup>[<a href="#auto-release-resources">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad - you need to close the file descriptor explicitly f = File.open(&#8216;testfile&#8217;) # some action on the file f.close</p>
-<p># good - the file descriptor is closed automatically File.open(&#8216;testfile&#8217;) do |f| # some action on the file end ```</p>
-<ul>
-<li><a name="standard-exceptions"></a> Favor the use of exceptions from the standard library over introducing new exception classes. <sup>[<a href="#standard-exceptions">link</a>]</sup></li>
+<li><p>Prefer <code>raise</code> over <code>fail</code> for exceptions. raise &#27604; fail &#22909;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+fail <span class="dt">SomeException</span>, <span class="st">&#39;message&#39;</span>
+
+<span class="co"># good</span>
+raise <span class="dt">SomeException</span>, <span class="st">&#39;message&#39;</span></code></pre></div></li>
+<li><p>Don&#8217;t specify <code>RuntimeError</code> explicitly in the two argument version of <code>raise</code>. &#30452;&#25509; raise &#23601;&#22909;&#65292;&#19981;&#29992;&#21152;&#19978; RuntimeError&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+raise <span class="dt">RuntimeError</span>, <span class="st">&#39;message&#39;</span>
+
+<span class="co"># good - signals a RuntimeError by default</span>
+raise <span class="st">&#39;message&#39;</span></code></pre></div></li>
+<li><p>Prefer supplying an exception class and a message as two separate arguments to <code>raise</code>, instead of an exception instance. &#22312;&#20320; raise exception &#30340;&#26102;&#20505;&#65292;&#19981;&#35201;&#29992; new&#8230;&#8230;&#30452;&#25509;&#29992;&#20004;&#20010;&#21442;&#25968;&#23601;&#22909;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+raise <span class="dt">SomeException</span>.new(<span class="st">&#39;message&#39;</span>)
+<span class="co"># Note that there is no way to do `raise SomeException.new(&#39;message&#39;), backtrace`.</span>
+
+<span class="co"># good</span>
+raise <span class="dt">SomeException</span>, <span class="st">&#39;message&#39;</span>
+<span class="co"># Consistent with `raise SomeException, &#39;message&#39;, backtrace`.</span></code></pre></div></li>
+<li><p>Do not return from an <code>ensure</code> block. If you explicitly return from a method inside an <code>ensure</code> block, the return will take precedence over any exception being raised, and the method will return as if no exception had been raised at all. In effect, the exception will be silently thrown away. &#36825;&#20010;&#24456;&#26377;&#24847;&#24605;&#65292;&#22914;&#26524;&#20320;&#22312; enusre &#37324;&#38754; return&#65292;raise &#30340;&#19996;&#35199;&#23601;&#19981;&#35265;&#20102;&#12290;&#22909;&#20687;&#27809;&#26377; raise error &#19968;&#26679;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">def</span> foo
+  raise
+<span class="kw">ensure</span>
+  <span class="kw">return</span> <span class="st">&#39;very bad idea&#39;</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Use <em>implicit begin blocks</em> where possible. &#24635;&#20043;&#19981;&#35201;&#22810;&#20313;&#30340;&#19996;&#35199;&#12290;&#33021;&#31934;&#28860;&#23601;&#31934;&#28860;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">def</span> foo
+  <span class="kw">begin</span>
+    <span class="co"># main logic goes here</span>
+  <span class="kw">rescue</span>
+    <span class="co"># failure handling goes here</span>
+  <span class="kw">end</span>
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">def</span> foo
+  <span class="co"># main logic goes here</span>
+<span class="kw">rescue</span>
+  <span class="co"># failure handling goes here</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Mitigate the <strong>proliferation</strong> of <code>begin</code> blocks by using <em>contingency methods</em> (a term coined by Avdi Grimm).</p>
+<pre><code>proliferation
+    [pro,l&#618;f&#601;&#39;re&#643;&#601;n; pr&#601;&#650;,l&#618;f&#601;&#39;re&#618;&#643;n]
+    n. &#22686;&#27542;&#65292;&#25193;&#25955;&#65307;&#20998;&#33469;&#32321;&#27542;
+
+contingency
+    &#33521; [k&#601;n&#39;t&#618;nd&#658;(&#601;)ns&#618;] &#32654; [k&#601;n&#39;t&#618;nd&#658;&#601;nsi]
+    n. &#20598;&#28982;&#24615;&#65307;[&#23433;&#20840;] &#24847;&#22806;&#20107;&#25925;&#65307;&#21487;&#33021;&#24615;&#65307;[&#23457;&#35745;] &#24847;&#22806;&#24320;&#25903;&#65307;[&#31163;&#25955;&#25968;&#23398;&#25110;&#36923;&#36753;&#23398;]&#20598;&#28982;&#24335;</code></pre>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">begin</span>
+  something_that_might_fail
+<span class="kw">rescue</span> <span class="dt">IOError</span>
+  <span class="co"># handle IOError</span>
+<span class="kw">end</span>
+
+<span class="kw">begin</span>
+  something_else_that_might_fail
+<span class="kw">rescue</span> <span class="dt">IOError</span>
+  <span class="co"># handle IOError</span>
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">def</span> with_io_error_handling
+   <span class="kw">yield</span>
+<span class="kw">rescue</span> <span class="dt">IOError</span>
+  <span class="co"># handle IOError</span>
+<span class="kw">end</span>
+
+with_io_error_handling { something_that_might_fail }
+with_io_error_handling { something_else_that_might_fail }</code></pre></div></li>
+<li><p>Don&#8217;t suppress exceptions. &#30475;&#20102;&#36825;&#20010;&#8230;&#8230;&#25105;&#23398;&#21040;&#30340;&#26159;&#22914;&#20309; supress exceptions&#8230;&#8230;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">begin</span>
+  <span class="co"># an exception occurs here</span>
+<span class="kw">rescue</span> <span class="dt">SomeError</span>
+  <span class="co"># the rescue clause does absolutely nothing</span>
+<span class="kw">end</span>
+
+<span class="co"># bad</span>
+do_something <span class="kw">rescue</span> <span class="dv">nil</span></code></pre></div></li>
+<li><p>Avoid using <code>rescue</code> in its modifier form. &#19981;&#35201;&#29992; modifier &#30340; rescue&#65288;&#21518;&#32622;&#30340;&#65289;&#12290;&#21643;&#35828;&#21602;&#65292;&#20320;&#26368;&#22909;&#19968;&#20010;&#19968;&#20010; rescue&#8230;&#8230;&#65288;&#22909;&#32047;&#30340;&#36214;&#33050;&#65289;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad - this catches exceptions of StandardError class and its descendant classes</span>
+read_file <span class="kw">rescue</span> handle_error(<span class="dt">$!</span>)
+
+<span class="co"># good - this catches only the exceptions of Errno::ENOENT class and its descendant classes</span>
+<span class="kw">def</span> foo
+  read_file
+<span class="kw">rescue</span> <span class="dt">Errno</span>::<span class="dt">ENOENT</span> =&gt; ex
+  handle_error(ex)
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Don&#8217;t use exceptions for flow of control. &#20854;&#23454;&#8230;&#8230;&#36825;&#26159;&#22312;&#26435;&#34913;&#21861;&#26679;&#30340;&#26159;&#31243;&#24207;&#24212;&#35813;&#22788;&#29702;&#30340;&#65292;&#21861;&#26679;&#30340;&#26159;&#36755;&#20837;&#26377;&#38382;&#39064;&#65292;&#24212;&#24403;&#20174;&#36755;&#20837;&#19978;&#28040;&#24365;&#30340;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">begin</span>
+  n / d
+<span class="kw">rescue</span> <span class="dt">ZeroDivisionError</span>
+  puts <span class="st">&#39;Cannot divide by 0!&#39;</span>
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">if</span> d.zero?
+  puts <span class="st">&#39;Cannot divide by 0!&#39;</span>
+<span class="kw">else</span>
+  n / d
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Avoid rescuing the <code>Exception</code> class. This will trap signals and calls to <code>exit</code>, requiring you to <code>kill -9</code> the process.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">begin</span>
+  <span class="co"># calls to exit and kill signals will be caught (except kill -9)</span>
+  exit
+<span class="kw">rescue</span> <span class="dt">Exception</span>
+  puts <span class="st">&quot;you didn&#39;t really want to exit, right?&quot;</span>
+  <span class="co"># exception handling</span>
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">begin</span>
+  <span class="co"># a blind rescue rescues from StandardError, not Exception as many</span>
+  <span class="co"># programmers assume.</span>
+<span class="kw">rescue</span> =&gt; e
+  <span class="co"># exception handling</span>
+<span class="kw">end</span>
+
+<span class="co"># also good</span>
+<span class="kw">begin</span>
+  <span class="co"># an exception occurs here</span>
+<span class="kw">rescue</span> <span class="dt">StandardError</span> =&gt; e
+  <span class="co"># exception handling</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Put more specific exceptions higher up the rescue chain, otherwise they&#8217;ll never be rescued from. &#36825;&#20010;&#21644; Ruby &#20063;&#26080;&#20851;&#21834;&#8230;&#8230;rescue &#26159;&#19981;&#26029; fall back&#65292;&#24403;&#28982;&#35201;&#25226;&#26368;&#21518;&#30340;&#8220;default&#8221;&#25918;&#21518;&#38754;&#21679;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">begin</span>
+  <span class="co"># some code</span>
+<span class="kw">rescue</span> <span class="dt">StandardError</span> =&gt; e
+  <span class="co"># some handling</span>
+<span class="kw">rescue</span> <span class="dt">IOError</span> =&gt; e
+  <span class="co"># some handling that will never be executed</span>
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">begin</span>
+  <span class="co"># some code</span>
+<span class="kw">rescue</span> <span class="dt">IOError</span> =&gt; e
+  <span class="co"># some handling</span>
+<span class="kw">rescue</span> <span class="dt">StandardError</span> =&gt; e
+  <span class="co"># some handling</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Release external resources obtained by your program in an <code>ensure</code> block. &#36825;&#26102;&#65292;&#24212;&#24403;&#24576;&#24565; Java &#30340; try with resources &#35821;&#27861;&#8230;&#8230;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">f = <span class="dt">File</span>.open(<span class="st">&#39;testfile&#39;</span>)
+<span class="kw">begin</span>
+  <span class="co"># .. process</span>
+<span class="kw">rescue</span>
+  <span class="co"># .. handle error</span>
+<span class="kw">ensure</span>
+  f.close <span class="kw">if</span> f
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Use versions of resource obtaining methods that do automatic resource cleanup when possible. &#26377;&#33258;&#21160;&#30340;&#65292;&#22909;&#29992;&#30340;&#65292;&#29305;&#20040;&#24178;&#22043;&#33258;&#24049;&#36896;&#31232;&#28866;&#30340;&#36718;&#23376;&#21834;&#65281;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad - you need to close the file descriptor explicitly</span>
+f = <span class="dt">File</span>.open(<span class="st">&#39;testfile&#39;</span>)
+<span class="co"># some action on the file</span>
+f.close
+
+<span class="co"># good - the file descriptor is closed automatically</span>
+<span class="dt">File</span>.open(<span class="st">&#39;testfile&#39;</span>) <span class="kw">do</span> |f|
+  <span class="co"># some action on the file</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Favor the use of exceptions from the standard library over introducing new exception classes.</p></li>
 </ul>
 <h2 id="collections">Collections</h2>
 <ul>
-<li><a name="literal-array-hash"></a> Prefer literal array and hash creation notation (unless you need to pass parameters to their constructors, that is). <sup>[<a href="#literal-array-hash">link</a>]</sup></li>
+<li><p>Prefer literal array and hash creation notation (unless you need to pass parameters to their constructors, that is). &#36319; JavaScript &#19968;&#26679;&#65292;&#33021;&#29992; <code>var list = []</code> &#24178;&#22043;&#29992;&#37027;&#20010;&#24694;&#24515;&#30340;&#26500;&#36896;&#20989;&#25968;&#35821;&#27861;&#21834;&#65281;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+arr = <span class="dt">Array</span>.new
+hash = <span class="dt">Hash</span>.new
+
+<span class="co"># good</span>
+arr = []
+arr = <span class="dt">Array</span>.new(<span class="dv">10</span>)
+hash = {}
+hash = <span class="dt">Hash</span>.new(<span class="dv">0</span>)</code></pre></div></li>
+<li><p>Prefer <code>%w</code> to the literal array syntax when you need an array of words (non-empty strings without spaces and special characters in them). Apply this rule only to arrays with two or more elements. &#36825;&#20010;&#20854;&#23454;&#20063;&#26159;&#35265;&#20161;&#35265;&#26234;&#30340;&#8230;&#8230;&#21518;&#32773;&#26174;&#28982;&#26356;&#28165;&#26224;&#12290;&#20174;&#21035;&#30340;&#22320;&#26041;&#25335;&#36125;&#26469;&#19968;&#20018;&#36335;&#24452;&#21861;&#30340;&#65292;&#29992;&#36825;&#26679;&#30340;&#35821;&#27861;&#20063;&#33021;&#30452;&#25509;&#29992;&#65292;&#19981;&#24517;&#25918;&#21040; Vim &#37324;&#38754;&#20462;&#25913;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="dt">STATES</span> = [<span class="st">&#39;draft&#39;</span>, <span class="st">&#39;open&#39;</span>, <span class="st">&#39;closed&#39;</span>]
+
+<span class="co"># good</span>
+<span class="dt">STATES</span> =<span class="ot"> %w[</span><span class="st">draft open closed</span><span class="ot">]</span></code></pre></div></li>
+<li><p>Prefer <code>%i</code> to the literal array syntax when you need an array of symbols (and you don&#8217;t need to maintain Ruby 1.9 compatibility). Apply this rule only to arrays with two or more elements. &#36825;&#26159; symbol &#30340;&#24555;&#36895;&#26500;&#36896;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="dt">STATES</span> = [<span class="st">:draft</span>, <span class="st">:open</span>, <span class="st">:closed</span>]
+
+<span class="co"># good</span>
+<span class="dt">STATES</span> =<span class="ot"> %</span>i<span class="ot">[</span><span class="st">draft open closed</span><span class="ot">]</span></code></pre></div></li>
+<li><p>Avoid comma after the last item of an <code>Array</code> or <code>Hash</code> literal, especially when the items are not on separate lines. &#36825;&#20010;&#19978;&#38754;&#35828;&#36807;&#8230;&#8230;&#20854;&#23454;&#25105;&#36824;&#25402;&#21916;&#27426;&#30340;&#8230;&#8230;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad - easier to move/add/remove items, but still not preferred</span>
+<span class="dt">VALUES</span> = [
+           <span class="dv">1001</span>,
+           <span class="dv">2020</span>,
+           <span class="dv">3333</span>,
+         ]
+
+<span class="co"># bad</span>
+<span class="dt">VALUES</span> = [<span class="dv">1001</span>, <span class="dv">2020</span>, <span class="dv">3333</span>, ]
+
+<span class="co"># good</span>
+<span class="dt">VALUES</span> = [<span class="dv">1001</span>, <span class="dv">2020</span>, <span class="dv">3333</span>]</code></pre></div></li>
+<li><p>Avoid the creation of huge gaps in arrays. &#36825;&#20010;&#26159;&#31243;&#24207;&#35774;&#35745;&#19978;&#30340;&#38382;&#39064;&#12290;&#24178;&#22043;&#19981;&#29992; Hash &#21602;&#65311;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">arr = []
+arr[<span class="dv">100</span>] = <span class="dv">1</span> <span class="co"># now you have an array with lots of nils</span></code></pre></div></li>
+<li><p>When accessing the first or last element from an array, prefer <code>first</code> or <code>last</code> over <code>[0]</code> or <code>[-1]</code>. &#34532;&#8230;&#8230;&#36825;&#20010;&#8230;&#8230;&#36824;&#22909;&#21543;&#12290;first&#65292;last &#30830;&#23454;&#22909;&#29992;&#12290;&#20294;&#26159; <code>[0]</code> &#21644; <code>[-1]</code> &#22909;&#35760;&#21834;&#65281;</p></li>
+<li><p>Use <code>Set</code> instead of <code>Array</code> when dealing with unique elements. <code>Set</code> implements a collection of unordered values with no duplicates. This is a hybrid of <code>Array</code>&#8217;s intuitive inter-operation facilities and <code>Hash</code>&#8217;s fast lookup. &#36825;&#20010;&#26159;&#25968;&#25454;&#32467;&#26500;&#30340;&#36873;&#25321;&#65292;&#21644; Ruby &#20063;&#27809;&#21861;&#20851;&#31995;&#12290;</p></li>
+<li><p>Prefer symbols instead of strings as hash keys. &#25105;&#24819;&#30693;&#36947;&#36825;&#20004;&#20010; hash &#26159;&#19968;&#26679;&#30340;&#22043;&#65311;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+hash = { <span class="st">&#39;one&#39;</span> =&gt; <span class="dv">1</span>, <span class="st">&#39;two&#39;</span> =&gt; <span class="dv">2</span>, <span class="st">&#39;three&#39;</span> =&gt; <span class="dv">3</span> }
+
+<span class="co"># good</span>
+hash = { <span class="st">one: </span><span class="dv">1</span>, <span class="st">two: </span><span class="dv">2</span>, <span class="st">three: </span><span class="dv">3</span> }</code></pre></div></li>
+<li><p>Avoid the use of mutable objects as hash keys. &#36825;&#20010;&#8230;&#8230;&#26159; hash &#30340;&#29305;&#24615;&#65292;&#22914;&#26524; key &#21464;&#20102;&#65292;&#23427;&#30340; entry &#23601;&#24212;&#24403;&#21464;&#65292;&#36825;&#20010;&#21644; hash &#20914;&#31361;&#12290;</p></li>
+<li><p>Use the Ruby 1.9 hash literal syntax when your hash keys are symbols. &#20284;&#20046;&#26159;&#19981;&#19968;&#26679;&#30340;&#12290;&#19981;&#36807;&#36825;&#20010;&#35821;&#27861;&#30475;&#19978;&#21435;&#21644; JS &#19968;&#26679;&#20102;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+hash = { <span class="st">:one</span> =&gt; <span class="dv">1</span>, <span class="st">:two</span> =&gt; <span class="dv">2</span>, <span class="st">:three</span> =&gt; <span class="dv">3</span> }
+
+<span class="co"># good</span>
+hash = { <span class="st">one: </span><span class="dv">1</span>, <span class="st">two: </span><span class="dv">2</span>, <span class="st">three: </span><span class="dv">3</span> }</code></pre></div></li>
+<li><p>Don&#8217;t mix the Ruby 1.9 hash syntax with hash rockets in the same hash literal. When you&#8217;ve got keys that are not symbols stick to the hash rockets syntax. &#36825;&#20010;&#31526;&#21495;&#21448;&#21483; rocket syntax &#20102;&#21834;&#8230;&#8230;&#65311;&#65281;&#26377;&#20154;&#21483;&#23427; fat arrow&#8230;&#8230;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+{ <span class="st">a: </span><span class="dv">1</span>, <span class="st">&#39;b&#39;</span> =&gt; <span class="dv">2</span> }
+
+<span class="co"># good</span>
+{ <span class="st">:a</span> =&gt; <span class="dv">1</span>, <span class="st">&#39;b&#39;</span> =&gt; <span class="dv">2</span> }</code></pre></div></li>
+<li><p>Use <code>Hash#key?</code> instead of <code>Hash#has_key?</code> and <code>Hash#value?</code> instead of <code>Hash#has_value?</code>. &#26377;&#8220;&#65311;&#8221;&#21495;&#23601;&#19981;&#35201;&#30011;&#34503;&#28155;&#36275;&#21862;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+hash.has_key?(<span class="st">:test</span>)
+hash.has_value?(value)
+
+<span class="co"># good</span>
+hash.key?(<span class="st">:test</span>)
+hash.value?(value)</code></pre></div></li>
+<li><p>Use <code>Hash#each_key</code> instead of <code>Hash#keys.each</code> and <code>Hash#each_value</code> instead of <code>Hash#values.each</code>. <code>each_key</code> &#21644; <code>each_value</code> &#20272;&#35745;&#25928;&#29575;&#22909;&#28857;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+hash.keys.each { |k| p k }
+hash.values.each { |v| p v }
+hash.each { |k, _v| p k }
+hash.each { |_k, v| p v }
+
+<span class="co"># good</span>
+hash.each_key { |k| p k }
+hash.each_value { |v| p v }</code></pre></div></li>
+<li><p>Use <code>Hash#fetch</code> when dealing with hash keys that should be present. &#25509;&#36865;&#20989;&#25968;&#19981;&#38169;&#12290;== fetch&#12290;&#36824;&#21487;&#20197;&#35774;&#23450;&#40664;&#35748;&#20540;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">heroes = { <span class="st">batman: &#39;Bruce Wayne&#39;</span>, <span class="st">superman: &#39;Clark Kent&#39;</span> }
+<span class="co"># bad - if we make a mistake we might not spot it right away</span>
+heroes[<span class="st">:batman</span>] <span class="co"># =&gt; &#39;Bruce Wayne&#39;</span>
+heroes[<span class="st">:supermann</span>] <span class="co"># =&gt; nil</span>
+
+<span class="co"># good - fetch raises a KeyError making the problem obvious</span>
+heroes.fetch(<span class="st">:supermann</span>)</code></pre></div>
+<p>Introduce default values for hash keys via <code>Hash#fetch</code> as opposed to using custom logic.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">batman = { <span class="st">name: &#39;Bruce Wayne&#39;</span>, <span class="st">is_evil: </span><span class="dv">false</span> }
+
+<span class="co"># bad - if we just use || operator with falsy value we won&#39;t get the expected result</span>
+<span class="co"># &#25152;&#20197;&#36825;&#29305;&#20040;&#36824;&#26159;&#38169;&#30340;&#8230;&#8230;&#25152;&#20197;&#36825;&#26681;&#26412;&#19981;&#21483;&#39118;&#26684;&#65281;&#36825;&#21483;&#35823;&#29992;&#12290;</span>
+batman[<span class="st">:is_evil</span>] || <span class="dv">true</span> <span class="co"># =&gt; true</span>
+
+<span class="co"># good - fetch work correctly with falsy values</span>
+batman.fetch(<span class="st">:is_evil</span>, <span class="dv">true</span>) <span class="co"># =&gt; false</span></code></pre></div></li>
+<li><p>Prefer the use of the block instead of the default value in <code>Hash#fetch</code> if the code that has to be evaluated may have side effects or be expensive. &#36825;&#20010;&#8230;&#8230;&#34532;&#65311;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">batman = { <span class="st">name: &#39;Bruce Wayne&#39;</span> }
+
+<span class="co"># bad - if we use the default value, we eager evaluate it</span>
+<span class="co"># so it can slow the program down if done multiple times</span>
+batman.fetch(<span class="st">:powers</span>, obtain_batman_powers) <span class="co"># obtain_batman_powers is an expensive call</span>
+
+<span class="co"># good - blocks are lazy evaluated, so only triggered in case of KeyError exception</span>
+batman.fetch(<span class="st">:powers</span>) { obtain_batman_powers }</code></pre></div></li>
+<li><p>Use <code>Hash#values_at</code> when you need to retrieve several values consecutively from a hash. &#19968;&#27425;&#21462;&#20986;&#22909;&#20960;&#20010;&#65292;&#23601;&#29992; values_at&#8230;&#8230;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+email = data[<span class="st">&#39;email&#39;</span>]
+username = data[<span class="st">&#39;nickname&#39;</span>]
+
+<span class="co"># good</span>
+email, username = data.values_at(<span class="st">&#39;email&#39;</span>, <span class="st">&#39;nickname&#39;</span>)</code></pre></div></li>
+<li><p>Rely on the fact that as of Ruby 1.9 hashes are ordered. &#34532;&#65292;hash &#37117;&#26159; ordered_hash&#8230;&#8230;==Java &#21453;&#27491;&#26159;&#25552;&#20379;&#20102;&#22909;&#20960;&#31181; Hash&#12290;</p></li>
+<li><p>Do not modify a collection while traversing it. &#36825;&#26159;&#25968;&#25454;&#32467;&#26500;&#19978;&#30340;&#24314;&#35758;&#12290;</p></li>
+<li><p>When accessing elements of a collection, avoid direct access via <code>[n]</code> by using an alternate form of the reader method if it is supplied. This guards you from calling <code>[]</code> on <code>nil</code>. &#21704;&#21704;&#21704;&#21704;&#22909;&#21543;&#12290;&#21407;&#26469;&#36825;&#26679;&#26356;&#22909;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="dt">Regexp</span>.last_match[<span class="dv">1</span>]
+
+<span class="co"># good</span>
+<span class="dt">Regexp</span>.last_match(<span class="dv">1</span>)</code></pre></div></li>
+<li><p>When providing an accessor for a collection, provide an alternate form to save users from checking for <code>nil</code> before accessing an element in the collection. &#29992;&#40664;&#35748;&#20540;&#35774;&#23450;&#20026; nil &#26469;&#36991;&#20813;&#36807;&#22810;&#30340;&#26080;&#30031;&#21028;&#26029;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="kw">def</span> awesome_things
+  <span class="ot">@awesome_things</span>
+<span class="kw">end</span>
+
+<span class="co"># good</span>
+<span class="kw">def</span> awesome_things(index = <span class="dv">nil</span>)
+  <span class="kw">if</span> index &amp;&amp; <span class="ot">@awesome_things</span>
+    <span class="ot">@awesome_things</span>[index]
+  <span class="kw">else</span>
+    <span class="ot">@awesome_things</span>
+  <span class="kw">end</span>
+<span class="kw">end</span></code></pre></div></li>
 </ul>
-<p>```ruby # bad arr = Array.new hash = Hash.new</p>
-<p># good arr = [] arr = Array.new(10) hash = {} hash = Hash.new(0) ```</p>
+<h2 id="numbers">Numbers</h2>
 <ul>
-<li><a name="percent-w"></a> Prefer <code>%w</code> to the literal array syntax when you need an array of words (non-empty strings without spaces and special characters in them). Apply this rule only to arrays with two or more elements. <sup>[<a href="#percent-w">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad STATES = [&#8216;draft&#8217;, &#8216;open&#8217;, &#8216;closed&#8217;]</p>
-<p># good STATES = %w[draft open closed] ```</p>
-<ul>
-<li><a name="percent-i"></a> Prefer <code>%i</code> to the literal array syntax when you need an array of symbols (and you don&#8217;t need to maintain Ruby 1.9 compatibility). Apply this rule only to arrays with two or more elements. <sup>[<a href="#percent-i">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad STATES = [:draft, :open, :closed]</p>
-<p># good STATES = %i[draft open closed] ```</p>
-<ul>
-<li><a name="no-trailing-array-commas"></a> Avoid comma after the last item of an <code>Array</code> or <code>Hash</code> literal, especially when the items are not on separate lines. <sup>[<a href="#no-trailing-array-commas">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad - easier to move/add/remove items, but still not preferred VALUES = [ 1001, 2020, 3333, ]</p>
-<p># bad VALUES = [1001, 2020, 3333, ]</p>
-<p># good VALUES = [1001, 2020, 3333] ```</p>
-<ul>
-<li><a name="no-gappy-arrays"></a> Avoid the creation of huge gaps in arrays. <sup>[<a href="#no-gappy-arrays">link</a>]</sup></li>
-</ul>
-<p><code>ruby   arr = []   arr[100] = 1 # now you have an array with lots of nils</code></p>
-<ul>
-<li><p><a name="first-and-last"></a> When accessing the first or last element from an array, prefer <code>first</code> or <code>last</code> over <code>[0]</code> or <code>[-1]</code>. <sup>[<a href="#first-and-last">link</a>]</sup></p></li>
-<li><p><a name="set-vs-array"></a> Use <code>Set</code> instead of <code>Array</code> when dealing with unique elements. <code>Set</code> implements a collection of unordered values with no duplicates. This is a hybrid of <code>Array</code>&#8217;s intuitive inter-operation facilities and <code>Hash</code>&#8217;s fast lookup. <sup>[<a href="#set-vs-array">link</a>]</sup></p></li>
-<li><p><a name="symbols-as-keys"></a> Prefer symbols instead of strings as hash keys. <sup>[<a href="#symbols-as-keys">link</a>]</sup></p></li>
-</ul>
-<p>```ruby # bad hash = { &#8216;one&#8217; =&gt; 1, &#8216;two&#8217; =&gt; 2, &#8216;three&#8217; =&gt; 3 }</p>
-<p># good hash = { one: 1, two: 2, three: 3 } ```</p>
-<ul>
-<li><p><a name="no-mutable-keys"></a> Avoid the use of mutable objects as hash keys. <sup>[<a href="#no-mutable-keys">link</a>]</sup></p></li>
-<li><p><a name="hash-literals"></a> Use the Ruby 1.9 hash literal syntax when your hash keys are symbols. <sup>[<a href="#hash-literals">link</a>]</sup></p></li>
-</ul>
-<p>```ruby # bad hash = { :one =&gt; 1, :two =&gt; 2, :three =&gt; 3 }</p>
-<p># good hash = { one: 1, two: 2, three: 3 } ```</p>
-<ul>
-<li><a name="no-mixed-hash-syntaces"></a> Don&#8217;t mix the Ruby 1.9 hash syntax with hash rockets in the same hash literal. When you&#8217;ve got keys that are not symbols stick to the hash rockets syntax. <sup>[<a href="#no-mixed-hash-syntaces">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad { a: 1, &#8216;b&#8217; =&gt; 2 }</p>
-<p># good { :a =&gt; 1, &#8216;b&#8217; =&gt; 2 } ```</p>
-<ul>
-<li><a name="hash-key"></a> Use <code>Hash#key?</code> instead of <code>Hash#has_key?</code> and <code>Hash#value?</code> instead of <code>Hash#has_value?</code>. <sup>[<a href="#hash-key">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad hash.has_key?(:test) hash.has_value?(value)</p>
-<p># good hash.key?(:test) hash.value?(value) ```</p>
-<ul>
-<li><a name="hash-each"></a> Use <code>Hash#each_key</code> instead of <code>Hash#keys.each</code> and <code>Hash#each_value</code> instead of <code>Hash#values.each</code>. <sup>[<a href="#hash-each">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad hash.keys.each { |k| p k } hash.values.each { |v| p v } hash.each { |k, _v| p k } hash.each { |_k, v| p v }</p>
-<p># good hash.each_key { |k| p k } hash.each_value { |v| p v } ```</p>
-<ul>
-<li><a name="hash-fetch"></a> Use <code>Hash#fetch</code> when dealing with hash keys that should be present. <sup>[<a href="#hash-fetch">link</a>]</sup></li>
-</ul>
-<p>```ruby heroes = { batman: &#8216;Bruce Wayne&#8217;, superman: &#8216;Clark Kent&#8217; } # bad - if we make a mistake we might not spot it right away heroes[:batman] # =&gt; &#8216;Bruce Wayne&#8217; heroes[:supermann] # =&gt; nil</p>
-<p># good - fetch raises a KeyError making the problem obvious heroes.fetch(:supermann) ```</p>
-<ul>
-<li><a name="hash-fetch-defaults"></a> Introduce default values for hash keys via <code>Hash#fetch</code> as opposed to using custom logic. <sup>[<a href="#hash-fetch-defaults">link</a>]</sup></li>
-</ul>
-<p>```ruby batman = { name: &#8216;Bruce Wayne&#8217;, is_evil: false }</p>
-<p># bad - if we just use || operator with falsy value we won&#8217;t get the expected result batman[:is_evil] || true # =&gt; true</p>
-<p># good - fetch work correctly with falsy values batman.fetch(:is_evil, true) # =&gt; false ```</p>
-<ul>
-<li><a name="use-hash-blocks"></a> Prefer the use of the block instead of the default value in <code>Hash#fetch</code> if the code that has to be evaluated may have side effects or be expensive. <sup>[<a href="#use-hash-blocks">link</a>]</sup></li>
-</ul>
-<p>```ruby batman = { name: &#8216;Bruce Wayne&#8217; }</p>
-<p># bad - if we use the default value, we eager evaluate it # so it can slow the program down if done multiple times batman.fetch(:powers, obtain_batman_powers) # obtain_batman_powers is an expensive call</p>
-<p># good - blocks are lazy evaluated, so only triggered in case of KeyError exception batman.fetch(:powers) { obtain_batman_powers } ```</p>
-<ul>
-<li><a name="hash-values-at"></a> Use <code>Hash#values_at</code> when you need to retrieve several values consecutively from a hash. <sup>[<a href="#hash-values-at">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad email = data[&#8216;email&#8217;] username = data[&#8216;nickname&#8217;]</p>
-<p># good email, username = data.values_at(&#8216;email&#8217;, &#8216;nickname&#8217;) ```</p>
-<ul>
-<li><p><a name="ordered-hashes"></a> Rely on the fact that as of Ruby 1.9 hashes are ordered. <sup>[<a href="#ordered-hashes">link</a>]</sup></p></li>
-<li><p><a name="no-modifying-collections"></a> Do not modify a collection while traversing it. <sup>[<a href="#no-modifying-collections">link</a>]</sup></p></li>
-<li><p><a name="accessing-elements-directly"></a> When accessing elements of a collection, avoid direct access via <code>[n]</code> by using an alternate form of the reader method if it is supplied. This guards you from calling <code>[]</code> on <code>nil</code>. <sup>[<a href="#accessing-elements-directly">link</a>]</sup></p></li>
-</ul>
-<p>```ruby # bad Regexp.last_match[1]</p>
-<p># good Regexp.last_match(1) ```</p>
-<ul>
-<li><a name="provide-alternate-accessor-to-collections"></a> When providing an accessor for a collection, provide an alternate form to save users from checking for <code>nil</code> before accessing an element in the collection. <sup>[<a href="#provide-alternate-accessor-to-collections">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad def awesome_things <span class="citation">@awesome_things</span> end</p>
-<p># good def awesome_things(index = nil) if index &amp;&amp; <span class="citation">@awesome_things</span> <span class="citation">@awesome_things [index]</span> else <span class="citation">@awesome_things</span> end end ``` ## Numbers</p>
-<ul>
-<li><a name="integer-type-checking"></a> Use <code>Integer</code> check type of an integer number. Since <code>Fixnum</code> is platform-dependent, checking against it will return different results on 32-bit and 64-bit machines. <sup>[<a href="#integer-type-checking">link</a>]</sup></li>
-</ul>
-<p>```ruby timestamp = Time.now.to_i</p>
-<p># bad timestamp.is_a? Fixnum timestamp.is_a? Bignum</p>
-<p># good timestamp.is_a? Integer ```</p>
-<ul>
-<li><p><a name="random-numbers"></a> Prefer to use ranges when generating random numbers instead of integers with offsets, since it clearly states your intentions. Imagine simulating a role of a dice: <sup>[<a href="#random-numbers">link</a>]</sup></p>
+<li><p>Use <code>Integer</code> check type of an integer number. Since <code>Fixnum</code> is platform-dependent, checking against it will return different results on 32-bit and 64-bit machines.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">timestamp = <span class="dt">Time</span>.now.to_i
+
+<span class="co"># bad</span>
+timestamp.is_a? <span class="dt">Fixnum</span>
+timestamp.is_a? <span class="dt">Bignum</span>
+
+<span class="co"># good</span>
+timestamp.is_a? <span class="dt">Integer</span></code></pre></div></li>
+<li><p>Prefer to use ranges when generating random numbers instead of integers with offsets, since it clearly states your intentions. Imagine simulating a role of a dice: &#36824;&#21487;&#20197;&#36825;&#26679; rand&#8230;&#8230;</p>
 <div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
 rand(<span class="dv">6</span>) + <span class="dv">1</span>
 
@@ -2130,13 +2291,17 @@ rand(<span class="dv">1</span>..<span class="dv">6</span>)</code></pre></div></l
 </ul>
 <h2 id="strings">Strings</h2>
 <ul>
-<li><a name="string-interpolation"></a> Prefer string interpolation and string formatting instead of string concatenation: <sup>[<a href="#string-interpolation">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad email_with_name = user.name + &#8216;&lt;&#8217; + user.email + &#8216;&gt;&#8217;</p>
-<p># good email_with_name = &#8220;#{user.name} &lt;#{user.email}&gt;&#8221;</p>
-<p># good email_with_name = format(&#8216;%s &lt;%s&gt;&#8217;, user.name, user.email) ```</p>
+<li><p>Prefer string interpolation and string formatting instead of string concatenation: &#23383;&#31526;&#20018;&#25340;&#25509;&#24635;&#26159;&#25928;&#29575;&#24046;&#65292;&#32780;&#19988;&#38590;&#30475;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+email_with_name = user.name + <span class="st">&#39; &lt;&#39;</span> + user.email + <span class="st">&#39;&gt;&#39;</span>
+
+<span class="co"># good</span>
+email_with_name = <span class="st">&quot;</span><span class="ot">#{</span>user.name<span class="ot">}</span><span class="st"> &lt;</span><span class="ot">#{</span>user.email<span class="ot">}</span><span class="st">&gt;&quot;</span>
+
+<span class="co"># good</span>
+email_with_name = format(<span class="st">&#39;%s &lt;%s&gt;&#39;</span>, user.name, user.email)</code></pre></div></li>
+<li><p>Adopt a consistent string literal quoting style. There are two popular styles in the Ruby community, both of which are considered good&#8212;single quotes by default (Option A) and double quotes by default (Option B). &#22914;&#26524;&#19981;&#38656;&#35201; escape char&#65292;&#20063;&#27809;&#26377; string interpolation &#30340;&#35805;&#8230;&#8230;&#23601;&#29992;&#21333;&#24341;&#21495;&#12290;</p>
 <ul>
-<li><p><a name="consistent-string-literals"></a> Adopt a consistent string literal quoting style. There are two popular styles in the Ruby community, both of which are considered good&#8212;single quotes by default (Option A) and double quotes by default (Option B). <sup>[<a href="#consistent-string-literals">link</a>]</sup></p></li>
 <li><p><strong>(Option A)</strong> Prefer single-quoted strings when you don&#8217;t need string interpolation or special symbols such as <code>\t</code>, <code>\n</code>, <code>'</code>, etc.</p>
 <div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
 name = <span class="st">&quot;Bozhidar&quot;</span>
@@ -2150,63 +2315,62 @@ name = <span class="st">&#39;Bozhidar&#39;</span>
 <span class="co"># good</span>
 name = <span class="st">&quot;Bozhidar&quot;</span></code></pre></div></li>
 </ul>
-<p>The string literals in this guide are aligned with the first style.</p>
-<ul>
-<li><a name="no-character-literals"></a> Don&#8217;t use the character literal syntax <code>?x</code>. Since Ruby 1.9 it&#8217;s basically redundant&#8212;<code>?x</code> would interpreted as <code>'x'</code> (a string with a single character in it). <sup>[<a href="#no-character-literals">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad char = ?c</p>
-<p># good char = &#8216;c&#8217; ```</p>
-<ul>
-<li><a name="curlies-interpolate"></a> Don&#8217;t leave out <code>{}</code> around instance and global variables being interpolated into a string. <sup>[<a href="#curlies-interpolate">link</a>]</sup></li>
-</ul>
-<p>```ruby class Person attr_reader :first_name, :last_name</p>
-<pre><code>def initialize(first_name, last_name)
-  @first_name = first_name
-  @last_name = last_name
-end
+<p>The string literals in this guide are aligned with the first style.</p></li>
+<li><p>Don&#8217;t use the character literal syntax <code>?x</code>. Since Ruby 1.9 it&#8217;s basically redundant&#8212;<code>?x</code> would interpreted as <code>'x'</code> (a string with a single character in it). &#21734;&#8230;&#8230;&#30475;&#24471;&#20070;&#32769;&#65292;&#36824;&#35273;&#24471;&#36825;&#26679;&#22909;&#21602;&#8230;&#8230;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+char =<span class="dv"> ?c</span>
 
-# bad - valid, but awkward
-def to_s
-  &quot;#@first_name #@last_name&quot;
-end
+<span class="co"># good</span>
+char = <span class="st">&#39;c&#39;</span></code></pre></div></li>
+<li><p>Don&#8217;t leave out <code>{}</code> around instance and global variables being interpolated into a string. &#36825;&#29305;&#20040;&#19978;&#38754;&#35828;&#36807;&#20102;&#8230;&#8230;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="kw">class</span> <span class="dt">Person</span>
+  <span class="ot">attr_reader</span> <span class="st">:first_name</span>, <span class="st">:last_name</span>
 
-# good
-def to_s
-  &quot;#{@first_name} #{@last_name}&quot;
-end</code></pre>
-<p>end</p>
-<p><span class="math inline">\(global = 0  # bad  puts &quot;\)</span>global = #$global&quot;</p>
-<p># good puts &#8220;<span class="math inline">\(global = #{\)</span>global}&#8221; ```</p>
-<ul>
-<li><a name="no-to-s"></a> Don&#8217;t use <code>Object#to_s</code> on interpolated objects. It&#8217;s invoked on them automatically. <sup>[<a href="#no-to-s">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad message = &#8220;This is the #{result.to_s}.&#8221;</p>
-<p># good message = &#8220;This is the #{result}.&#8221; ```</p>
-<ul>
-<li><a name="concat-strings"></a> Avoid using <code>String#+</code> when you need to construct large data chunks. Instead, use <code>String#&lt;&lt;</code>. Concatenation mutates the string instance in-place and is always faster than <code>String#+</code>, which creates a bunch of new string objects. <sup>[<a href="#concat-strings">link</a>]</sup></li>
-</ul>
-```ruby # bad html = &#8216;&#8217; html +=&#8217;
-<h1>
-Page title
-</h1>
-<p>&#8217;</p>
-paragraphs.each do |paragraph| html += &#8220;
-<p>
-#{paragraph}
-</p>
-<p>&quot; end</p>
-# good and also fast html = &#8216;&#8217; html &lt;&lt;&#8217;
-<h1>
-Page title
-</h1>
-<p>&#8217;</p>
-paragraphs.each do |paragraph| html &lt;&lt; &#8220;
-<p>
-#{paragraph}
-</p>
-<p>&quot; end ```</p>
-<ul>
-<li><p><a name="dont-abuse-gsub"></a> Don&#8217;t use <code>String#gsub</code> in scenarios in which you can use a faster more specialized alternative. <sup>[<a href="#dont-abuse-gsub">link</a>]</sup></p>
+  <span class="kw">def</span> initialize(first_name, last_name)
+    <span class="ot">@first_name</span> = first_name
+    <span class="ot">@last_name</span> = last_name
+  <span class="kw">end</span>
+
+  <span class="co"># bad - valid, but awkward</span>
+  <span class="kw">def</span> to_s
+    <span class="st">&quot;</span><span class="ot">#@first_name</span><span class="st"> </span><span class="ot">#@last_name</span><span class="st">&quot;</span>
+  <span class="kw">end</span>
+
+  <span class="co"># good</span>
+  <span class="kw">def</span> to_s
+    <span class="st">&quot;</span><span class="ot">#{@first_name}</span><span class="st"> </span><span class="ot">#{@last_name}</span><span class="st">&quot;</span>
+  <span class="kw">end</span>
+<span class="kw">end</span>
+
+<span class="dt">$global</span> = <span class="dv">0</span>
+<span class="co"># bad</span>
+puts <span class="st">&quot;$global = #$global&quot;</span>
+
+<span class="co"># good</span>
+puts <span class="st">&quot;$global = </span><span class="ot">#{</span><span class="dt">$global</span><span class="ot">}</span><span class="st">&quot;</span></code></pre></div></li>
+<li><p>Don&#8217;t use <code>Object#to_s</code> on interpolated objects. It&#8217;s invoked on them automatically. &#21516;&#26679;&#65292;&#19981;&#35201;&#30011;&#34503;&#28155;&#36275;&#65292;&#36825;&#20010;&#33258;&#21160; implicitely &#36716;&#21270;&#30340;&#8230;&#8230;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+message = <span class="st">&quot;This is the </span><span class="ot">#{</span>result.to_s<span class="ot">}</span><span class="st">.&quot;</span>
+
+<span class="co"># good</span>
+message = <span class="st">&quot;This is the </span><span class="ot">#{</span>result<span class="ot">}</span><span class="st">.&quot;</span></code></pre></div></li>
+<li><p>Avoid using <code>String#+</code> when you need to construct large data chunks. Instead, use <code>String#&lt;&lt;</code>. Concatenation mutates the string instance in-place and is always faster than <code>String#+</code>, which creates a bunch of new string objects. &#21363;&#20351;&#35201; string concat&#65292;&#20063;&#35201;&#29992; <code>String#&lt;&lt;</code> &#20989;&#25968;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+html = <span class="st">&#39;&#39;</span>
+html += <span class="st">&#39;&lt;h1&gt;Page title&lt;/h1&gt;&#39;</span>
+
+paragraphs.each <span class="kw">do</span> |paragraph|
+  html += <span class="st">&quot;&lt;p&gt;</span><span class="ot">#{</span>paragraph<span class="ot">}</span><span class="st">&lt;/p&gt;&quot;</span>
+<span class="kw">end</span>
+
+<span class="co"># good and also fast</span>
+html = <span class="st">&#39;&#39;</span>
+html &lt;&lt; <span class="st">&#39;&lt;h1&gt;Page title&lt;/h1&gt;&#39;</span>
+
+paragraphs.each <span class="kw">do</span> |paragraph|
+  html &lt;&lt; <span class="st">&quot;&lt;p&gt;</span><span class="ot">#{</span>paragraph<span class="ot">}</span><span class="st">&lt;/p&gt;&quot;</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Don&#8217;t use <code>String#gsub</code> in scenarios in which you can use a faster more specialized alternative.</p>
 <div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">url = <span class="st">&#39;http://example.com&#39;</span>
 str = <span class="st">&#39;lisp-case-rules&#39;</span>
 
@@ -2217,142 +2381,213 @@ str.gsub(<span class="st">&#39;-&#39;</span>, <span class="st">&#39;_&#39;</span
 <span class="co"># good</span>
 url.sub(<span class="st">&#39;http://&#39;</span>, <span class="st">&#39;https://&#39;</span>)
 str.tr(<span class="st">&#39;-&#39;</span>, <span class="st">&#39;_&#39;</span>)</code></pre></div></li>
-<li><p><a name="heredocs"></a> When using heredocs for multi-line strings keep in mind the fact that they preserve leading whitespace. It&#8217;s a good practice to employ some margin based on which to trim the excessive whitespace. <sup>[<a href="#heredocs">link</a>]</sup></p></li>
+<li><p>When using heredocs for multi-line strings keep in mind the fact that they preserve leading whitespace. It&#8217;s a good practice to employ some margin based on which to trim the excessive whitespace. &#36825;&#20010;&#37239;&#27609;&#20102;&#8230;&#8230;&#19981;&#36807;&#8230;&#8230;&#22909;&#20687;&#26377;&#28857;&#25928;&#29575;&#38382;&#39064;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">code = &lt;&lt;-<span class="kw">END</span><span class="ot">.gsub(/^\s+\|/, &#39;&#39;)</span>
+<span class="ot">  |def test</span>
+<span class="ot">  |  some_method</span>
+<span class="ot">  |  other_method</span>
+<span class="ot">  |end</span>
+<span class="kw">END</span>
+<span class="co"># =&gt; &quot;def test\n  some_method\n  other_method\nend\n&quot;</span></code></pre></div></li>
+<li><p>Use Ruby 2.3&#8217;s <strong>squiggly heredocs</strong> for nicely indented multi-line strings.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad - using Powerpack String#strip_margin</span>
+code = &lt;&lt;-<span class="kw">END</span><span class="ot">.strip_margin(&#39;|&#39;)</span>
+<span class="ot">  |def test</span>
+<span class="ot">  |  some_method</span>
+<span class="ot">  |  other_method</span>
+<span class="ot">  |end</span>
+<span class="kw">END</span>
+
+<span class="co"># also bad</span>
+code = &lt;&lt;-<span class="kw">END</span>
+<span class="ot">def test</span>
+<span class="ot">  some_method</span>
+<span class="ot">  other_method</span>
+<span class="ot">end</span>
+<span class="kw">END</span>
+
+<span class="co"># good</span>
+code = &lt;&lt;~<span class="kw">END</span>
+  <span class="kw">def</span> test
+    some_method
+    other_method
+  <span class="kw">end</span>
+<span class="kw">END</span></code></pre></div></li>
 </ul>
-<p><code>ruby   code = &lt;&lt;-END.gsub(/^\s+\|/, '')     |def test     |  some_method     |  other_method     |end   END   # =&gt; &quot;def test\n  some_method\n  other_method\nend\n&quot;</code></p>
-<ul>
-<li><a name="squiggly-heredocs"></a> Use Ruby 2.3&#8217;s squiggly heredocs for nicely indented multi-line strings. <sup>[<a href="#squiggly-heredocs">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad - using Powerpack String#strip_margin code = &lt;&lt;-END.strip_margin(&#8216;|&#8217;) |def test | some_method | other_method |end END</p>
-<p># also bad code = &lt;&lt;-END def test some_method other_method end END</p>
-<p># good code = &lt;&lt;~END def test some_method other_method end END ```</p>
 <h2 id="date-time">Date &amp; Time</h2>
 <ul>
-<li><p><a name="time-now"></a> Prefer <code>Time.now</code> over <code>Time.new</code> when retrieving the current system time. <sup>[<a href="#time-now">link</a>]</sup></p></li>
-<li><p><a name="no-datetime"></a> Don&#8217;t use <code>DateTime</code> unless you need to account for historical calendar reform &#8211; and if you do, explicitly specify the <code>start</code> argument to clearly state your intentions. <sup>[<a href="#no-datetime">link</a>]</sup></p></li>
+<li><p>Prefer <code>Time.now</code> over <code>Time.new</code> when retrieving the current system time.</p></li>
+<li><p>Don&#8217;t use <code>DateTime</code> unless you need to account for historical calendar reform &#8211; and if you do, explicitly specify the <code>start</code> argument to clearly state your intentions. &#9829;&#65039;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad - uses DateTime for current time</span>
+<span class="dt">DateTime</span>.now
+
+<span class="co"># good - uses Time for current time</span>
+<span class="dt">Time</span>.now
+
+<span class="co"># bad - uses DateTime for modern date</span>
+<span class="dt">DateTime</span>.iso8601(<span class="st">&#39;2016-06-29&#39;</span>)
+
+<span class="co"># good - uses Date for modern date</span>
+<span class="dt">Date</span>.iso8601(<span class="st">&#39;2016-06-29&#39;</span>)
+
+<span class="co"># good - uses DateTime with start argument for historical date</span>
+<span class="dt">DateTime</span>.iso8601(<span class="st">&#39;1751-04-23&#39;</span>, <span class="dt">Date</span>::<span class="dt">ENGLAND</span>)</code></pre></div></li>
 </ul>
-<p>```ruby # bad - uses DateTime for current time DateTime.now</p>
-<p># good - uses Time for current time Time.now</p>
-<p># bad - uses DateTime for modern date DateTime.iso8601(&#8216;2016-06-29&#8217;)</p>
-<p># good - uses Date for modern date Date.iso8601(&#8216;2016-06-29&#8217;)</p>
-<p># good - uses DateTime with start argument for historical date DateTime.iso8601(&#8216;1751-04-23&#8217;, Date::ENGLAND) ```</p>
 <h2 id="regular-expressions">Regular Expressions</h2>
 <blockquote>
-<p>Some people, when confronted with a problem, think &#8220;I know, I&#8217;ll use regular expressions.&#8221; Now they have two problems.<br> &#8211; Jamie Zawinski</p>
+<p>Some people, when confronted with a problem, think &#8220;I know, I&#8217;ll use regular expressions.&#8221; Now they have two problems.</p>
+<p>&#8211; Jamie Zawinski</p>
 </blockquote>
 <ul>
-<li><p><a name="no-regexp-for-plaintext"></a> Don&#8217;t use regular expressions if you just need plain text search in string: <code>string['text']</code> <sup>[<a href="#no-regexp-for-plaintext">link</a>]</sup></p></li>
-<li><p><a name="regexp-string-index"></a> For simple constructions you can use regexp directly through string index. <sup>[<a href="#regexp-string-index">link</a>]</sup></p></li>
+<li><p>Don&#8217;t use regular expressions if you just need plain text search in string: <code>string['text']</code></p></li>
+<li><p>For simple constructions you can use regexp directly through string index.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">match = string[<span class="ot">/regexp/</span>]             <span class="co"># get content of matched regexp</span>
+first_group = string[<span class="ot">/text(grp)/</span>, <span class="dv">1</span>] <span class="co"># get content of captured group</span>
+string[<span class="ot">/text (grp)/</span>, <span class="dv">1</span>] = <span class="st">&#39;replace&#39;</span>  <span class="co"># string =&gt; &#39;text replace&#39;</span></code></pre></div></li>
+<li><p>Use non-capturing groups when you don&#8217;t use the captured result.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="ot">/(first|second)/</span>
+
+<span class="co"># good</span>
+<span class="ot">/(?:first|second)/</span></code></pre></div></li>
+<li><p>Don&#8217;t use the cryptic Perl-legacy variables denoting last regexp group matches (<code>$1</code>, <code>$2</code>, etc). Use <code>Regexp.last_match(n)</code> instead. &#21704;&#21704;&#65292;Ruby &#20063;&#26377;&#36825;&#26679;&#30340;&#19996;&#35199;&#21834;&#65281;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="ot">/(regexp)/</span> =~ string
+...
+
+<span class="co"># bad</span>
+process <span class="dt">$1</span>
+
+<span class="co"># good</span>
+process <span class="dt">Regexp</span>.last_match(<span class="dv">1</span>)</code></pre></div></li>
+<li><p>Avoid using numbered groups as it can be hard to track what they contain. Named groups can be used instead. &#24403;&#28982;&#35201;&#29992; named captutre &#21834;&#65281;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="ot">/(regexp)/</span> =~ string
+<span class="co"># some code</span>
+process <span class="dt">Regexp</span>.last_match(<span class="dv">1</span>)
+
+<span class="co"># good</span>
+<span class="ot">/(?&lt;meaningful_var&gt;regexp)/</span> =~ string
+<span class="co"># some code</span>
+process meaningful_var</code></pre></div></li>
+<li><p>Character classes have only a few special characters you should care about: <code>^</code>, <code>-</code>, <code>\</code>, <code>]</code>, so don&#8217;t escape <code>.</code> or brackets in <code>[]</code>.</p></li>
+<li><p>Be careful with <code>^</code> and <code>$</code> as they match start/end of line, not string endings. If you want to match the whole string use: <code>\A</code> and <code>\z</code> (not to be confused with <code>\Z</code> which is the equivalent of <code>/\n?\z/</code>).</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">string = <span class="st">&quot;some injection\nusername&quot;</span>
+string[<span class="ot">/^username$/</span>]   <span class="co"># matches</span>
+string[<span class="ot">/\Ausername\z/</span>] <span class="co"># doesn&#39;t match</span></code></pre></div></li>
+<li><p>Use <code>x</code> modifier for complex regexps. This makes them more readable and you can add some useful comments. Just be careful as spaces are ignored. &#36825;&#20010; Perl &#20063;&#26377;&#30340;&#12290;</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">regexp = <span class="ot">/</span>
+<span class="ot">  start         # some text</span>
+<span class="ot">  \s            # white space char</span>
+<span class="ot">  (group)       # first group</span>
+<span class="ot">  (?:alt1|alt2) # some alternation</span>
+<span class="ot">  end</span>
+<span class="ot">/x</span></code></pre></div></li>
+<li><p>For complex replacements <code>sub</code>/<code>gsub</code> can be used with a block or a hash.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">words = <span class="st">&#39;foo bar&#39;</span>
+words.sub(<span class="ot">/f/</span>, <span class="st">&#39;f&#39;</span> =&gt; <span class="st">&#39;F&#39;</span>) <span class="co"># =&gt; &#39;Foo bar&#39;</span>
+words.gsub(<span class="ot">/\w+/</span>) { |word| word.capitalize } <span class="co"># =&gt; &#39;Foo Bar&#39;</span></code></pre></div></li>
 </ul>
-<p><code>ruby   match = string[/regexp/]             # get content of matched regexp   first_group = string[/text(grp)/, 1] # get content of captured group   string[/text (grp)/, 1] = 'replace'  # string =&gt; 'text replace'</code></p>
-<ul>
-<li><a name="non-capturing-regexp"></a> Use non-capturing groups when you don&#8217;t use the captured result. <sup>[<a href="#non-capturing-regexp">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad /(first|second)/</p>
-<p># good /(?:first|second)/ ```</p>
-<ul>
-<li><a name="no-perl-regexp-last-matchers"></a> Don&#8217;t use the cryptic Perl-legacy variables denoting last regexp group matches (<code>$1</code>, <code>$2</code>, etc). Use <code>Regexp.last_match(n)</code> instead. <sup>[<a href="#no-perl-regexp-last-matchers">link</a>]</sup></li>
-</ul>
-<p>```ruby /(regexp)/ =~ string &#8230;</p>
-<p># bad process $1</p>
-<p># good process Regexp.last_match(1) ```</p>
-<ul>
-<li><a name="no-numbered-regexes"></a> Avoid using numbered groups as it can be hard to track what they contain. Named groups can be used instead. <sup>[<a href="#no-numbered-regexes">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad /(regexp)/ =~ string # some code process Regexp.last_match(1)</p>
-<p># good /(?<meaningful_var>regexp)/ =~ string # some code process meaningful_var ```</p>
-<ul>
-<li><p><a name="limit-escapes"></a> Character classes have only a few special characters you should care about: <code>^</code>, <code>-</code>, <code>\</code>, <code>]</code>, so don&#8217;t escape <code>.</code> or brackets in <code>[]</code>. <sup>[<a href="#limit-escapes">link</a>]</sup></p></li>
-<li><p><a name="caret-and-dollar-regexp"></a> Be careful with <code>^</code> and <code>$</code> as they match start/end of line, not string endings. If you want to match the whole string use: <code>\A</code> and <code>\z</code> (not to be confused with <code>\Z</code> which is the equivalent of <code>/\n?\z/</code>). <sup>[<a href="#caret-and-dollar-regexp">link</a>]</sup></p></li>
-</ul>
-<p><code>ruby   string = &quot;some injection\nusername&quot;   string[/^username$/]   # matches   string[/\Ausername\z/] # doesn't match</code></p>
-<ul>
-<li><a name="comment-regexes"></a> Use <code>x</code> modifier for complex regexps. This makes them more readable and you can add some useful comments. Just be careful as spaces are ignored. <sup>[<a href="#comment-regexes">link</a>]</sup></li>
-</ul>
-<p><code>ruby   regexp = /     start         # some text     \s            # white space char     (group)       # first group     (?:alt1|alt2) # some alternation     end   /x</code></p>
-<ul>
-<li><a name="gsub-blocks"></a> For complex replacements <code>sub</code>/<code>gsub</code> can be used with a block or a hash. <sup>[<a href="#gsub-blocks">link</a>]</sup></li>
-</ul>
-<p><code>ruby   words = 'foo bar'   words.sub(/f/, 'f' =&gt; 'F') # =&gt; 'Foo bar'   words.gsub(/\w+/) { |word| word.capitalize } # =&gt; 'Foo Bar'</code></p>
 <h2 id="percent-literals">Percent Literals</h2>
 <ul>
-<li><a name="percent-q-shorthand"></a> Use <code>%()</code>(it&#8217;s a shorthand for <code>%Q</code>) for single-line strings which require both interpolation and embedded double-quotes. For multi-line strings, prefer heredocs. <sup>[<a href="#percent-q-shorthand">link</a>]</sup></li>
-</ul>
-```ruby # bad (no interpolation needed) %(
-<div class="text">
-Some text
-</div>
-) # should be &#8217;
-<div class="text">
-Some text
-</div>
-<p>&#8217;</p>
-<p># bad (no double-quotes) %(This is #{quality} style) # should be &#8220;This is #{quality} style&#8221;</p>
-# bad (multiple lines) %(
-<div>
-<p>#{exclamation}</span>) # should be a heredoc.</p>
-# good (requires interpolation, has quotes, single line) %(
-<tr>
-<td class="name">
-#{name}
-</td>
-<p>) ```</p>
+<li><p>Use <code>%()</code>(it&#8217;s a shorthand for <code>%Q</code>) for single-line strings which require both interpolation and embedded double-quotes. For multi-line strings, prefer heredocs.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad (no interpolation needed)</span>
+<span class="ot">%(</span><span class="st">&lt;div class=&quot;text&quot;&gt;Some text&lt;/div&gt;</span><span class="ot">)</span>
+<span class="co"># should be &#39;&lt;div class=&quot;text&quot;&gt;Some text&lt;/div&gt;&#39;</span>
+
+<span class="co"># bad (no double-quotes)</span>
+<span class="ot">%(</span><span class="st">This is </span><span class="ot">#{</span>quality<span class="ot">}</span><span class="st"> style</span><span class="ot">)</span>
+<span class="co"># should be &quot;This is #{quality} style&quot;</span>
+
+<span class="co"># bad (multiple lines)</span>
+<span class="ot">%(</span><span class="st">&lt;div&gt;\n&lt;span class=&quot;big&quot;&gt;</span><span class="ot">#{</span>exclamation<span class="ot">}</span><span class="st">&lt;/span&gt;\n&lt;/div&gt;</span><span class="ot">)</span>
+<span class="co"># should be a heredoc.</span>
+
+<span class="co"># good (requires interpolation, has quotes, single line)</span>
+<span class="ot">%(</span><span class="st">&lt;tr&gt;&lt;td class=&quot;name&quot;&gt;</span><span class="ot">#{</span>name<span class="ot">}</span><span class="st">&lt;/td&gt;</span><span class="ot">)</span></code></pre></div></li>
+<li><p>Avoid %() or the equivalent %q() unless you have a string with both <code>'</code> and <code>&quot;</code> in it. Regular string literals are more readable and should be preferred unless a lot of characters would have to be escaped in them.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+name =<span class="ot"> %q(</span><span class="st">Bruce Wayne</span><span class="ot">)</span>
+time =<span class="ot"> %q(</span><span class="st">8 o&#39;clock</span><span class="ot">)</span>
+question =<span class="ot"> %q(</span><span class="st">&quot;What did you say?&quot;</span><span class="ot">)</span>
+
+<span class="co"># good</span>
+name = <span class="st">&#39;Bruce Wayne&#39;</span>
+time = <span class="st">&quot;8 o&#39;clock&quot;</span>
+question = <span class="st">&#39;&quot;What did you say?&quot;&#39;</span>
+quote =<span class="ot"> %q(</span><span class="st">&lt;p class=&#39;quote&#39;&gt;&quot;What did you say?&quot;&lt;/p&gt;</span><span class="ot">)</span></code></pre></div></li>
+<li><p>Use <code>%r</code> only for regular expressions matching <em>at least</em> one &#8216;/&#8217; character.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="ot">%r{\s+}</span>
+
+<span class="co"># good</span>
+<span class="ot">%r{^/(.*)$}</span>
+<span class="ot">%r{^/blog/2011/(.*)$}</span></code></pre></div></li>
+<li><p>Avoid the use of <code>%x</code> unless you&#8217;re going to invoke a command with backquotes in it(which is rather unlikely).</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+date =<span class="ot"> %x(</span><span class="st">date</span><span class="ot">)</span>
+
+<span class="co"># good</span>
+date = <span class="st">`date`</span>
+echo =<span class="ot"> %x(</span><span class="st">echo `date`</span><span class="ot">)</span></code></pre></div></li>
+<li><p>Avoid the use of <code>%s</code>. It seems that the community has decided <code>:&quot;some string&quot;</code> is the preferred way to create a symbol with spaces in it. &#22909;&#21543;&#8230;&#8230;&#22240;&#20026;&#25163;&#20889;&#30830;&#23454;&#20063;&#19981;&#40635;&#28902;&#12290;</p></li>
+<li><p>Use the braces that are the most appropriate for the various kinds of percent literals. &#36825;&#20010;&#8230;&#8230;&#20063;&#26377;&#20542;&#21521;&#24615;&#21704;&#21704;&#12290;</p>
 <ul>
-<li><a name="percent-q"></a> Avoid %() or the equivalent %q() unless you have a string with both <code>'</code> and <code>&quot;</code> in it. Regular string literals are more readable and should be preferred unless a lot of characters would have to be escaped in them. <sup>[<a href="#percent-q">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad name = %q(Bruce Wayne) time = %q(8 o&#8217;clock) question = %q(&#8220;What did you say?&#8221;)</p>
-# good name = &#8216;Bruce Wayne&#8217; time = &#8220;8 o&#8217;clock&#8221; question = &#8216;&#8220;What did you say?&#8221;&#8217; quote = %q(
-<p class="quote">
-&#8220;What did you say?&#8221;
-</p>
-<p>) ```</p>
-<ul>
-<li><a name="percent-r"></a> Use <code>%r</code> only for regular expressions matching <em>at least</em> one &#8216;/&#8217; character. <sup>[<a href="#percent-r">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad %r{+}</p>
-<p># good %r{^/(.*)<span class="math inline">\(}  %r{^/blog/2011/(.*)\)</span>} ```</p>
-<ul>
-<li><a name="percent-x"></a> Avoid the use of <code>%x</code> unless you&#8217;re going to invoke a command with backquotes in it(which is rather unlikely). <sup>[<a href="#percent-x">link</a>]</sup></li>
-</ul>
-<p>```ruby # bad date = %x(date)</p>
-<p># good date = <code>date</code> echo = %x(echo <code>date</code>) ```</p>
-<ul>
-<li><p><a name="percent-s"></a> Avoid the use of <code>%s</code>. It seems that the community has decided <code>:&quot;some   string&quot;</code> is the preferred way to create a symbol with spaces in it. <sup>[<a href="#percent-s">link</a>]</sup></p></li>
-<li><a name="percent-literal-braces"></a> Use the braces that are the most appropriate for the various kinds of percent literals. <sup>[<a href="#percent-literal-braces">link</a>]</sup></li>
 <li><code>()</code> for string literals(<code>%q</code>, <code>%Q</code>).</li>
 <li><code>[]</code> for array literals(<code>%w</code>, <code>%i</code>, <code>%W</code>, <code>%I</code>) as it is aligned with the standard array literals.</li>
 <li><code>{}</code> for regexp literals(<code>%r</code>) since parentheses often appear inside regular expressions. That&#8217;s why a less common character with <code>{</code> is usually the best delimiter for <code>%r</code> literals.</li>
-<li><p><code>()</code> for all other literals (e.g. <code>%s</code>, <code>%x</code>)</p></li>
+<li><code>()</code> for all other literals (e.g. <code>%s</code>, <code>%x</code>)</li>
 </ul>
-<p>```ruby # bad %q{&#8220;Test&#8217;s king!&#8221;, John said.}</p>
-<p># good %q(&#8220;Test&#8217;s king!&#8221;, John said.)</p>
-<p># bad %w(one two three) %i(one two three)</p>
-<p># good %w[one two three] %i[one two three]</p>
-<p># bad %r((+)-(+)) %r{}</p>
-<p># good %r{(+)-(+)} %r|| ```</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="ot">%q{</span><span class="st">&quot;Test&#39;s king!&quot;, John said.</span><span class="ot">}</span>
+
+<span class="co"># good</span>
+<span class="ot">%q(</span><span class="st">&quot;Test&#39;s king!&quot;, John said.</span><span class="ot">)</span>
+
+<span class="co"># bad</span>
+<span class="ot">%w(</span><span class="st">one two three</span><span class="ot">)</span>
+<span class="ot">%</span>i<span class="ot">(</span><span class="st">one two three</span><span class="ot">)</span>
+
+<span class="co"># good&#65292;&#30830;&#23454;&#30475;&#19978;&#21435;&#22909;&#28857;</span>
+<span class="ot">%w[</span><span class="st">one two three</span><span class="ot">]</span>
+<span class="ot">%</span>i<span class="ot">[</span><span class="st">one two three</span><span class="ot">]</span>
+
+<span class="co"># bad</span>
+<span class="ot">%r((\w+)-(\d+))</span>
+<span class="ot">%r{\w{1,2}\d{2,5}}</span>
+
+<span class="co"># good</span>
+<span class="ot">%r{(\w+)-(\d+)}</span>
+<span class="ot">%r|\w{1,2}\d{2,5}|</span></code></pre></div></li>
+</ul>
 <h2 id="metaprogramming">Metaprogramming</h2>
+<p>&#65288;&#36825;&#37096;&#20998;&#25105;&#20284;&#20046;&#30475;&#19981;&#25026;&#21834;&#8230;&#8230;&#65289;</p>
 <ul>
-<li><p><a name="no-needless-metaprogramming"></a> Avoid needless metaprogramming. <sup>[<a href="#no-needless-metaprogramming">link</a>]</sup></p></li>
-<li><p><a name="no-monkey-patching"></a> Do not mess around in core classes when writing libraries. (Do not monkey-patch them.) <sup>[<a href="#no-monkey-patching">link</a>]</sup></p></li>
-<li><p><a name="block-class-eval"></a> The block form of <code>class_eval</code> is preferable to the string-interpolated form. <sup>[<a href="#block-class-eval">link</a>]</sup></p></li>
-<li><p>when you use the string-interpolated form, always supply <code>__FILE__</code> and <code>__LINE__</code>, so that your backtraces make sense:</p>
+<li><p>Avoid needless metaprogramming. &#24403;&#22836;&#19968;&#26834;&#8230;&#8230;&#65288;&#21483;&#20320;&#28843;&#25216;&#8230;&#8230;&#65289;</p></li>
+<li><p>Do not mess around in core classes when writing libraries. (Do not monkey-patch them.)</p></li>
+<li><p>The block form of <code>class_eval</code> is preferable to the string-interpolated form.</p>
+<p>when you use the string-interpolated form, always supply <code>__FILE__</code> and <code>__LINE__</code>, so that your backtraces make sense:</p>
 <div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">class_eval <span class="st">&#39;def use_relative_model_naming?; true; end&#39;</span>, <span class="dv">__FILE__</span>, <span class="dv">__LINE__</span></code></pre></div></li>
 <li><p><code>define_method</code> is preferable to <code>class_eval{ def ... }</code></p></li>
-<li><p><a name="eval-comment-docs"></a> When using <code>class_eval</code> (or other <code>eval</code>) with string interpolation, add a comment block showing its appearance if interpolated (a practice used in Rails code): <sup>[<a href="#eval-comment-docs">link</a>]</sup></p></li>
-</ul>
-<p>```ruby # from activesupport/lib/active_support/core_ext/string/output_safety.rb UNSAFE_STRING_METHODS.each do |unsafe_method| if &#8216;String&#8217;.respond_to?(unsafe_method) class_eval &lt;&lt;-EOT, <strong>FILE</strong>, <strong>LINE</strong> + 1 def #{unsafe_method}(<em>params, &amp;block) # def capitalize(</em>params, &amp;block) to_str.#{unsafe_method}(<em>params, &amp;block) # to_str.capitalize(</em>params, &amp;block) end # end</p>
-<pre><code>    def #{unsafe_method}!(*params)              # def capitalize!(*params)
-      @dirty = true                           #   @dirty = true
-      super                                   #   super
-    end                                       # end
-  EOT
-end</code></pre>
-<p>end ```</p>
-<ul>
-<li><p><a name="no-method-missing"></a> Avoid using <code>method_missing</code> for metaprogramming because backtraces become messy, the behavior is not listed in <code>#methods</code>, and misspelled method calls might silently work, e.g. <code>nukes.launch_state = false</code>. Consider using delegation, proxy, or <code>define_method</code> instead. If you must use <code>method_missing</code>: <sup>[<a href="#no-method-missing">link</a>]</sup></p></li>
-<li>Be sure to <a href="http://blog.marc-andre.ca/2010/11/methodmissing-politely.html">also define <code>respond_to_missing?</code></a></li>
-<li>Only catch methods with a well-defined prefix, such as <code>find_by_*</code> &#8211; make your code as assertive as possible.</li>
-<li>Call <code>super</code> at the end of your statement</li>
+<li><p>When using <code>class_eval</code> (or other <code>eval</code>) with string interpolation, add a comment block showing its appearance if interpolated (a practice used in Rails code):</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># from activesupport/lib/active_support/core_ext/string/output_safety.rb</span>
+<span class="dt">UNSAFE_STRING_METHODS</span>.each <span class="kw">do</span> |unsafe_method|
+  <span class="kw">if</span> <span class="st">&#39;String&#39;</span>.respond_to?(unsafe_method)
+    class_eval &lt;&lt;-<span class="kw">EOT</span><span class="ot">, __FILE__, __LINE__ + 1</span>
+<span class="ot">      def #{</span>unsafe_method<span class="ot">}(*params, &amp;block)       # def capitalize(*params, &amp;block)</span>
+<span class="ot">        to_str.#{</span>unsafe_method<span class="ot">}(*params, &amp;block)  #   to_str.capitalize(*params, &amp;block)</span>
+<span class="ot">      end                                       # end</span>
+
+<span class="ot">      def #{</span>unsafe_method<span class="ot">}!(*params)              # def capitalize!(*params)</span>
+<span class="ot">        @dirty = true                           #   @dirty = true</span>
+<span class="ot">        super                                   #   super</span>
+<span class="ot">      end                                       # end</span>
+<span class="ot">    </span><span class="kw">EOT</span>
+  <span class="kw">end</span>
+<span class="kw">end</span></code></pre></div></li>
+<li><p>Avoid using <code>method_missing</code> for metaprogramming because backtraces become messy, the behavior is not listed in <code>#methods</code>, and misspelled method calls might silently work, e.g. <code>nukes.launch_state = false</code>. Consider using delegation, proxy, or <code>define_method</code> instead. If you must use <code>method_missing</code>:</p></li>
+<li><p>Be sure to <a href="http://blog.marc-andre.ca/2010/11/methodmissing-politely.html">also define <code>respond_to_missing?</code></a></p></li>
+<li><p>Only catch methods with a well-defined prefix, such as <code>find_by_*</code> &#8211; make your code as assertive as possible.</p></li>
+<li><p>Call <code>super</code> at the end of your statement</p></li>
 <li><p>Delegate to assertive, non-magical methods:</p>
 <div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
 <span class="kw">def</span> method_missing?(meth, *params, &amp;block)
@@ -2373,53 +2608,77 @@ end</code></pre>
 <span class="kw">end</span>
 
 <span class="co"># best of all, though, would to define_method as each findable attribute is declared</span></code></pre></div></li>
-<li><p><a name="prefer-public-send"></a> Prefer <code>public_send</code> over <code>send</code> so as not to circumvent <code>private</code>/<code>protected</code> visibility. <sup>[<a href="#prefer-public-send">link</a>]</sup></p></li>
+<li><p>Prefer <code>public_send</code> over <code>send</code> so as not to circumvent <code>private</code>/<code>protected</code> visibility.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># We have  an ActiveModel Organization that includes concern Activatable</span>
+<span class="kw">module</span> <span class="dt">Activatable</span>
+  extend <span class="dt">ActiveSupport</span>::<span class="dt">Concern</span>
+
+  included <span class="kw">do</span>
+    before_create <span class="st">:create_token</span>
+  <span class="kw">end</span>
+
+  <span class="kw">private</span>
+
+  <span class="kw">def</span> reset_token
+    <span class="co"># some code</span>
+  <span class="kw">end</span>
+
+  <span class="kw">def</span> create_token
+    <span class="co"># some code</span>
+  <span class="kw">end</span>
+
+  <span class="kw">def</span> activate!
+    <span class="co"># some code</span>
+  <span class="kw">end</span>
+<span class="kw">end</span>
+
+<span class="kw">class</span> <span class="dt">Organization</span> &lt; <span class="dt">ActiveRecord</span>::<span class="dt">Base</span>
+  include <span class="dt">Activatable</span>
+<span class="kw">end</span>
+
+linux_organization = <span class="dt">Organization</span>.find(...)
+<span class="co"># BAD - violates privacy</span>
+linux_organization.send(<span class="st">:reset_token</span>)
+<span class="co"># GOOD - should throw an exception</span>
+linux_organization.public_send(<span class="st">:reset_token</span>)</code></pre></div></li>
+<li><p>Prefer <code>__send__</code> over <code>send</code>, as <code>send</code> may overlap with existing methods.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">require <span class="st">&#39;socket&#39;</span>
+
+u1 = <span class="dt">UDPSocket</span>.new
+u1.bind(<span class="st">&#39;127.0.0.1&#39;</span>, <span class="dv">4913</span>)
+u2 = <span class="dt">UDPSocket</span>.new
+u2.connect(<span class="st">&#39;127.0.0.1&#39;</span>, <span class="dv">4913</span>)
+<span class="co"># Won&#39;t send a message to the receiver obj.</span>
+<span class="co"># Instead it will send a message via UDP socket.</span>
+u2.send <span class="st">:sleep</span>, <span class="dv">0</span>
+<span class="co"># Will actually send a message to the receiver obj.</span>
+u2.__send__ ...</code></pre></div></li>
 </ul>
-<p>```ruby # We have an ActiveModel Organization that includes concern Activatable module Activatable extend ActiveSupport::Concern</p>
-<pre><code>included do
-  before_create :create_token
-end
-
-private
-
-def reset_token
-  # some code
-end
-
-def create_token
-  # some code
-end
-
-def activate!
-  # some code
-end</code></pre>
-<p>end</p>
-<p>class Organization &lt; ActiveRecord::Base include Activatable end</p>
-<p>linux_organization = Organization.find(&#8230;) # BAD - violates privacy linux_organization.send(:reset_token) # GOOD - should throw an exception linux_organization.public_send(:reset_token) ```</p>
-<ul>
-<li><a name="prefer-__send__"></a> Prefer <code>__send__</code> over <code>send</code>, as <code>send</code> may overlap with existing methods. <sup>[<a href="#prefer-__send__">link</a>]</sup></li>
-</ul>
-<p>```ruby require &#8216;socket&#8217;</p>
-<p>u1 = UDPSocket.new u1.bind(&#8216;127.0.0.1&#8217;, 4913) u2 = UDPSocket.new u2.connect(&#8216;127.0.0.1&#8217;, 4913) # Won&#8217;t send a message to the receiver obj. # Instead it will send a message via UDP socket. u2.send :sleep, 0 # Will actually send a message to the receiver obj. u2.<strong>send</strong> &#8230; ```</p>
 <h2 id="misc">Misc</h2>
 <ul>
-<li><p><a name="always-warn"></a> Write <code>ruby -w</code> safe code. <sup>[<a href="#always-warn">link</a>]</sup></p></li>
-<li><p><a name="no-optional-hash-params"></a> Avoid hashes as optional parameters. Does the method do too much? (Object initializers are exceptions for this rule). <sup>[<a href="#no-optional-hash-params">link</a>]</sup></p></li>
-<li><p><a name="short-methods"></a> Avoid methods longer than 10 LOC (lines of code). Ideally, most methods will be shorter than 5 LOC. Empty lines do not contribute to the relevant LOC. <sup>[<a href="#short-methods">link</a>]</sup></p></li>
-<li><p><a name="too-many-params"></a> Avoid parameter lists longer than three or four parameters. <sup>[<a href="#too-many-params">link</a>]</sup></p></li>
-<li><p><a name="private-global-methods"></a> If you really need &#8220;global&#8221; methods, add them to Kernel and make them private. <sup>[<a href="#private-global-methods">link</a>]</sup></p></li>
-<li><p><a name="instance-vars"></a> Use module instance variables instead of global variables. <sup>[<a href="#instance-vars">link</a>]</sup></p></li>
-</ul>
-<p>```ruby # bad $foo_bar = 1</p>
-<p># good module Foo class &lt;&lt; self attr_accessor :bar end end</p>
-<p>Foo.bar = 1 ```</p>
-<ul>
-<li><p><a name="optionparser"></a> Use <code>OptionParser</code> for parsing complex command line options and <code>ruby -s</code> for trivial command line options. <sup>[<a href="#optionparser">link</a>]</sup></p></li>
-<li><p><a name="functional-code"></a> Code in a functional way, avoiding mutation when that makes sense. <sup>[<a href="#functional-code">link</a>]</sup></p></li>
-<li><p><a name="no-param-mutations"></a> Do not mutate parameters unless that is the purpose of the method. <sup>[<a href="#no-param-mutations">link</a>]</sup></p></li>
-<li><p><a name="three-is-the-number-thou-shalt-count"></a> Avoid more than three levels of block nesting. <sup>[<a href="#three-is-the-number-thou-shalt-count">link</a>]</sup></p></li>
-<li><p><a name="be-consistent"></a> Be consistent. In an ideal world, be consistent with these guidelines. <sup>[<a href="#be-consistent">link</a>]</sup></p></li>
-<li><p><a name="common-sense"></a> Use common sense. <sup>[<a href="#common-sense">link</a>]</sup></p></li>
+<li><p>Write <code>ruby -w</code> safe code.</p></li>
+<li><p>Avoid hashes as optional parameters. Does the method do too much? (Object initializers are exceptions for this rule).</p></li>
+<li><p>Avoid methods longer than 10 LOC (lines of code). Ideally, most methods will be shorter than 5 LOC. Empty lines do not contribute to the relevant LOC.</p></li>
+<li><p>Avoid parameter lists longer than three or four parameters.</p></li>
+<li><p>If you really need &#8220;global&#8221; methods, add them to Kernel and make them private.</p></li>
+<li><p>Use module instance variables instead of global variables.</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="co"># bad</span>
+<span class="dt">$foo_bar</span> = <span class="dv">1</span>
+
+<span class="co"># good</span>
+<span class="kw">module</span> <span class="dt">Foo</span>
+  <span class="kw">class</span> &lt;&lt; <span class="dv">self</span>
+    <span class="ot">attr_accessor</span> <span class="st">:bar</span>
+  <span class="kw">end</span>
+<span class="kw">end</span>
+
+<span class="dt">Foo</span>.bar = <span class="dv">1</span></code></pre></div></li>
+<li><p>Use <code>OptionParser</code> for parsing complex command line options and <code>ruby -s</code> for trivial command line options.</p></li>
+<li><p>Code in a functional way, avoiding mutation when that makes sense.</p></li>
+<li><p>Do not mutate parameters unless that is the purpose of the method.</p></li>
+<li><p>Avoid more than three levels of block nesting.</p></li>
+<li><p>Be consistent. In an ideal world, be consistent with these guidelines.</p></li>
+<li><p>Use common sense.</p></li>
 </ul>
 <h2 id="tools">Tools</h2>
 <p>Here are some tools to help you automatically check Ruby code against this guide.</p>
