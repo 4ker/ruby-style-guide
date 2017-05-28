@@ -1,3 +1,9 @@
+---
+title: Ruby Style Guide
+---
+
+【Ruby Style Guide】
+
 # Prelude
 
 > Role models are important. <br>
@@ -358,6 +364,8 @@ Translations of the guide are available in the following languages:
     end
     ```
 
+    不过不要在 class 和 function 的第一行就空行。
+
 -   Don't use several empty lines in a row.
     编辑器也不同意啊！
 
@@ -375,7 +383,8 @@ Translations of the guide are available in the following languages:
     ```
 
 -   Use empty lines around access modifiers.
-    不懂……
+    这个就相当于定义了自带 getter 和 setters 的变量。
+    比如这里 attr_reader 就可以读取 @foo 这个内部变量。
 
     ```ruby
     # bad
@@ -439,7 +448,8 @@ Translations of the guide are available in the following languages:
 
 -   Avoid comma after the last parameter in a method call, especially when the
     parameters are not on separate lines.
-    我就喜欢这样……话说特别讨厌 JSON 文本得列表不允许最后元素后面加个“,”。
+    我就喜欢这样……话说特别讨厌 JSON 文本得列表不允许最后元素后面加个“,”，
+    不过从好看的角度，确实应该去掉。
 
     ```ruby
     # bad - easier to move/add/remove parameters, but still not preferred
@@ -529,6 +539,7 @@ Translations of the guide are available in the following languages:
     line. When aligning parameters is not appropriate due to line-length
     constraints, single indent for the lines after the first is also
     acceptable.
+    我还是喜欢 8 个空格（两倍于常规 indent）的对齐。或者直接对齐到括弧。
 
     ```ruby
     # starting point (line is too long)
@@ -567,6 +578,7 @@ Translations of the guide are available in the following languages:
     ```
 
 -   Align the elements of array literals spanning multiple lines.
+    第二种好看。
 
     ```ruby
     # bad - single indent
@@ -625,7 +637,7 @@ Translations of the guide are available in the following languages:
 
 -   Avoid trailing whitespace.
 
--   End each file with a newline.
+-   **End each file with a newline.** 这个是为啥？
 
 -   Don't use block comments. They cannot be preceded by whitespace and are not
     as easy to spot as regular comments.
@@ -692,7 +704,8 @@ Translations of the guide are available in the following languages:
 -   Use parentheses around the arguments of method invocations,
     especially if the first argument begins with an open parenthesis `(`,
     as in `f((3 + 2) + 1)`.
-    函数调用有参数的时候，还是加上括弧把。
+    **函数调用有参数的时候，还是加上括弧把。**
+    这部分都很有意思。:hearts:
 
     ```ruby
     # bad
@@ -798,7 +811,7 @@ Translations of the guide are available in the following languages:
     assignment is allowed when it is the return of a method call, used with
     the splat operator, or when used to swap variable assignment. Parallel
     assignment is less readable than separate assignment.
-    定义的时候不要这么玩。
+    定义的时候不要这么玩。只有在赋值的时候才用 parallel assignment。
 
     ```ruby
     # bad
@@ -841,6 +854,7 @@ Translations of the guide are available in the following languages:
     underscore variables are necessary when there is a splat variable defined
     on the left side of the assignment, and the splat variable is not an
     underscore.
+    多余的不要，加上逗号就行。
 
     ```ruby
     # bad
@@ -849,7 +863,6 @@ Translations of the guide are available in the following languages:
     first, second, _ = foo.split(',')
     first, _, _ = foo.split(',')
     first, *_ = foo.split(',')
-
 
     # good
     # 没必要用 `_`
@@ -971,7 +984,7 @@ Translations of the guide are available in the following languages:
 -   Leverage the fact that `if` and `case` are expressions which return a
     result.
     这个和大多数编程语言不一样，因为 ruby 的 if else 也是 expression，while 别
-    的语言都只算 statement。一个表达式（expression）是要返回值的。
+    的语言都只算 statement。在 Ruby 里，一个表达式（expression）是有返回值的。
 
     ```ruby
     # bad
@@ -1139,7 +1152,7 @@ Translations of the guide are available in the following languages:
     ```
 
 -   Don't use parentheses around the condition of a control expression.
-    if 后面不需要括弧。
+    **if 后面不需要括弧。**
 
     ```ruby
     # bad
@@ -1188,9 +1201,9 @@ Translations of the guide are available in the following languages:
     ```
 
 -   Favor modifier `while/until` usage when you have a single-line body.
-    话说这样确实没错，不过很多时候你不太清楚这个 body 是不是 single-line
+    **话说这样确实没错，不过很多时候你不太清楚这个 body 是不是 single-line
     就能搞定。所以啊……乖乖写成 while ... end 最好。还可以扩展。
-    只有在极其 sure 只有一个 single-line bode 的时候，才用后置。
+    只有在极其 sure 只有一个 single-line bode 的时候，才用后置。**（我真是机智）
 
     ```ruby
     # bad
@@ -1203,6 +1216,8 @@ Translations of the guide are available in the following languages:
     ```
 
 -   Favor `until` over `while` for negative conditions.
+    其实这都可以解释为“请用直观的那个关键词！”……
+    不要特么脑子拎不清瞎用反转。
 
     ```ruby
     # bad
@@ -1274,6 +1289,8 @@ Translations of the guide are available in the following languages:
     end
     ```
 
+    之前说了有参数的话要加上括弧，现在呢……嗯……如果参数是一个 hash，就不要括弧了……
+
 -   Use the proc invocation shorthand when the invoked method is the only operation of a block.
     用 symbol 前置 & 的方式来 invocate 一个 proc。
 
@@ -1315,6 +1332,8 @@ Translations of the guide are available in the following languages:
     Some will argue that multi-line chaining would look OK with the use of
     {...}, but they should ask themselves&mdash;is this code really readable
     and can the blocks' contents be extracted into nifty methods?
+
+    话说这个逻辑我没看懂……我要是那个“some”的话，我就要说“你这是逻辑上耍流氓！”。
 
 -   Consider using explicit block argument to avoid writing block literal that
     just passes its arguments to another block. Beware of the performance
@@ -1487,6 +1506,7 @@ Translations of the guide are available in the following languages:
 -   Use `&&=` to preprocess variables that may or may not exist. Using `&&=`
     will change the value only if it exists, removing the need to check its
     existence with `if`.
+    这个牛逼了……从来都是一个 chain 地看是否有这个东西……这样就不用写得很啰嗦了。
 
     ```ruby
     # bad
@@ -1507,355 +1527,342 @@ Translations of the guide are available in the following languages:
     something &&= something.downcase
     ```
 
-* <a name="no-case-equality"></a>
-  Avoid explicit use of the case equality operator `===`. As its name implies
-  it is meant to be used implicitly by `case` expressions and outside of them it
-  yields some pretty confusing code.
-<sup>[[link](#no-case-equality)]</sup>
+-   Avoid explicit use of the case equality operator `===`. As its name implies
+    it is meant to be used implicitly by `case` expressions and outside of them
+    it yields some pretty confusing code.
+    不要自己写“===”，这个东西在 case when 的时候用就可以了。
 
-  ```ruby
-  # bad
-  Array === something
-  (1..100) === 7
-  /something/ === some_string
+    ```ruby
+    # bad
+    Array === something
+    (1..100) === 7
+    /something/ === some_string
 
-  # good
-  something.is_a?(Array)
-  (1..100).include?(7)
-  some_string =~ /something/
-  ```
+    # good
+    something.is_a?(Array)
+    (1..100).include?(7)
+    some_string =~ /something/
+    ```
 
-* <a name="eql"></a>
-  Do not use `eql?` when using `==` will do. The stricter comparison semantics
-  provided by `eql?` are rarely needed in practice.
-<sup>[[link](#eql)]</sup>
+-   Do not use `eql?` when using `==` will do. The stricter comparison semantics
+    provided by `eql?` are rarely needed in practice.
+    `eql?` 这东西没啥实际用处，根本没有应用机会。
 
-  ```ruby
-  # bad - eql? is the same as == for strings
-  'ruby'.eql? some_str
+    ```ruby
+    # bad - eql? is the same as == for strings
+    'ruby'.eql? some_str
 
-  # good
-  'ruby' == some_str
-  1.0.eql? x # eql? makes sense here if want to differentiate between Integer and Float 1
-  ```
+    # good
+    'ruby' == some_str
+    1.0.eql? x # eql? makes sense here if want to differentiate between Integer and Float 1
+    ```
 
-* <a name="no-cryptic-perlisms"></a>
-  Avoid using Perl-style special variables (like `$:`, `$;`, etc. ). They are
-  quite cryptic and their use in anything but one-liner scripts is discouraged.
-  Use the human-friendly aliases provided by the `English` library.
-<sup>[[link](#no-cryptic-perlisms)]</sup>
+-   Avoid using Perl-style special variables (like `$:`, `$;`, etc. ). They are
+    quite cryptic （含义模糊的） and their use in anything but one-liner scripts is
+    discouraged.  Use the human-friendly aliases provided by the `English`
+    library.
 
-  ```ruby
-  # bad
-  $:.unshift File.dirname(__FILE__)
+    ```ruby
+    # bad
+    $:.unshift File.dirname(__FILE__)                   # 这个太特么常见了。
 
-  # good
-  require 'English'
-  $LOAD_PATH.unshift File.dirname(__FILE__)
-  ```
+    # good
+    require 'English'
+    $LOAD_PATH.unshift File.dirname(__FILE__)
+    ```
 
-* <a name="parens-no-spaces"></a>
-  Do not put a space between a method name and the opening parenthesis.
-<sup>[[link](#parens-no-spaces)]</sup>
+    上面的代码就是形成一个 $PATH，把当前目录 prepend 到里面。
 
-  ```ruby
-  # bad
-  f (3 + 2) + 1
+-   Do not put a space between a method name and the opening parenthesis.
+    为啥？因为这样特么有歧义啊！
+    这根本不是 good 和 bad 的问题，这是 right 和 wrong 的问题。
 
-  # good
-  f(3 + 2) + 1
-  ```
+    ```ruby
+    # bad
+    f (3 + 2) + 1
 
-* <a name="always-warn-at-runtime"></a>
-  Always run the Ruby interpreter with the `-w` option so it will warn you if
-  you forget either of the rules above!
-<sup>[[link](#always-warn-at-runtime)]</sup>
+    # good
+    f(3 + 2) + 1
+    ```
 
-* <a name="no-nested-methods"></a>
-  Do not use nested method definitions, use lambda instead.
-  Nested method definitions actually produce methods in the same scope
-  (e.g. class) as the outer method. Furthermore, the "nested method" will be
-  redefined every time the method containing its definition is invoked.
-<sup>[[link](#no-nested-methods)]</sup>
+-   Always run the Ruby interpreter with the `-w` option so it will warn you if
+    you forget either of the rules above!
+    加上这个“-w”选项，就可以提示你。有点类似 JavaScript 的“use strict;”。
 
-  ```ruby
-  # bad
-  def foo(x)
+-   Do not use nested method definitions, use lambda instead.
+    Nested method definitions actually produce methods in the same scope (e.g.
+    class) as the outer method. Furthermore, the "nested method" will be
+    redefined every time the method containing its definition is invoked.
+    不要嵌套定义 method，如果你的函数只在局部用一两次，那就用 lambda。
+
+    ```ruby
+    # bad
+    def foo(x)
+      def bar(y)
+        # body omitted
+      end
+
+      bar(x)
+    end
+
+    # good - the same as the previous, but no bar redefinition on every foo call
     def bar(y)
       # body omitted
     end
 
-    bar(x)
-  end
+    def foo(x)
+      bar(x)
+    end
 
-  # good - the same as the previous, but no bar redefinition on every foo call
-  def bar(y)
-    # body omitted
-  end
+    # also good
+    def foo(x)
+      bar = ->(y) { ... }
+      bar.call(x)
+    end
+    ```
 
-  def foo(x)
-    bar(x)
-  end
+-   Use the new lambda literal syntax for single line body blocks. Use the
+    `lambda` method for multi-line blocks.
+    一行的 method，用 `->`（stabby），多行的用 `lambda` 关键字。
 
-  # also good
-  def foo(x)
-    bar = ->(y) { ... }
-    bar.call(x)
-  end
-  ```
+    ```ruby
+    # bad
+    l = lambda { |a, b| a + b }
+    l.call(1, 2)
 
-* <a name="lambda-multi-line"></a>
-  Use the new lambda literal syntax for single line body blocks. Use the
-  `lambda` method for multi-line blocks.
-<sup>[[link](#lambda-multi-line)]</sup>
+    # correct, but looks extremely awkward
+    l = ->(a, b) do
+      tmp = a * 7
+      tmp * b / 50
+    end
 
-  ```ruby
-  # bad
-  l = lambda { |a, b| a + b }
-  l.call(1, 2)
+    # good
+    l = ->(a, b) { a + b }
+    l.call(1, 2)
 
-  # correct, but looks extremely awkward
-  l = ->(a, b) do
-    tmp = a * 7
-    tmp * b / 50
-  end
+    l = lambda do |a, b|
+      tmp = a * 7
+      tmp * b / 50
+    end
+    ```
 
-  # good
-  l = ->(a, b) { a + b }
-  l.call(1, 2)
+-   Don't omit the parameter parentheses when defining a stabby lambda with
+    parameters.
+    虽然 lambda 可以省略括弧，但是不推荐。请加上。
+    只有没有参数的时候，不要括弧。
 
-  l = lambda do |a, b|
-    tmp = a * 7
-    tmp * b / 50
-  end
-  ```
+    ```ruby
+    # bad
+    l = ->x, y { something(x, y) }
 
-* <a name="stabby-lambda-with-args"></a>
-Don't omit the parameter parentheses when defining a stabby lambda with
-parameters.
-<sup>[[link](#stabby-lambda-with-args)]</sup>
+    # good
+    l = ->(x, y) { something(x, y) }
+    ```
 
-  ```ruby
-  # bad
-  l = ->x, y { something(x, y) }
+-   Omit the parameter parentheses when defining a stabby lambda with
+    no parameters.
+    如果没有参数的话，那就不要括弧。
 
-  # good
-  l = ->(x, y) { something(x, y) }
-  ```
+    ```ruby
+    # bad
+    l = ->() { something }
 
-* <a name="stabby-lambda-no-args"></a>
-Omit the parameter parentheses when defining a stabby lambda with
-no parameters.
-<sup>[[link](#stabby-lambda-no-args)]</sup>
+    # good
+    l = -> { something }
+    ```
 
-  ```ruby
-  # bad
-  l = ->() { something }
+-   Prefer `proc` over `Proc.new`.
+    用 `proc` 而不是 `Proc.new`，两种用法一样的。
 
-  # good
-  l = -> { something }
-  ```
+    ```ruby
+    # bad
+    p = Proc.new { |n| puts n }
 
-* <a name="proc"></a>
-  Prefer `proc` over `Proc.new`.
-<sup>[[link](#proc)]</sup>
+    # good
+    p = proc { |n| puts n }
+    ```
 
-  ```ruby
-  # bad
-  p = Proc.new { |n| puts n }
+-   Prefer `proc.call()` over `proc[]` or `proc.()` for both lambdas and procs.
+    `proc.call` 更加清晰。
 
-  # good
-  p = proc { |n| puts n }
-  ```
+    ```ruby
+    # bad - looks similar to Enumeration access
+    l = ->(v) { puts v }
+    l[1]
 
-* <a name="proc-call"></a>
-  Prefer `proc.call()` over `proc[]` or `proc.()` for both lambdas and procs.
-<sup>[[link](#proc-call)]</sup>
+    # also bad - uncommon syntax
+    l = ->(v) { puts v }
+    l.(1)
 
-  ```ruby
-  # bad - looks similar to Enumeration access
-  l = ->(v) { puts v }
-  l[1]
+    # good
+    l = ->(v) { puts v }
+    l.call(1)
+    ```
 
-  # also bad - uncommon syntax
-  l = ->(v) { puts v }
-  l.(1)
+-   Prefix with `_` unused block parameters and local variables. It's also
+    acceptable to use just `_` (although it's a bit less descriptive). This
+    convention is recognized by the Ruby interpreter and tools like RuboCop and
+    will suppress their unused variable warnings.
+    可以用“_”前缀标记局部没用到的变量。
+    只用“_”的话，不够清晰，但也 Okay，不过还是推荐加上一个说明。
 
-  # good
-  l = ->(v) { puts v }
-  l.call(1)
-  ```
+    ```ruby
+    # bad
+    result = hash.map { |k, v| v + 1 }
 
-* <a name="underscore-unused-vars"></a>
-  Prefix with `_` unused block parameters and local variables. It's also
-  acceptable to use just `_` (although it's a bit less descriptive). This
-  convention is recognized by the Ruby interpreter and tools like RuboCop and
-  will suppress their unused variable warnings.
-<sup>[[link](#underscore-unused-vars)]</sup>
+    def something(x)
+      unused_var, used_var = something_else(x)
+      # some code
+    end
 
-  ```ruby
-  # bad
-  result = hash.map { |k, v| v + 1 }
+    # good
+    result = hash.map { |_k, v| v + 1 }
 
-  def something(x)
-    unused_var, used_var = something_else(x)
-    # some code
-  end
+    def something(x)
+      _unused_var, used_var = something_else(x)
+      # some code
+    end
 
-  # good
-  result = hash.map { |_k, v| v + 1 }
+    # good
+    result = hash.map { |_, v| v + 1 }
 
-  def something(x)
-    _unused_var, used_var = something_else(x)
-    # some code
-  end
+    def something(x)
+      _, used_var = something_else(x)
+      # some code
+    end
+    ```
 
-  # good
-  result = hash.map { |_, v| v + 1 }
+-  Use `$stdout/$stderr/$stdin` instead of `STDOUT/STDERR/STDIN`.
+    `STDOUT/STDERR/STDIN` are constants, and while you can actually reassign
+    (possibly to redirect some stream) constants in Ruby, you'll get an
+    interpreter warning if you do so.
 
-  def something(x)
-    _, used_var = something_else(x)
-    # some code
-  end
-  ```
+    $stdout 等三个常用 fd 要比 STDOUT 这三个类似的常量好，因为后者
+    可能被重新赋值了。这是 error-prone。
 
-* <a name="global-stdout"></a>
-  Use `$stdout/$stderr/$stdin` instead of `STDOUT/STDERR/STDIN`.
-  `STDOUT/STDERR/STDIN` are constants, and while you can actually reassign
-  (possibly to redirect some stream) constants in Ruby, you'll get an
-  interpreter warning if you do so.
-<sup>[[link](#global-stdout)]</sup>
+-   Use `warn` instead of `$stderr.puts`. Apart from being more concise and
+    clear, `warn` allows you to suppress warnings if you need to (by setting
+    the warn level to 0 via `-W0`).
+    错误输出用 warn。
 
-* <a name="warn"></a>
-  Use `warn` instead of `$stderr.puts`. Apart from being more concise and
-  clear, `warn` allows you to suppress warnings if you need to (by setting the
-  warn level to 0 via `-W0`).
-<sup>[[link](#warn)]</sup>
+-   Favor the use of `sprintf` and its alias `format` over the fairly cryptic
+    `String#%` method.
+    虽然 Ruby 提供 str%array 的方法来 format 字符串，还是推荐用 sprintf 或者
+    format。
 
-* <a name="sprintf"></a>
-  Favor the use of `sprintf` and its alias `format` over the fairly cryptic
-  `String#%` method.
-<sup>[[link](#sprintf)]</sup>
+    ```ruby
+    # bad
+    '%d %d' % [20, 10]
+    # => '20 10'
 
-  ```ruby
-  # bad
-  '%d %d' % [20, 10]
-  # => '20 10'
+    # good
+    sprintf('%d %d', 20, 10)
+    # => '20 10'
 
-  # good
-  sprintf('%d %d', 20, 10)
-  # => '20 10'
+    # good
+    sprintf('%<first>d %<second>d', first: 20, second: 10)
+    # => '20 10'
 
-  # good
-  sprintf('%<first>d %<second>d', first: 20, second: 10)
-  # => '20 10'
+    format('%d %d', 20, 10)
+    # => '20 10'
 
-  format('%d %d', 20, 10)
-  # => '20 10'
+    # good
+    format('%<first>d %<second>d', first: 20, second: 10)
+    # => '20 10'
+    ```
 
-  # good
-  format('%<first>d %<second>d', first: 20, second: 10)
-  # => '20 10'
-  ```
+-   When using named format string tokens, favor `%<name>s` over `%{name}`
+    because it encodes information about the type of the value.
 
-* <a name="named-format-tokens"></a>
-  When using named format string tokens, favor `%<name>s` over `%{name}` because it encodes information about the type of the value.
-<sup>[[link]](#named-format-tokens)</sup>
+    ```ruby
+    # bad
+    format('Hello, %{name}', name: 'John')
 
-  ```ruby
-  # bad
-  format('Hello, %{name}', name: 'John')
+    # good
+    format('Hello, %<name>s', name: 'John')
+    ```
 
-  # good
-  format('Hello, %<name>s', name: 'John')
-  ```
+-   Favor the use of `Array#join` over the fairly cryptic `Array#*` with
+    a string argument.
+    用 join 来 join，而不用蛋疼的 * 字符。
 
-* <a name="array-join"></a>
-  Favor the use of `Array#join` over the fairly cryptic `Array#*` with
-  a string argument.
-<sup>[[link](#array-join)]</sup>
+    ```ruby
+    # bad
+    %w[one two three] * ', '
+    # => 'one, two, three'
 
-  ```ruby
-  # bad
-  %w[one two three] * ', '
-  # => 'one, two, three'
+    # good
+    %w[one two three].join(', ')
+    # => 'one, two, three'
+    ```
 
-  # good
-  %w[one two three].join(', ')
-  # => 'one, two, three'
-  ```
+-   Use `Array()` instead of explicit `Array` check or `[*var]`, when dealing
+    with a variable you want to treat as an Array, but you're not certain it's an
+    array.
+    **Array(input) 总是输出一个 Array。**十分好用的样子。
 
-* <a name="array-coercion"></a>
-  Use `Array()` instead of explicit `Array` check or `[*var]`, when dealing
-  with a variable you want to treat as an Array, but you're not certain it's an
-  array.
-<sup>[[link](#array-coercion)]</sup>
+    ```ruby
+    # bad
+    paths = [paths] unless paths.is_a? Array
+    paths.each { |path| do_something(path) }
 
-  ```ruby
-  # bad
-  paths = [paths] unless paths.is_a? Array
-  paths.each { |path| do_something(path) }
+    # bad (always creates a new Array instance)
+    [*paths].each { |path| do_something(path) }
 
-  # bad (always creates a new Array instance)
-  [*paths].each { |path| do_something(path) }
+    # good (and a bit more readable)
+    Array(paths).each { |path| do_something(path) }
+    ```
 
-  # good (and a bit more readable)
-  Array(paths).each { |path| do_something(path) }
-  ```
+-   Use ranges or `Comparable#between?` instead of complex comparison logic when
+    possible.
+    用 between？直接判断区间。
 
-* <a name="ranges-or-between"></a>
-  Use ranges or `Comparable#between?` instead of complex comparison logic when
-  possible.
-<sup>[[link](#ranges-or-between)]</sup>
+    ```ruby
+    # bad
+    do_something if x >= 1000 && x <= 2000
 
-  ```ruby
-  # bad
-  do_something if x >= 1000 && x <= 2000
+    # good
+    do_something if (1000..2000).include?(x)
 
-  # good
-  do_something if (1000..2000).include?(x)
+    # good
+    do_something if x.between?(1000, 2000)
+    ```
 
-  # good
-  do_something if x.between?(1000, 2000)
-  ```
+-   Favor the use of predicate methods to explicit comparisons with `==`.
+    Numeric comparisons are OK.
+    能用专业的表达，就不要用自己 naive 的实现拉！
 
-* <a name="predicate-methods"></a>
-  Favor the use of predicate methods to explicit comparisons with `==`.
-  Numeric comparisons are OK.
-<sup>[[link](#predicate-methods)]</sup>
+    ```ruby
+    # bad
+    if x % 2 == 0
+    end
 
-  ```ruby
-  # bad
-  if x % 2 == 0
-  end
+    if x % 2 == 1
+    end
 
-  if x % 2 == 1
-  end
+    if x == nil
+    end
 
-  if x == nil
-  end
+    # good
+    if x.even?
+    end
 
-  # good
-  if x.even?
-  end
+    if x.odd?
+    end
 
-  if x.odd?
-  end
+    if x.nil?
+    end
 
-  if x.nil?
-  end
+    if x.zero?
+    end
 
-  if x.zero?
-  end
+    if x == 0
+    end
+    ```
 
-  if x == 0
-  end
-  ```
-
-* <a name="no-non-nil-checks"></a>
-  Don't do explicit non-`nil` checks unless you're dealing with boolean
-  values.
-<sup>[[link](#no-non-nil-checks)]</sup>
+-   Don't do explicit non-`nil` checks unless you're dealing with boolean values.
+    咋说呢，一般用 if ... 来判断这个东西是不是 nil，如果不是 nil，就可以处理。
+    除了……如果这个变量本来就是 boolean，这时候，你还是判断一下它是 nil 还 false 为好。
 
     ```ruby
     # bad
@@ -1871,1066 +1878,1010 @@ no parameters.
     end
     ```
 
-* <a name="no-BEGIN-blocks"></a>
-  Avoid the use of `BEGIN` blocks.
-<sup>[[link](#no-BEGIN-blocks)]</sup>
-
-* <a name="no-END-blocks"></a>
-  Do not use `END` blocks. Use `Kernel#at_exit` instead.
-<sup>[[link](#no-END-blocks)]</sup>
-
-  ```ruby
-  # bad
-  END { puts 'Goodbye!' }
-
-  # good
-  at_exit { puts 'Goodbye!' }
-  ```
-
-* <a name="no-flip-flops"></a>
-  Avoid the use of flip-flops.
-<sup>[[link](#no-flip-flops)]</sup>
-
-* <a name="no-nested-conditionals"></a>
-  Avoid use of nested conditionals for flow of control.
-<sup>[[link](#no-nested-conditionals)]</sup>
-
-  Prefer a guard clause when you can assert invalid data. A guard clause
-  is a conditional statement at the top of a function that bails out as
-  soon as it can.
-
-  ```ruby
-  # bad
-  def compute_thing(thing)
-    if thing[:foo]
-      update_with_bar(thing[:foo])
-      if thing[:foo][:bar]
-        partial_compute(thing)
-      else
-        re_compute(thing)
-      end
-    end
-  end
-
-  # good
-  def compute_thing(thing)
-    return unless thing[:foo]
-    update_with_bar(thing[:foo])
-    return re_compute(thing) unless thing[:foo][:bar]
-    partial_compute(thing)
-  end
-  ```
-
-  Prefer `next` in loops instead of conditional blocks.
-
-  ```ruby
-  # bad
-  [0, 1, 2, 3].each do |item|
-    if item > 1
-      puts item
-    end
-  end
-
-  # good
-  [0, 1, 2, 3].each do |item|
-    next unless item > 1
-    puts item
-  end
-  ```
-
-* <a name="map-find-select-reduce-size"></a>
-  Prefer `map` over `collect`, `find` over `detect`, `select` over `find_all`,
-  `reduce` over `inject` and `size` over `length`. This is not a hard
-  requirement; if the use of the alias enhances readability, it's ok to use it.
-  The rhyming methods are inherited from Smalltalk and are not common in other
-  programming languages. The reason the use of `select` is encouraged over
-  `find_all` is that it goes together nicely with `reject` and its name is
-  pretty self-explanatory.
-<sup>[[link](#map-find-select-reduce-size)]</sup>
-
-* <a name="count-vs-size"></a>
-  Don't use `count` as a substitute for `size`. For `Enumerable` objects other
-  than `Array` it will iterate the entire collection in order to determine its
-  size.
-<sup>[[link](#count-vs-size)]</sup>
-
-  ```ruby
-  # bad
-  some_hash.count
-
-  # good
-  some_hash.size
-  ```
-
-* <a name="flat-map"></a>
-  Use `flat_map` instead of `map` + `flatten`.  This does not apply for arrays
-  with a depth greater than 2, i.e.  if `users.first.songs == ['a', ['b','c']]`,
-  then use `map + flatten` rather than `flat_map`.  `flat_map` flattens the
-  array by 1, whereas `flatten` flattens it all the way.
-<sup>[[link](#flat-map)]</sup>
-
-  ```ruby
-  # bad
-  all_songs = users.map(&:songs).flatten.uniq
-
-  # good
-  all_songs = users.flat_map(&:songs).uniq
-  ```
-
-* <a name="reverse-each"></a>
-  Prefer `reverse_each` to `reverse.each` because some classes that `include
-  Enumerable` will provide an efficient implementation. Even in the worst case
-  where a class does not provide a specialized implementation, the general
-  implementation inherited from `Enumerable` will be at least as efficient as
-  using `reverse.each`.
-<sup>[[link](#reverse-each)]</sup>
-
-  ```ruby
-  # bad
-  array.reverse.each { ... }
-
-  # good
-  array.reverse_each { ... }
-  ```
-
-## Naming
-
-> The only real difficulties in programming are cache invalidation and
-> naming things. <br>
-> -- Phil Karlton
-
-* <a name="english-identifiers"></a>
-  Name identifiers in English.
-<sup>[[link](#english-identifiers)]</sup>
-
-  ```ruby
-  # bad - identifier using non-ascii characters
-  заплата = 1_000
-
-  # bad - identifier is a Bulgarian word, written with Latin letters (instead of Cyrillic)
-  zaplata = 1_000
-
-  # good
-  salary = 1_000
-  ```
-
-* <a name="snake-case-symbols-methods-vars"></a>
-  Use `snake_case` for symbols, methods and variables.
-<sup>[[link](#snake-case-symbols-methods-vars)]</sup>
-
-  ```ruby
-  # bad
-  :'some symbol'
-  :SomeSymbol
-  :someSymbol
-
-  someVar = 5
-  var_10  = 10
-
-  def someMethod
-    # some code
-  end
-
-  def SomeMethod
-    # some code
-  end
-
-  # good
-  :some_symbol
-
-  some_var = 5
-  var10    = 10
-
-  def some_method
-    # some code
-  end
-  ```
-
-* <a name="snake-case-symbols-methods-vars-with-numbers"></a>
-  Do not separate numbers from letters on symbols, methods and variables.
-<sup>[[link](#snake-case-symbols-methods-vars-with-numbers)]</sup>
-
-  ```ruby
-  # bad
-  :some_sym_1
-
-  some_var_1 = 1
-
-  def some_method_1
-    # some code
-  end
-
-  # good
-  :some_sym1
-
-  some_var1 = 1
-
-  def some_method1
-    # some code
-  end
-  ```
-
-
-* <a name="camelcase-classes"></a>
-  Use `CamelCase` for classes and modules.  (Keep acronyms like HTTP, RFC, XML
-  uppercase.)
-<sup>[[link](#camelcase-classes)]</sup>
-
-  ```ruby
-  # bad
-  class Someclass
-    # some code
-  end
-
-  class Some_Class
-    # some code
-  end
-
-  class SomeXml
-    # some code
-  end
-
-  class XmlSomething
-    # some code
-  end
-
-  # good
-  class SomeClass
-    # some code
-  end
-
-  class SomeXML
-    # some code
-  end
-
-  class XMLSomething
-    # some code
-  end
-  ```
-
-* <a name="snake-case-files"></a>
-  Use `snake_case` for naming files, e.g. `hello_world.rb`.
-<sup>[[link](#snake-case-files)]</sup>
-
-* <a name="snake-case-dirs"></a>
-  Use `snake_case` for naming directories, e.g.
-  `lib/hello_world/hello_world.rb`.
-<sup>[[link](#snake-case-dirs)]</sup>
-
-* <a name="one-class-per-file"></a>
-  Aim to have just a single class/module per source file. Name the file name
-  as the class/module, but replacing CamelCase with snake_case.
-<sup>[[link](#one-class-per-file)]</sup>
-
-* <a name="screaming-snake-case"></a>
-  Use `SCREAMING_SNAKE_CASE` for other constants.
-<sup>[[link](#screaming-snake-case)]</sup>
-
-  ```ruby
-  # bad
-  SomeConst = 5
-
-  # good
-  SOME_CONST = 5
-  ```
-
-* <a name="bool-methods-qmark"></a>
-  The names of predicate methods (methods that return a boolean value) should
-  end in a question mark.  (i.e. `Array#empty?`). Methods that don't return a
-  boolean, shouldn't end in a question mark.
-<sup>[[link](#bool-methods-qmark)]</sup>
-
-* <a name="bool-methods-prefix"></a>
-  Avoid prefixing predicate methods with the auxiliary verbs such as `is`,
-  `does`, or `can`.  These words are redundant and inconsistent with the style of
-  boolean methods in the Ruby core library, such as `empty?` and `include?`.
-<sup>[[link](#bool-methods-prefix)]</sup>
-
-  ```ruby
-  # bad
-  class Person
-    def is_tall?
-      true
-    end
-
-    def can_play_basketball?
-      false
-    end
-
-    def does_like_candy?
-      true
-    end
-  end
-
-  # good
-  class Person
-    def tall?
-      true
-    end
-
-    def basketball_player?
-      false
-    end
-
-    def likes_candy?
-      true
-    end
-  end
-  ```
-
-* <a name="dangerous-method-bang"></a>
-  The names of potentially *dangerous* methods (i.e. methods that modify
-  `self` or the arguments, `exit!` (doesn't run the finalizers like `exit`
-  does), etc.) should end with an exclamation mark if there exists a safe
-  version of that *dangerous* method.
-<sup>[[link](#dangerous-method-bang)]</sup>
-
-  ```ruby
-  # bad - there is no matching 'safe' method
-  class Person
-    def update!
-    end
-  end
-
-  # good
-  class Person
-    def update
-    end
-  end
-
-  # good
-  class Person
-    def update!
-    end
-
-    def update
-    end
-  end
-  ```
-
-* <a name="safe-because-unsafe"></a>
-  Define the non-bang (safe) method in terms of the bang (dangerous) one if
-  possible.
-<sup>[[link](#safe-because-unsafe)]</sup>
-
-  ```ruby
-  class Array
-    def flatten_once!
-      res = []
-
-      each do |e|
-        [*e].each { |f| res << f }
-      end
-
-      replace(res)
-    end
-
-    def flatten_once
-      dup.flatten_once!
-    end
-  end
-  ```
-
-* <a name="other-arg"></a>
-  When defining binary operators, name the parameter `other`(`<<` and `[]` are
-  exceptions to the rule, since their semantics are different).
-<sup>[[link](#other-arg)]</sup>
-
-  ```ruby
-  def +(other)
-    # body omitted
-  end
-  ```
-
-## Comments
-
-> Good code is its own best documentation. As you're about to add a
-> comment, ask yourself, "How can I improve the code so that this
-> comment isn't needed?" Improve the code and then document it to make
-> it even clearer. <br>
-> -- Steve McConnell
-
-* <a name="no-comments"></a>
-  Write self-documenting code and ignore the rest of this section. Seriously!
-<sup>[[link](#no-comments)]</sup>
-
-* <a name="english-comments"></a>
-  Write comments in English.
-<sup>[[link](#english-comments)]</sup>
-
-* <a name="hash-space"></a>
-  Use one space between the leading `#` character of the comment and the text
-  of the comment.
-<sup>[[link](#hash-space)]</sup>
-
-* <a name="english-syntax"></a>
-  Comments longer than a word are capitalized and use punctuation. Use [one
-  space](https://en.wikipedia.org/wiki/Sentence_spacing) after periods.
-<sup>[[link](#english-syntax)]</sup>
-
-* <a name="no-superfluous-comments"></a>
-  Avoid superfluous comments.
-<sup>[[link](#no-superfluous-comments)]</sup>
-
-  ```ruby
-  # bad
-  counter += 1 # Increments counter by one.
-  ```
-
-* <a name="comment-upkeep"></a>
-  Keep existing comments up-to-date. An outdated comment is worse than no
-  comment at all.
-<sup>[[link](#comment-upkeep)]</sup>
-
-> Good code is like a good joke: it needs no explanation. <br>
-> &mdash; old programmers maxim, through [Russ Olsen](http://eloquentruby.com/blog/2011/03/07/good-code-and-good-jokes/)
-
-* <a name="refactor-dont-comment"></a>
-  Avoid writing comments to explain bad code. Refactor the code to make it
-  self-explanatory. ("Do or do not&mdash;there is no try." Yoda)
-<sup>[[link](#refactor-dont-comment)]</sup>
-
-### Comment Annotations
-
-* <a name="annotate-above"></a>
-  Annotations should usually be written on the line immediately above the
-  relevant code.
-<sup>[[link](#annotate-above)]</sup>
-
-* <a name="annotate-keywords"></a>
-  The annotation keyword is followed by a colon and a space, then a note
-  describing the problem.
-<sup>[[link](#annotate-keywords)]</sup>
-
-* <a name="indent-annotations"></a>
-  If multiple lines are required to describe the problem, subsequent lines
-  should be indented three spaces after the `#` (one general plus two for
-  indentation purpose).
-<sup>[[link](#indent-annotations)]</sup>
-
-  ```ruby
-  def bar
-    # FIXME: This has crashed occasionally since v3.2.1. It may
-    #   be related to the BarBazUtil upgrade.
-    baz(:quux)
-  end
-  ```
-
-* <a name="rare-eol-annotations"></a>
-  In cases where the problem is so obvious that any documentation would be
-  redundant, annotations may be left at the end of the offending line with no
-  note. This usage should be the exception and not the rule.
-<sup>[[link](#rare-eol-annotations)]</sup>
-
-  ```ruby
-  def bar
-    sleep 100 # OPTIMIZE
-  end
-  ```
-
-* <a name="todo"></a>
-  Use `TODO` to note missing features or functionality that should be added at
-  a later date.
-<sup>[[link](#todo)]</sup>
-
-* <a name="fixme"></a>
-  Use `FIXME` to note broken code that needs to be fixed.
-<sup>[[link](#fixme)]</sup>
-
-* <a name="optimize"></a>
-  Use `OPTIMIZE` to note slow or inefficient code that may cause performance
-  problems.
-<sup>[[link](#optimize)]</sup>
-
-* <a name="hack"></a>
-  Use `HACK` to note code smells where questionable coding practices were used
-  and should be refactored away.
-<sup>[[link](#hack)]</sup>
-
-* <a name="review"></a>
-  Use `REVIEW` to note anything that should be looked at to confirm it is
-  working as intended. For example: `REVIEW: Are we sure this is how the client
-  does X currently?`
-<sup>[[link](#review)]</sup>
-
-* <a name="document-annotations"></a>
-  Use other custom annotation keywords if it feels appropriate, but be sure to
-  document them in your project's `README` or similar.
-<sup>[[link](#document-annotations)]</sup>
-
-### Magic Comments
-
-* <a name="magic-comments-first"></a>
-  Place magic comments above all code and documentation. Magic comments should only go below shebangs if they are needed in your source file.
-<sup>[[link](#magic-comments-first)]</sup>
-
-  ```ruby
-  # good
-  # frozen_string_literal: true
-  # Some documentation about Person
-  class Person
-  end
-
-  # bad
-  # Some documentation about Person
-  # frozen_string_literal: true
-  class Person
-  end
-  ```
-
-  ```ruby
-  # good
-  #!/usr/bin/env ruby
-  # frozen_string_literal: true
-  App.parse(ARGV)
-
-  # bad
-  # frozen_string_literal: true
-  #!/usr/bin/env ruby
-  App.parse(ARGV)
-  ```
-
-* <a name="one-magic-comment-per-line"></a>
-  Use one magic comment per line if you need multiple.
-<sup>[[link](#one-magic-comment-per-line)]</sup>
-
-  ```ruby
-  # good
-  # frozen_string_literal: true
-  # encoding: ascii-8bit
-
-  # bad
-  # -*- frozen_string_literal: true; encoding: ascii-8bit -*-
-  ```
-
-* <a name="separate-magic-comments-from-code"></a>
-  Separate magic comments from code and documentation with a blank line.
-<sup>[[link](#separate-magic-comments-from-code)]</sup>
-
-  ```ruby
-  # good
-  # frozen_string_literal: true
-
-  # Some documentation for Person
-  class Person
-    # Some code
-  end
-
-  # bad
-  # frozen_string_literal: true
-  # Some documentation for Person
-  class Person
-    # Some code
-  end
-  ```
-
-## Classes & Modules
-
-* <a name="consistent-classes"></a>
-  Use a consistent structure in your class definitions.
-<sup>[[link](#consistent-classes)]</sup>
-
-  ```ruby
-  class Person
-    # extend and include go first
-    extend SomeModule
-    include AnotherModule
-
-    # inner classes
-    CustomError = Class.new(StandardError)
-
-    # constants are next
-    SOME_CONSTANT = 20
-
-    # afterwards we have attribute macros
-    attr_reader :name
-
-    # followed by other macros (if any)
-    validates :name
-
-    # public class methods are next in line
-    def self.some_method
-    end
-
-    # initialization goes between class methods and other instance methods
-    def initialize
-    end
-
-    # followed by other public instance methods
-    def some_method
-    end
-
-    # protected and private methods are grouped near the end
-    protected
-
-    def some_protected_method
-    end
-
-    private
-
-    def some_private_method
-    end
-  end
-  ```
-
-* <a name="mixin-grouping"></a>
-  Split multiple mixins into separate statements.
-<sup>[[link](#mixin-grouping)]</sup>
-
-  ```ruby
-  # bad
-  class Person
-    include Foo, Bar
-  end
-
-  # good
-  class Person
-    # multiple mixins go in separate statements
-    include Foo
-    include Bar
-  end
-  ```
-
-* <a name="file-classes"></a>
-  Don't nest multi-line classes within classes. Try to have such nested
-  classes each in their own file in a folder named like the containing class.
-<sup>[[link](#file-classes)]</sup>
-
-  ```ruby
-  # bad
-
-  # foo.rb
-  class Foo
-    class Bar
-      # 30 methods inside
-    end
-
-    class Car
-      # 20 methods inside
-    end
-
-    # 30 methods inside
-  end
-
-  # good
-
-  # foo.rb
-  class Foo
-    # 30 methods inside
-  end
-
-  # foo/bar.rb
-  class Foo
-    class Bar
-      # 30 methods inside
-    end
-  end
-
-  # foo/car.rb
-  class Foo
-    class Car
-      # 20 methods inside
-    end
-  end
-  ```
-
-* <a name="modules-vs-classes"></a>
-  Prefer modules to classes with only class methods. Classes should be used
-  only when it makes sense to create instances out of them.
-<sup>[[link](#modules-vs-classes)]</sup>
-
-  ```ruby
-  # bad
-  class SomeClass
-    def self.some_method
-      # body omitted
-    end
-
-    def self.some_other_method
-      # body omitted
-    end
-  end
-
-  # good
-  module SomeModule
-    module_function
-
-    def some_method
-      # body omitted
-    end
-
-    def some_other_method
-      # body omitted
-    end
-  end
-  ```
-
-* <a name="module-function"></a>
-  Favor the use of `module_function` over `extend self` when you want to turn
-  a module's instance methods into class methods.
-<sup>[[link](#module-function)]</sup>
-
-  ```ruby
-  # bad
-  module Utilities
-    extend self
-
-    def parse_something(string)
-      # do stuff here
-    end
-
-    def other_utility_method(number, string)
-      # do some more stuff
-    end
-  end
-
-  # good
-  module Utilities
-    module_function
-
-    def parse_something(string)
-      # do stuff here
-    end
-
-    def other_utility_method(number, string)
-      # do some more stuff
-    end
-  end
-  ```
-
-* <a name="liskov"></a>
-  When designing class hierarchies make sure that they conform to the [Liskov
-  Substitution
-  Principle](https://en.wikipedia.org/wiki/Liskov_substitution_principle).
-<sup>[[link](#liskov)]</sup>
-
-* <a name="solid-design"></a>
-  Try to make your classes as
-  [SOLID](https://en.wikipedia.org/wiki/SOLID_\(object-oriented_design\)) as
-  possible.
-<sup>[[link](#solid-design)]</sup>
-
-* <a name="define-to-s"></a>
-  Always supply a proper `to_s` method for classes that represent domain
-  objects.
-<sup>[[link](#define-to-s)]</sup>
-
-  ```ruby
-  class Person
-    attr_reader :first_name, :last_name
-
-    def initialize(first_name, last_name)
-      @first_name = first_name
-      @last_name = last_name
-    end
-
-    def to_s
-      "#{@first_name} #{@last_name}"
-    end
-  end
-  ```
-
-* <a name="attr_family"></a>
-  Use the `attr` family of functions to define trivial accessors or mutators.
-<sup>[[link](#attr_family)]</sup>
-
-  ```ruby
-  # bad
-  class Person
-    def initialize(first_name, last_name)
-      @first_name = first_name
-      @last_name = last_name
-    end
-
-    def first_name
-      @first_name
-    end
-
-    def last_name
-      @last_name
-    end
-  end
-
-  # good
-  class Person
-    attr_reader :first_name, :last_name
-
-    def initialize(first_name, last_name)
-      @first_name = first_name
-      @last_name = last_name
-    end
-  end
-  ```
-
-* <a name="accessor_mutator_method_names"></a>
-  For accessors and mutators, avoid prefixing method names with
-  `get_` and `set_`.
-  It is a Ruby convention to use attribute names for accessors (readers) and
-  `attr_name=` for mutators (writers).
-<sup>[[link](#accessor_mutator_method_names)]</sup>
-
-  ```ruby
-  # bad
-  class Person
-    def get_name
-      "#{@first_name} #{@last_name}"
-    end
-
-    def set_name(name)
-      @first_name, @last_name = name.split(' ')
-    end
-  end
-
-  # good
-  class Person
-    def name
-      "#{@first_name} #{@last_name}"
-    end
-
-    def name=(name)
-      @first_name, @last_name = name.split(' ')
-    end
-  end
-  ```
-
-* <a name="attr"></a>
-  Avoid the use of `attr`. Use `attr_reader` and `attr_accessor` instead.
-<sup>[[link](#attr)]</sup>
-
-  ```ruby
-  # bad - creates a single attribute accessor (deprecated in Ruby 1.9)
-  attr :something, true
-  attr :one, :two, :three # behaves as attr_reader
-
-  # good
-  attr_accessor :something
-  attr_reader :one, :two, :three
-  ```
-
-* <a name="struct-new"></a>
-  Consider using `Struct.new`, which defines the trivial accessors,
-  constructor and comparison operators for you.
-<sup>[[link](#struct-new)]</sup>
-
-  ```ruby
-  # good
-  class Person
-    attr_accessor :first_name, :last_name
-
-    def initialize(first_name, last_name)
-      @first_name = first_name
-      @last_name = last_name
-    end
-  end
-
-  # better
-  Person = Struct.new(:first_name, :last_name) do
-  end
-  ```
-
-* <a name="no-extend-struct-new"></a>
-  Don't extend an instance initialized by `Struct.new`. Extending it introduces
-  a superfluous class level and may also introduce weird errors if the file is
-  required multiple times.
-<sup>[[link](#no-extend-struct-new)]</sup>
-
-  ```ruby
-  # bad
-  class Person < Struct.new(:first_name, :last_name)
-  end
-
-  # good
-  Person = Struct.new(:first_name, :last_name)
-  ```
-
-* <a name="factory-methods"></a>
-  Consider adding factory methods to provide additional sensible ways to
-  create instances of a particular class.
-<sup>[[link](#factory-methods)]</sup>
-
-  ```ruby
-  class Person
-    def self.create(options_hash)
-      # body omitted
-    end
-  end
-  ```
-
-* <a name="duck-typing"></a>
-  Prefer [duck-typing](https://en.wikipedia.org/wiki/Duck_typing) over
-  inheritance.
-<sup>[[link](#duck-typing)]</sup>
-
-  ```ruby
-  # bad
-  class Animal
-    # abstract method
-    def speak
-    end
-  end
-
-  # extend superclass
-  class Duck < Animal
-    def speak
-      puts 'Quack! Quack'
-    end
-  end
-
-  # extend superclass
-  class Dog < Animal
-    def speak
-      puts 'Bau! Bau!'
-    end
-  end
-
-  # good
-  class Duck
-    def speak
-      puts 'Quack! Quack'
-    end
-  end
-
-  class Dog
-    def speak
-      puts 'Bau! Bau!'
-    end
-  end
-  ```
-
-* <a name="no-class-vars"></a>
-  Avoid the usage of class (`@@`) variables due to their "nasty" behavior in
-  inheritance.
-<sup>[[link](#no-class-vars)]</sup>
-
-  ```ruby
-  class Parent
-    @@class_var = 'parent'
-
-    def self.print_class_var
-      puts @@class_var
-    end
-  end
-
-  class Child < Parent
-    @@class_var = 'child'
-  end
-
-  Parent.print_class_var # => will print 'child'
-  ```
-
-  As you can see all the classes in a class hierarchy actually share one
-  class variable. Class instance variables should usually be preferred
-  over class variables.
-
-* <a name="visibility"></a>
-  Assign proper visibility levels to methods (`private`, `protected`) in
-  accordance with their intended usage. Don't go off leaving everything `public`
-  (which is the default). After all we're coding in *Ruby* now, not in *Python*.
-<sup>[[link](#visibility)]</sup>
-
-* <a name="indent-public-private-protected"></a>
-  Indent the `public`, `protected`, and `private` methods as much as the method
-  definitions they apply to. Leave one blank line above the visibility modifier
-  and one blank line below in order to emphasize that it applies to all methods
-  below it.
-<sup>[[link](#indent-public-private-protected)]</sup>
-
-  ```ruby
-  class SomeClass
-    def public_method
-      # some code
-    end
-
-    private
-
-    def private_method
-      # some code
-    end
-
-    def another_private_method
-      # some code
-    end
-  end
-  ```
-
-* <a name="def-self-class-methods"></a>
-  Use `def self.method` to define class methods. This makes the code
-  easier to refactor since the class name is not repeated.
-<sup>[[link](#def-self-class-methods)]</sup>
-
-  ```ruby
-  class TestClass
+-   Avoid the use of `BEGIN` blocks.
+    这个东西其实可以用其他的流程避免。
+    不过我个人挺喜欢，因为逻辑上更加紧凑，你可以把一个循环只处理一次的东西写到里面，
+    而不是放在外面。
+
+    不过看上去，这里说的是文本 scope 下的 BEGIN，这个……执行顺序太不好掌控了。
+    （我是说，虽然你知道这个是有顺序的，但还是要自己看看想想，不好不好。好的代码，不需要
+    担心这担心那，还要人工 check。）
+
+-   Do not use `END` blocks. Use `Kernel#at_exit` instead.
+    跟 C 语言一样，注册一个函数。（不过 Ruby 下应该能注册多个。）
+
+    ```ruby
     # bad
-    def TestClass.some_method
-      # body omitted
+    END { puts 'Goodbye!' }
+
+    # good
+    at_exit { puts 'Goodbye!' }
+    ```
+
+-   Avoid the use of flip-flops.
+    因为有点复杂……可以改成 while，然后 check 状态。
+
+-   Avoid use of nested conditionals for flow of control.
+    这个我写 C++ 就用的这个原则。因为如果总是 if，然后到下一层，
+    你的代码会越来越宽，看上去很不好。
+    可以一点一点 check，直接返回。
+    这样一来，后面可以写得很窄，还保证了它的预设条件是正确的。
+    嗯……下面也说了，这叫“guard clause”。
+
+    Prefer a **guard clause** when you can assert invalid data. A guard clause is a
+    conditional statement at the top of a function that bails out as soon as it can.
+
+    ```ruby
+    # bad
+    def compute_thing(thing)
+      if thing[:foo]
+        update_with_bar(thing[:foo])
+        if thing[:foo][:bar]
+          partial_compute(thing)
+        else
+          re_compute(thing)
+        end
+      end
     end
 
     # good
-    def self.some_other_method
+    def compute_thing(thing)
+      return unless thing[:foo]
+      update_with_bar(thing[:foo])
+      return re_compute(thing) unless thing[:foo][:bar]
+      partial_compute(thing)
+    end
+    ```
+
+    Prefer `next` in loops instead of conditional blocks.
+
+    ```ruby
+    # bad
+    [0, 1, 2, 3].each do |item|
+      if item > 1
+        puts item
+      end
+    end
+
+    # good
+    [0, 1, 2, 3].each do |item|
+      next unless item > 1
+      puts item
+    end
+    ```
+
+-   Prefer `map` over `collect`, `find` over `detect`, `select` over `find_all`,
+    `reduce` over `inject` and `size` over `length`. This is not a hard
+    requirement; if the use of the alias enhances readability, it's ok to use
+    it.  The rhyming methods are inherited from Smalltalk and are not common in
+    other programming languages. The reason the use of `select` is encouraged
+    over `find_all` is that it goes together nicely with `reject` and its name
+    is pretty self-explanatory.
+    哈哈哈，我就说 Ruby 这些关键词……map 比 collect 好。:hearts:
+
+-   Don't use `count` as a substitute for `size`. For `Enumerable` objects other
+    than `Array` it will iterate the entire collection in order to determine
+    its size.
+
+    ```ruby
+    # bad
+    some_hash.count
+
+    # good
+    some_hash.size
+    ```
+
+-   Use `flat_map` instead of `map` + `flatten`.  This does not apply for arrays
+    with a depth greater than 2, i.e.  if `users.first.songs == ['a',
+    ['b','c']]`, then use `map + flatten` rather than `flat_map`.  `flat_map`
+    flattens the array by 1, whereas `flatten` flattens it all the way.
+    好像很有用的样子。
+
+    ```ruby
+    # bad
+    all_songs = users.map(&:songs).flatten.uniq
+
+    # good
+    all_songs = users.flat_map(&:songs).uniq
+    ```
+
+-   Prefer `reverse_each` to `reverse.each` because some classes that `include
+    Enumerable` will provide an efficient implementation. Even in the worst
+    case where a class does not provide a specialized implementation, the
+    general implementation inherited from `Enumerable` will be at least as
+    efficient as using `reverse.each`.
+    这个……其实是说不要生成不必要的拷贝，能直接反着用 iterator，干嘛要把整个数组都反过来，
+    再 each 啊！
+
+    ```ruby
+    # bad
+    array.reverse.each { ... }
+
+    # good
+    array.reverse_each { ... }
+    ```
+
+## Naming
+
+>   The only real difficulties in programming are cache invalidation and
+>   naming things.
+>
+>   -- Phil Karlton
+
+-   Name identifiers in English.
+    哈哈哈，Ruby 还可以用中文的。
+
+    ```ruby
+    # bad - identifier using non-ascii characters
+    заплата = 1_000
+
+    # bad - identifier is a Bulgarian word, written with Latin letters (instead of Cyrillic)
+    zaplata = 1_000
+
+    # good
+    salary = 1_000
+    ```
+
+-   Use `snake_case` for symbols, methods and variables.
+    和 C 语言变量的风格一样。
+
+    ```ruby
+    # bad
+    :'some symbol'
+    :SomeSymbol
+    :someSymbol
+
+    someVar = 5
+    var_10  = 10
+
+    def someMethod
+      # some code
+    end
+
+    def SomeMethod
+      # some code
+    end
+
+    # good
+    :some_symbol
+
+    some_var = 5
+    var10    = 10
+
+    def some_method
+      # some code
+    end
+    ```
+
+-   Do not separate numbers from letters on symbols, methods and variables.
+    这个规则有点细致。不要把数字单独分出来。我觉得这个还要看情况把。
+
+    ```ruby
+    # bad
+    :some_sym_1
+
+    some_var_1 = 1
+
+    def some_method_1
+      # some code
+    end
+
+    # good
+    :some_sym1
+
+    some_var1 = 1
+
+    def some_method1
+      # some code
+    end
+    ```
+
+-   Use `CamelCase` for classes and modules.  (Keep acronyms like HTTP, RFC, XML
+    uppercase.)
+    这个和 C++ 类似。
+    这里有一点，专有名词比如 HTTP 本来就大写，就不要弄成 HttpClient 了。
+
+    ```ruby
+    # bad
+    class Someclass
+      # some code
+    end
+
+    class Some_Class
+      # some code
+    end
+
+    class SomeXml
+      # some code
+    end
+
+    class XmlSomething
+      # some code
+    end
+
+    # good
+    class SomeClass
+      # some code
+    end
+
+    class SomeXML
+      # some code
+    end
+
+    class XMLSomething
+      # some code
+    end
+    ```
+
+-   Use `snake_case` for naming files, e.g. `hello_world.rb`.
+    文件名，用下划线分隔。（我似乎更喜欢用 dash，hyphen。）
+
+    Use `snake_case` for naming directories, e.g.
+    `lib/hello_world/hello_world.rb`.
+
+    Aim to have just a single class/module per source file. Name the file name
+    as the class/module, but replacing CamelCase with snake_case.
+
+-   Use `SCREAMING_SNAKE_CASE` for other constants.
+
+    ```ruby
+    # bad
+    SomeConst = 5
+
+    # good
+    SOME_CONST = 5
+    ```
+
+    这个 STDOUT 不也是么。
+
+-   The names of predicate methods (methods that return a boolean value) should
+    end in a question mark.  (i.e. `Array#empty?`). Methods that don't return a
+    boolean, shouldn't end in a question mark.
+
+    predict 谓词，这个 method 后面加上 ?，更清晰。
+
+-   Avoid prefixing predicate methods with the auxiliary verbs such as `is`,
+    `does`, or `can`.  These words are redundant and inconsistent with the
+    style of boolean methods in the Ruby core library, such as `empty?` and
+    `include?`.
+    既然后面有了 ？，前面就不要什么“is_”，“has_” 啥的了。
+
+    ```ruby
+    # bad
+    class Person
+      def is_tall?
+        true
+      end
+
+      def can_play_basketball?
+        false
+      end
+
+      def does_like_candy?
+        true
+      end
+    end
+
+    # good
+    class Person
+      def tall?
+        true
+      end
+
+      def basketball_player?
+        false
+      end
+
+      def likes_candy?
+        true
+      end
+    end
+    ```
+
+-   The names of potentially *dangerous* methods (i.e. methods that modify
+    `self` or the arguments, `exit!` (doesn't run the finalizers like `exit`
+    does), etc.) should end with an exclamation mark if there exists a safe
+    version of that *dangerous* method.
+    如果有两个版本，一个不安全的 inplace，一个安全的，不安全的那个后面加上“！”。
+    这个其实……还好啦。是个人都会这么写得。
+
+    ```ruby
+    # bad - there is no matching 'safe' method
+    class Person
+      def update!
+      end
+    end
+
+    # good
+    class Person
+      def update
+      end
+    end
+
+    # good
+    class Person
+      def update!
+      end
+
+      def update
+      end
+    end
+    ```
+
+-   Define the non-bang (safe) method in terms of the bang (dangerous) one if possible.
+    能搞一个非 intrusive 的安全的 non-bang 的 method，就整一个。
+
+    ```ruby
+    class Array
+      def flatten_once!
+        res = []
+
+        each do |e|
+          [*e].each { |f| res << f }
+        end
+
+        replace(res)
+      end
+
+      def flatten_once
+        dup.flatten_once!
+      end
+    end
+    ```
+
+-   When defining binary operators, name the parameter `other`(`<<` and `[]` are
+    exceptions to the rule, since their semantics are different).
+    这个……就是说定义二元操作符的时候，参数要用 other……这个也太细致了。
+    当然这个单词推荐得还不错。
+
+    ```ruby
+    def +(other)
       # body omitted
     end
+    ```
 
-    # Also possible and convenient when you
-    # have to define many class methods.
-    class << self
-      def first_method
+## Comments
+
+>   Good code is its own best documentation. As you're about to add a
+>   comment, ask yourself, "How can I improve the code so that this
+>   comment isn't needed?" Improve the code and then document it to make
+>   it even clearer.
+>
+>   -- Steve McConnell
+
+-   Write self-documenting code and ignore the rest of this section. Seriously!
+    代码写得好，注释都可以不要。
+
+-   Write comments in English.
+    中文注释要不得！（不要学我做笔记用中文）
+
+    外，扯个淡，我之所以用中文做代码笔记，是因为中文和英文有天然的隔离性，
+    很容易从视觉上区分。这样我就能快速地看到自己的笔记，而不是傻傻找半天，
+    不知道自己地笔记在哪。
+
+-   Use one space between the leading `#` character of the comment and the text
+    of the comment.
+
+-   Comments longer than a word are capitalized and use punctuation. Use
+    [one space](https://en.wikipedia.org/wiki/Sentence_spacing) after periods.
+    哈哈，这是作者吐槽，如果注释超过一个单词，特么这就是要给英文句子，
+    要遵守英文文法。标点符号要用对啊！
+
+-   Avoid superfluous comments.
+    这种注释写来干嘛啊……把代码翻译一遍，不叫注释。（当然，如果你不懂这个用法，
+    这就是笔记，而不是注释，是可以接受的。（我经常干这样的事。））
+
+    ```ruby
+    # bad
+    counter += 1 # Increments counter by one.
+    ```
+
+-   Keep existing comments up-to-date. An outdated comment is worse than no
+    comment at all.
+    这个其实……当然，不要代码改了注释不更新，反而误导看客。
+
+>   Good code is like a good joke: it needs no explanation.
+>   &mdash; old programmers maxim, through [Russ Olsen](http://eloquentruby.com/blog/2011/03/07/good-code-and-good-jokes/)
+
+-   Avoid writing comments to explain bad code. Refactor the code to make it
+    self-explanatory. ("Do or do not&mdash;there is no try." Yoda)
+
+### Comment Annotations
+
+-   Annotations should usually be written on the line immediately above the
+    relevant code.
+
+-   The annotation keyword is followed by a colon and a space, then a note
+    describing the problem.
+
+-   If multiple lines are required to describe the problem, subsequent lines
+    should be indented three spaces after the `#` (one general plus two for
+    indentation purpose).
+    这个太对了！我都是这样的！4 总是一个不错地 indent 尺度。
+
+    ```ruby
+    def bar
+      # FIXME: This has crashed occasionally since v3.2.1. It may
+      #   be related to the BarBazUtil upgrade.
+      baz(:quux)
+    end
+    ```
+
+-   In cases where the problem is so obvious that any documentation would be
+    redundant, annotations may be left at the end of the offending line with no
+    note. This usage should be the exception and not the rule.
+
+    ```ruby
+    def bar
+      sleep 100 # OPTIMIZE
+    end
+    ```
+
+-   TODO, OPTIMIZE, REVIEW, FIXME, 这些常用的标签，用起来。用对。
+
+    Use `TODO` to note missing features or functionality that should be added
+    at a later date.
+
+    Use `FIXME` to note broken code that needs to be fixed.
+
+    Use `OPTIMIZE` to note slow or inefficient code that may cause performance
+    problems.
+
+    Use `HACK` to note code smells where questionable coding practices were used
+    and should be refactored away.
+
+    Use `REVIEW` to note anything that should be looked at to confirm it is
+    working as intended. For example: `REVIEW: Are we sure this is how the client
+    does X currently?`
+
+    Use other custom annotation keywords if it feels appropriate, but be sure
+    to document them in your project's `README` or similar.
+
+### Magic Comments
+
+-   Place magic comments above all code and documentation. Magic comments
+    should only go below shebangs if they are needed in your source file.
+
+    magic comments 有点像配置说明啥的。如果对一个 Class 进行整体地功能性描述。
+    按照英文文法排版。
+
+    ```ruby
+    # good
+    # frozen_string_literal: true
+    # Some documentation about Person
+    class Person
+    end
+
+    # bad
+    # Some documentation about Person
+    # frozen_string_literal: true
+    class Person
+    end
+    ```
+
+    ```ruby
+    # good
+    #!/usr/bin/env ruby
+    # frozen_string_literal: true
+    App.parse(ARGV)
+
+    # bad
+    # frozen_string_literal: true
+    #!/usr/bin/env ruby
+    App.parse(ARGV)
+    ```
+
+-   Use one magic comment per line if you need multiple.
+
+    ```ruby
+    # good
+    # frozen_string_literal: true
+    # encoding: ascii-8bit
+
+    # bad
+    # -*- frozen_string_literal: true; encoding: ascii-8bit -*-
+    ```
+
+-   Separate magic comments from code and documentation with a blank line.
+
+    ```ruby
+    # good
+    # frozen_string_literal: true
+
+    # Some documentation for Person
+    class Person
+      # Some code
+    end
+
+    # bad
+    # frozen_string_literal: true
+    # Some documentation for Person
+    class Person
+      # Some code
+    end
+    ```
+
+    哦……好吧。
+
+## Classes & Modules
+
+-   Use a consistent structure in your class definitions.
+    自己要守自己的规矩啊！（守规矩是节约体力的事，因为你不要思考下次怎么弄，“按照规矩！”就好。）
+
+    ```ruby
+    class Person
+      # extend and include go first
+      extend SomeModule
+      include AnotherModule
+
+      # inner classes
+      CustomError = Class.new(StandardError)
+
+      # constants are next
+      SOME_CONSTANT = 20
+
+      # afterwards we have attribute macros
+      attr_reader :name
+
+      # followed by other macros (if any)
+      validates :name
+
+      # public class methods are next in line
+      def self.some_method
+      end
+
+      # initialization goes between class methods and other instance methods
+      def initialize
+      end
+
+      # followed by other public instance methods
+      def some_method
+      end
+
+      # protected and private methods are grouped near the end
+      protected
+
+      def some_protected_method
+      end
+
+      private
+
+      def some_private_method
+      end
+    end
+    ```
+
+-   Split multiple mixins into separate statements.
+    如何引入别的代码？mixins 是这个意思啊……
+
+    ```ruby
+    # bad
+    class Person
+      include Foo, Bar
+    end
+
+    # good
+    class Person
+      # multiple mixins go in separate statements
+      include Foo
+      include Bar
+    end
+    ```
+
+-   Don't nest multi-line classes within classes. Try to have such nested
+    classes each in their own file in a folder named like the containing class.
+    这个其实说的是文件结构或者代码组织。
+
+    ```ruby
+    # bad
+
+    # foo.rb
+    class Foo
+      class Bar
+        # 30 methods inside
+      end
+
+      class Car
+        # 20 methods inside
+      end
+
+      # 30 methods inside
+    end
+
+    # good
+
+    # foo.rb
+    class Foo
+      # 30 methods inside
+    end
+
+    # foo/bar.rb
+    class Foo
+      class Bar
+        # 30 methods inside
+      end
+    end
+
+    # foo/car.rb
+    class Foo
+      class Car
+        # 20 methods inside
+      end
+    end
+    ```
+
+-   Prefer modules to classes with only class methods. Classes should be used
+    only when it makes sense to create instances out of them.
+    这个是程序逻辑上的东西，和 Ruby 无关。Modules 是一些 functions，
+    Class 是面向对象的一些东西。
+
+    ```ruby
+    # bad
+    class SomeClass
+      def self.some_method
         # body omitted
       end
 
-      def second_method_etc
+      def self.some_other_method
         # body omitted
       end
     end
-  end
-  ```
 
-* <a name="alias-method-lexically"></a>
-  Prefer `alias` when aliasing methods in lexical class scope as the
-  resolution of `self` in this context is also lexical, and it communicates
-  clearly to the user that the indirection of your alias will not be altered
-  at runtime or by any subclass unless made explicit.
-<sup>[[link](#alias-method-lexically)]</sup>
+    # good
+    module SomeModule
+      module_function
 
-  ```ruby
-  class Westerner
-    def first_name
-      @names.first
+      def some_method
+        # body omitted
+      end
+
+      def some_other_method
+        # body omitted
+      end
+    end
+    ```
+
+-   Favor the use of `module_function` over `extend self` when you want to turn
+    a module's instance methods into class methods.
+
+    ```ruby
+    # bad
+    module Utilities
+      extend self
+
+      def parse_something(string)
+        # do stuff here
+      end
+
+      def other_utility_method(number, string)
+        # do some more stuff
+      end
     end
 
-    alias given_name first_name
-  end
-  ```
+    # good
+    module Utilities
+      module_function
 
-  Since `alias`, like `def`, is a keyword, prefer bareword arguments over
-  symbols or strings. In other words, do `alias foo bar`, not
-  `alias :foo :bar`.
+      def parse_something(string)
+        # do stuff here
+      end
 
-  Also be aware of how Ruby handles aliases and inheritance: an alias
-  references the method that was resolved at the time the alias was defined;
-  it is not dispatched dynamically.
-
-  ```ruby
-  class Fugitive < Westerner
-    def first_name
-      'Nobody'
+      def other_utility_method(number, string)
+        # do some more stuff
+      end
     end
-  end
-  ```
+    ```
 
-  In this example, `Fugitive#given_name` would still call the original
-  `Westerner#first_name` method, not `Fugitive#first_name`. To override the
-  behavior of `Fugitive#given_name` as well, you'd have to redefine it in the
-  derived class.
+-   When designing class hierarchies make sure that they conform to the [Liskov Substitution Principle](https://en.wikipedia.org/wiki/Liskov_substitution_principle).
 
-  ```ruby
-  class Fugitive < Westerner
-    def first_name
-      'Nobody'
+-   Try to make your classes as
+    [SOLID](https://en.wikipedia.org/wiki/SOLID_\(object-oriented_design\)) as
+    possible.
+
+-   Always supply a proper `to_s` method for classes that represent domain
+    objects.
+    记得定义一个 to_s 方法。
+
+    ```ruby
+    class Person
+      attr_reader :first_name, :last_name
+
+      def initialize(first_name, last_name)
+        @first_name = first_name
+        @last_name = last_name
+      end
+
+      def to_s
+        "#{@first_name} #{@last_name}"
+      end
+    end
+    ```
+
+-   Use the `attr` family of functions to define trivial accessors or mutators.
+    这特么不是 Ruby 风格，这是 Ruby 经验谈了。
+
+    ```ruby
+    # bad
+    class Person
+      def initialize(first_name, last_name)
+        @first_name = first_name
+        @last_name = last_name
+      end
+
+      def first_name
+        @first_name
+      end
+
+      def last_name
+        @last_name
+      end
     end
 
-    alias given_name first_name
-  end
-  ```
+    # good
+    class Person
+      attr_reader :first_name, :last_name
+
+      def initialize(first_name, last_name)
+        @first_name = first_name
+        @last_name = last_name
+      end
+    end
+    ```
+
+-   For accessors and mutators, avoid prefixing method names with
+    `get_` and `set_`.  It is a Ruby convention to use attribute names for
+    accessors (readers) and `attr_name=` for mutators (writers).
+
+    ```ruby
+    # bad
+    class Person
+      def get_name
+        "#{@first_name} #{@last_name}"
+      end
+
+      def set_name(name)
+        @first_name, @last_name = name.split(' ')
+      end
+    end
+
+    # good
+    class Person
+      def name
+        "#{@first_name} #{@last_name}"
+      end
+
+      def name=(name)
+        @first_name, @last_name = name.split(' ')
+      end
+    end
+    ```
+
+-   Avoid the use of `attr`. Use `attr_reader` and `attr_accessor` instead.
+    不用 attr（这个语法太蛋疼了），用 attr_reader、attr_writer 和 attr_accessor。
+
+    ```ruby
+    # bad - creates a single attribute accessor (deprecated in Ruby 1.9)
+    attr :something, true
+    attr :one, :two, :three # behaves as attr_reader
+
+    # good
+    attr_accessor :something
+    attr_reader :one, :two, :three
+    ```
+
+-   Consider using `Struct.new`, which defines the trivial accessors,
+    constructor and comparison operators for you.
+    如果只是一些变量的 get/set，用 Struct.new 似乎更简洁。
+
+    ```ruby
+    # good
+    class Person
+      attr_accessor :first_name, :last_name
+
+      def initialize(first_name, last_name)
+        @first_name = first_name
+        @last_name = last_name
+      end
+    end
+
+    # better
+    Person = Struct.new(:first_name, :last_name) do
+    end
+    ```
+
+-   Don't extend an instance initialized by `Struct.new`. Extending it introduces
+    a superfluous class level and may also introduce weird errors if the file is
+    required multiple times.
+
+    ```ruby
+    # bad
+    class Person < Struct.new(:first_name, :last_name)
+    end
+
+    # good
+    Person = Struct.new(:first_name, :last_name)
+    ```
+
+-   Consider adding factory methods to provide additional sensible ways to
+    create instances of a particular class.
+
+    ```ruby
+    class Person
+      def self.create(options_hash)
+        # body omitted
+      end
+    end
+    ```
+
+-   Prefer [duck-typing](https://en.wikipedia.org/wiki/Duck_typing) over inheritance.
+    其实就是说不要掉 oop 的书袋，用 duck-tpying，表现层符合预期就好。不要死活
+    往继承上套。
+
+    ```ruby
+    # bad
+    class Animal
+      # abstract method
+      def speak
+      end
+    end
+
+    # extend superclass
+    class Duck < Animal
+      def speak
+        puts 'Quack! Quack'
+      end
+    end
+
+    # extend superclass
+    class Dog < Animal
+      def speak
+        puts 'Bau! Bau!'
+      end
+    end
+
+    # good
+    class Duck
+      def speak
+        puts 'Quack! Quack'
+      end
+    end
+
+    class Dog
+      def speak
+        puts 'Bau! Bau!'
+      end
+    end
+    ```
+
+-   Avoid the usage of class (`@@`) variables due to their "nasty" behavior in
+    inheritance.
+    这个有点蛋疼啊……是共享了的 refenrece 嘛？
+
+    ```ruby
+    class Parent
+      @@class_var = 'parent'
+
+      def self.print_class_var
+        puts @@class_var
+      end
+    end
+
+    class Child < Parent
+      @@class_var = 'child'
+    end
+
+    Parent.print_class_var # => will print 'child'
+    ```
+
+    As you can see all the classes in a class hierarchy actually share one
+    class variable. Class instance variables should usually be preferred over
+    class variables.
+
+-   Assign proper visibility levels to methods (`private`, `protected`) in
+    accordance with their intended usage. Don't go off leaving everything
+    `public` (which is the default). After all we're coding in *Ruby* now, not
+    in *Python*.
+    这个 Ruby 啊……默认是 public 的，所以不要搞一堆画蛇添足的东西……
+
+-   Indent the `public`, `protected`, and `private` methods as much as the method
+    definitions they apply to. Leave one blank line above the visibility
+    modifier and one blank line below in order to emphasize that it applies to
+    all methods below it.
+    分隔开……这个和 C++ 类似了。
+
+    ```ruby
+    class SomeClass
+      def public_method
+        # some code
+      end
+
+      private
+
+      def private_method
+        # some code
+      end
+
+      def another_private_method
+        # some code
+      end
+    end
+    ```
+
+-   Use `def self.method` to define class methods. This makes the code
+    easier to refactor since the class name is not repeated.
+    定义 self.method，是 class method。
+
+    ```ruby
+    class TestClass
+      # bad
+      def TestClass.some_method
+        # body omitted
+      end
+
+      # good
+      def self.some_other_method
+        # body omitted
+      end
+
+      # Also possible and convenient when you
+      # have to define many class methods.
+      class << self
+        def first_method
+          # body omitted
+        end
+
+        def second_method_etc
+          # body omitted
+        end
+      end
+    end
+    ```
+
+-   Prefer `alias` when aliasing methods in lexical class scope as the
+    resolution of `self` in this context is also lexical, and it communicates
+    clearly to the user that the indirection of your alias will not be altered
+    at runtime or by any subclass unless made explicit.
+
+    ```ruby
+    class Westerner
+      def first_name
+        @names.first
+      end
+
+      alias given_name first_name
+    end
+    ```
+
+    Since `alias`, like `def`, is a keyword, prefer bareword arguments over
+    symbols or strings. In other words, do `alias foo bar`, not `alias :foo
+    :bar`.
+
+    Also be aware of how Ruby handles aliases and inheritance: an alias
+    references the method that was resolved at the time the alias was defined;
+    it is not dispatched dynamically.
+
+    ```ruby
+    class Fugitive < Westerner
+      def first_name
+        'Nobody'
+      end
+    end
+    ```
+
+    In this example, `Fugitive#given_name` would still call the original
+    `Westerner#first_name` method, not `Fugitive#first_name`. To override the
+    behavior of `Fugitive#given_name` as well, you'd have to redefine it in the
+    derived class.
+
+    ```ruby
+    class Fugitive < Westerner
+      def first_name
+        'Nobody'
+      end
+
+      alias given_name first_name
+    end
+    ```
 
 * <a name="alias-method"></a>
   Always use `alias_method` when aliasing methods of modules, classes, or

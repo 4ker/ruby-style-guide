@@ -10,3 +10,6 @@ md2html.jar:
 	curl http://whudoc.qiniudn.com/java/md2html/md2html.jar > md2html.jar
 clean:
 	rm -rf docs/*
+e: edit
+edit:	
+	gvim README.md
